@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simplified Application Diagram — DIY 5.1 Amp (Dual-MCU)</title>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <style>
+    body { background: #0a0e17; color: #e2e8f0; font-family: Arial, Helvetica, sans-serif; }
+    .page-wrap { max-width: 1280px; margin: 0 auto; padding: 12px; }
+    .diagram-card { background: #111827; border: 1px solid #374151; border-radius: 6px; padding: 8px; }
+    #diagram { width: 100%; height: auto; display: block; }
+    .w3-table td, .w3-table th { color: #cbd5e1; font-size: 13px; }
+    .w3-table th { background: #1f2937; color: #e2e8f0; }
+    .legend-dot { display: inline-block; width: 12px; height: 12px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
+    .note-box { background: #0f172a; border: 1px solid #334155; border-radius: 4px; padding: 8px 12px; font-size: 13px; line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <div class="page-wrap">
+    <div class="w3-center" style="margin: 6px 0 12px 0;">
+      <div style="font-size: 26px; font-weight: 300;">Simplified Application Diagram</div>
+      <div style="font-size: 13px; color: #94a3b8;">DIY 5.1 Amp &bull; ESP32-S3-Pico (master) + ESP32-WROOM-32 (slave) &bull; 3&times; PCM5102A &bull; 3&times; XH-M562 (TPA3116D2)</div>
+    </div>
+
+    <div class="diagram-card">
+      <svg id="diagram" viewBox="0 0 1200 680" role="img" aria-label="Simplified block diagram of the dual-MCU 5.1 amplifier"></svg>
+    </div>
+
+    <div id="legend" class="w3-margin-top" style="font-size: 13px;"></div>
+
+    <div class="w3-margin-top" style="font-size: 15px; font-weight: bold; color: #e2e8f0;">Connection list</div>
+    <div class="w3-responsive">
+      <table class="w3-table w3-bordered" id="conn-table"></table>
+    </div>
+
+    <div class="note-box w3-margin-top" id="notes"></div>
+  </div>
+
+<script>
+// ===========================================================================
+// DATA (2D arrays) - edit here, the page is drawn from these arrays only.
+// ===========================================================================
+
+// Block: [x, y, w, h, stroke, fill, title, line1, line2, line3]
+var BLOCKS = [
+  [20,  30,  150,  44, '#94a3b8', '#1e293b', 'AUX jack / VHM-314 BT', 'line-level analog in', '', ''],
+  [20,  100, 150,  58, '#eab308', '#422006', 'PCM1808 ADC', 'I2S DIN out', 'SCK <- MCLK', ''],
+  [20,  290, 150,  80, '#38bdf8', '#082f49', '4.3B Touch HMI', 'volume / mute / EQ /', 'delay sliders', 'ESP-NOW radio'],
+  [260, 90,  180, 220, '#8b5cf6', '#1e1b4b', 'ESP32-S3-Pico (MASTER)', 'I2S0 + I2S1, 32-bit float DSP', 'BCK 15 | LRCK 16 | MCLK 2', 'DIN 4 | DOUT1 7 | DOUT2 6'],
+  [260, 400, 180, 140, '#e879f9', '#3b0764', 'ESP32-WROOM-32 (SLAVE)', 'I2S slave, own DSP', 'D26 BCK in | D25 LRCK in', 'D35 DIN in | D27 DOUT'],
+  [540, 95,  140,  70, '#10b981', '#052e16', 'PCM5102A DAC #1', 'Front L/R', '', ''],
+  [540, 215, 140,  70, '#10b981', '#052e16', 'PCM5102A DAC #3', 'Center + Sub', '', ''],
+  [540, 445, 140,  70, '#10b981', '#052e16', 'PCM5102A DAC #2', 'Surround L/R', '', ''],
+  [770, 95,  150,  70, '#22c55e', '#14532d', 'Amp #1 XH-M562', 'TPA3116D2 2x50W', '', ''],
+  [770, 215, 150,  70, '#22c55e', '#14532d', 'Amp #3 XH-M562', 'TPA3116D2 2x50W', '', ''],
+  [770, 445, 150,  70, '#22c55e', '#14532d', 'Amp #2 XH-M562', 'TPA3116D2 2x50W', '', ''],
+  [990, 90,  170,  32, '#f8fafc', '#1e293b', 'Front Left', '', '', ''],
+  [990, 138, 170,  32, '#f8fafc', '#1e293b', 'Front Right', '', '', ''],
+  [990, 210, 170,  32, '#f8fafc', '#1e293b', 'Center', '', '', ''],
+  [990, 258, 170,  32, '#f8fafc', '#1e293b', 'Subwoofer', '', '', ''],
+  [990, 440, 170,  32, '#f8fafc', '#1e293b', 'Surround Left', '', '', ''],
+  [990, 488, 170,  32, '#f8fafc', '#1e293b', 'Surround Right', '', '', ''],
+  // Piezo Elements directly driven from Pico SDM bridge
+  [540, 560, 200,  75, '#f59e0b', '#451a03', 'PIEZO DISCS (×2)', 'Push-Pull Bridge Drive', '220Ω Resistor Protection', 'Cymbal & Chime Synth (1MHz SDM)'],
+  [990, 575, 170,  45, '#f59e0b', '#1e293b', 'Dual Piezo Transducers', 'Direct GPIO (No Amp needed)', '', '']
+];
+
+// Line: [points, colour, width, dashed(0/1), arrow(0/1)]
+var LINES = [
+  // analog source -> ADC
+  ['95,74 95,100', '#94a3b8', 2.5, 0, 1],
+  // ADC DIN bus -> Pico and Slave
+  ['170,129 200,129', '#eab308', 2.5, 0, 0],
+  ['200,129 200,455', '#eab308', 2.5, 0, 0],
+  ['200,129 260,129', '#eab308', 2.5, 0, 1],
+  ['200,455 260,455', '#eab308', 2.5, 0, 1],
+  // MCLK Pico -> ADC
+  ['260,185 95,185 95,158', '#f97316', 2, 0, 1],
+  // ESP-NOW HMI -> Pico and Slave (dashed radio)
+  ['170,330 235,330', '#38bdf8', 2, 1, 0],
+  ['235,255 235,480', '#38bdf8', 2, 1, 0],
+  ['235,255 260,255', '#38bdf8', 2, 1, 1],
+  ['235,480 260,480', '#38bdf8', 2, 1, 1],
+  // Shared clock bus BCK + LRCK
+  ['440,205 480,205', '#06b6d4', 4, 0, 0],
+  ['480,105 480,465', '#06b6d4', 4, 0, 0],
+  ['480,105 540,105', '#06b6d4', 4, 0, 1],
+  ['480,225 540,225', '#06b6d4', 4, 0, 1],
+  ['480,465 540,465', '#06b6d4', 4, 0, 1],
+  ['480,420 440,420', '#06b6d4', 4, 0, 1],
+  // I2S data lines
+  ['440,135 540,135', '#a855f7', 2.5, 0, 1],
+  ['440,255 540,255', '#a855f7', 2.5, 0, 1],
+  ['440,495 540,495', '#e879f9', 2.5, 0, 1],
+  // DAC -> amp (analog L/R)
+  ['680,130 770,130', '#10b981', 3, 0, 1],
+  ['680,250 770,250', '#10b981', 3, 0, 1],
+  ['680,480 770,480', '#10b981', 3, 0, 1],
+  // amp -> speakers
+  ['920,115 990,106', '#f8fafc', 2, 0, 1],
+  ['920,145 990,154', '#f8fafc', 2, 0, 1],
+  ['920,235 990,226', '#f8fafc', 2, 0, 1],
+  ['920,265 990,274', '#f8fafc', 2, 0, 1],
+  ['920,465 990,456', '#f8fafc', 2, 0, 1],
+  ['920,495 990,504', '#f8fafc', 2, 0, 1],
+  // Piezo direct bridge lines from Pico
+  ['440,290 500,290 500,595 540,595', '#f59e0b', 2.5, 0, 1],
+  ['740,595 990,595', '#f59e0b', 2.5, 0, 1]
+];
+
+// Text: [x, y, text, colour, size, anchor]
+var TEXTS = [
+  [200, 122, 'I2S DIN', '#eab308', 11, 'middle'],
+  [128, 178, 'MCLK', '#f97316', 11, 'middle'],
+  [488, 80, 'BCK + LRCK (shared)', '#06b6d4', 11, 'start'],
+  [492, 126, 'DOUT1', '#a855f7', 10, 'start'],
+  [492, 246, 'DOUT2', '#a855f7', 10, 'start'],
+  [446, 488, 'DOUT (D27)', '#e879f9', 10, 'start'],
+  [725, 122, 'analog L/R', '#10b981', 11, 'middle'],
+  [725, 242, 'analog L/R', '#10b981', 11, 'middle'],
+  [725, 472, 'analog L/R', '#10b981', 11, 'middle'],
+  [610, 182, 'on-board filter', '#64748b', 10, 'middle'],
+  [610, 302, 'on-board filter', '#64748b', 10, 'middle'],
+  [610, 532, 'on-board filter', '#64748b', 10, 'middle'],
+  [435, 595, 'GPIO 17 & 18 (220Ω bridge)', '#f59e0b', 10, 'end'],
+  [865, 582, 'Acoustic / Cymbal Audio', '#f59e0b', 10, 'middle'],
+  [20, 665, 'Common GND on all boards. 24 V PSU to amps; 5 V buck to Pico, Slave, DACs, ADC.', '#94a3b8', 11, 'start']
+];
+
+// Legend: [colour, label]
+var LEGEND = [
+  ['#06b6d4', 'BCK + LRCK clock bus (Pico master)'],
+  ['#a855f7', 'I2S data from Pico'],
+  ['#e879f9', 'I2S data from Slave'],
+  ['#eab308', 'ADC data in'],
+  ['#38bdf8', 'ESP-NOW radio (dashed)'],
+  ['#10b981', 'Analog audio to amps'],
+  ['#f59e0b', 'Direct Piezo Bridge Drive (GPIO)']
+];
+
+// Connection table: [Signal, From, To, Note]
+var CONNECTIONS = [
+  ['Signal', 'From', 'To', 'Note'],
+  ['BCK', 'Pico GPIO 15', 'DAC #1, #2, #3, PCM1808, Slave D26', 'Shared clock; keep wires short'],
+  ['LRCK', 'Pico GPIO 16', 'DAC #1, #2, #3, PCM1808, Slave D25', 'Shared clock; keep wires short'],
+  ['MCLK', 'Pico GPIO 2', 'PCM1808 SCK', 'Not GPIO 0 (strapping pin)'],
+  ['ADC data', 'PCM1808 OUT', 'Pico GPIO 4 + Slave D35', 'Parallel tap, one driver only'],
+  ['DOUT1', 'Pico GPIO 7', 'DAC #1 DIN', 'Front L/R, Amp #1'],
+  ['DOUT2', 'Pico GPIO 6', 'DAC #3 DIN', 'Center + Sub, Amp #3'],
+  ['DOUT (slave)', 'Slave D27', 'DAC #2 DIN', 'Surround L/R, Amp #2'],
+  ['Piezo Drive', 'Pico GPIO 17 & 18', '2× Piezo Discs (via 220Ω)', 'Differential bridge synth/chime output (1MHz SDM, No Amp needed)'],
+  ['UI control', '4.3B Touch', 'Pico + Slave', 'ESP-NOW radio, no wires']
+];
+
+// Notes
+var NOTES = [
+  'PCM5102A boards: solder SCK to GND (internal PLL), so no MCLK is needed on the DACs.',
+  'Slave pin picks (D26, D25, D35, D27) are proposed - verify against the board silkscreen.',
+  'Pico I2S1 must use the same BCK/LRCK as I2S0 (or jumper them back in) so all 3 DACs stay in sample sync.',
+  'Surround delay slider absorbs the small fixed latency of the Slave path - measure it with a click test.'
+];
+
+// ===========================================================================
+// RENDERING (DOM only, no HTML strings)
+// ===========================================================================
+var NS = 'http://www.w3.org/2000/svg';
+var svg = document.getElementById('diagram');
+
+function svgEl(name, attrs, parent) {
+  var e = document.createElementNS(NS, name);
+  Object.keys(attrs || {}).forEach(function (k) { e.setAttribute(k, attrs[k]); });
+  if (parent) { parent.appendChild(e); }
+  return e;
+}
+
+function htmlEl(name, props, parent) {
+  var e = document.createElement(name);
+  Object.keys(props || {}).forEach(function (k) {
+    if (k === 'text') { e.textContent = props[k]; } else if (k === 'style') { e.setAttribute('style', props[k]); } else { e.setAttribute(k, props[k]); }
+  });
+  if (parent) { parent.appendChild(e); }
+  return e;
+}
+
+function drawBackground() {
+  svgEl('rect', { x: 0, y: 0, width: 1200, height: 680, fill: '#0f172a', rx: 6 }, svg);
+}
+
+function drawMarkers(defs) {
+  var seen = {};
+  LINES.forEach(function (ln) {
+    var c = ln[1];
+    if (seen[c]) { return; }
+    seen[c] = true;
+    var m = svgEl('marker', { id: 'ar' + c.replace('#', ''), viewBox: '0 0 10 10', refX: 9, refY: 5, markerUnits: 'userSpaceOnUse', markerWidth: 11, markerHeight: 11, orient: 'auto-start-reverse' }, defs);
+    svgEl('path', { d: 'M0,0 L10,5 L0,10 z', fill: c }, m);
+  });
+}
+
+function drawLines() {
+  LINES.forEach(function (ln) {
+    var a = { points: ln[0], fill: 'none', stroke: ln[1], 'stroke-width': ln[2], 'stroke-linejoin': 'round' };
+    if (ln[3]) { a['stroke-dasharray'] = '6 4'; }
+    if (ln[4]) { a['marker-end'] = 'url(#ar' + ln[1].replace('#', '') + ')'; }
+    svgEl('polyline', a, svg);
+  });
+}
+
+function drawBlocks() {
+  BLOCKS.forEach(function (b) {
+    var x = b[0], y = b[1], w = b[2], h = b[3];
+    svgEl('rect', { x: x, y: y, width: w, height: h, fill: b[5], stroke: b[4], 'stroke-width': 2, rx: 4 }, svg);
+    var hasSub = b[7] !== '' || b[8] !== '' || b[9] !== '';
+    var ty = hasSub ? y + 18 : y + h / 2 + 5;
+    var t = svgEl('text', { x: x + w / 2, y: ty, 'text-anchor': 'middle', 'font-size': 13, 'font-weight': 'bold', fill: b[4], 'font-family': 'Arial, sans-serif' }, svg);
+    t.textContent = b[6];
+    for (var i = 0; i < 3; i++) {
+      var s = b[7 + i];
+      if (s === '') { continue; }
+      var st = svgEl('text', { x: x + w / 2, y: y + 36 + i * 15, 'text-anchor': 'middle', 'font-size': 11, fill: '#cbd5e1', 'font-family': 'Arial, sans-serif' }, svg);
+      st.textContent = s;
+    }
+  });
+}
+
+function drawTexts() {
+  TEXTS.forEach(function (t) {
+    var e = svgEl('text', { x: t[0], y: t[1], fill: t[3], 'font-size': t[4], 'text-anchor': t[5], 'font-family': 'Arial, sans-serif' }, svg);
+    e.textContent = t[2];
+  });
+}
+
+function drawLegend() {
+  var box = document.getElementById('legend');
+  LEGEND.forEach(function (l) {
+    var item = htmlEl('span', { style: 'margin-right: 18px; display: inline-block;' }, box);
+    htmlEl('span', { 'class': 'legend-dot', style: 'background:' + l[0] }, item);
+    htmlEl('span', { text: l[1] }, item);
+  });
+}
+
+function drawTable() {
+  var table = document.getElementById('conn-table');
+  CONNECTIONS.forEach(function (row, i) {
+    var tr = htmlEl('tr', {}, table);
+    row.forEach(function (cell) {
+      htmlEl(i === 0 ? 'th' : 'td', { text: cell }, tr);
+    });
+  });
+}
+
+function drawNotes() {
+  var box = document.getElementById('notes');
+  NOTES.forEach(function (n) {
+    htmlEl('div', { text: '\u2022 ' + n }, box);
+  });
+}
+
+(function init() {
+  var defs = svgEl('defs', {}, svg);
+  drawBackground();
+  drawMarkers(defs);
+  drawLines();
+  drawBlocks();
+  drawTexts();
+  drawLegend();
+  drawTable();
+  drawNotes();
+})();
+</script>
+</body>
+</html>

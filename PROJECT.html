@@ -1,0 +1,2050 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DIY 5.1 Analog Amplifier — Copper Chimney V2 Project Spec & Inventory</title>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --bg-card: rgba(15, 23, 42, 0.88);
+      --border-color: #334155;
+      --copper: #d97706;
+      --copper-glow: #f59e0b;
+      --cyan: #38bdf8;
+      --green: #22c55e;
+      --green-glow: #4ade80;
+      --red: #ef4444;
+      --amber: #f59e0b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: radial-gradient(circle at top center, #1e293b 0%, #090d16 100%);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text-main);
+      line-height: 1.6;
+    }
+
+    a {
+      color: var(--cyan);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    a:hover {
+      color: #7dd3fc;
+      text-decoration: underline;
+    }
+
+    .glass-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 22px;
+      margin-bottom: 24px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--copper-glow);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-bottom: 2px solid #b45309;
+      padding-bottom: 8px;
+      margin-top: 0;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .badge-copper {
+      background: rgba(217, 119, 6, 0.2);
+      border: 1px solid var(--copper);
+      color: #fcd34d;
+    }
+
+    .badge-cyan {
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid var(--cyan);
+      color: #bae6fd;
+    }
+
+    .badge-green {
+      background: rgba(34, 197, 94, 0.2);
+      border: 1px solid var(--green);
+      color: #86efac;
+    }
+
+    .badge-amber {
+      background: rgba(245, 158, 11, 0.2);
+      border: 1px solid var(--amber);
+      color: #fde68a;
+    }
+
+    .badge-red {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid var(--red);
+      color: #fca5a5;
+    }
+
+    .badge-blue {
+      background: rgba(59, 130, 246, 0.2);
+      border: 1px solid #3b82f6;
+      color: #93c5fd;
+    }
+
+    .custom-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 20px 0;
+      font-size: 13px;
+    }
+
+    .custom-table th {
+      background: #1e293b;
+      color: #e2e8f0;
+      text-align: left;
+      padding: 10px 12px;
+      border: 1px solid #334155;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .custom-table td {
+      padding: 10px 12px;
+      border: 1px solid #334155;
+      color: #cbd5e1;
+      vertical-align: middle;
+    }
+
+    .custom-table tr:nth-child(even) {
+      background: rgba(30, 41, 59, 0.35);
+    }
+
+    .custom-table tr:hover {
+      background: rgba(56, 189, 248, 0.08);
+    }
+
+    .code-block {
+      background: #020617;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 12px;
+      color: #38bdf8;
+      overflow-x: auto;
+      line-height: 1.5;
+    }
+
+    .stat-box {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 14px;
+      text-align: center;
+      transition: transform 0.15s, border-color 0.15s;
+    }
+
+    .stat-box:hover {
+      border-color: #64748b;
+      transform: translateY(-2px);
+    }
+
+    .stat-val {
+      font-size: 22px;
+      font-weight: 800;
+      color: #f59e0b;
+    }
+
+    .stat-lbl {
+      font-size: 11px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 4px;
+    }
+
+    /* Sticky Top Header */
+    .top-nav {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(15, 23, 42, 0.96);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid #334155;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .nav-btn {
+      background: #1e293b;
+      color: #cbd5e1;
+      border: 1px solid #334155;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-decoration: none;
+    }
+
+    .nav-btn:hover {
+      background: #334155;
+      color: #fff;
+      border-color: #64748b;
+      text-decoration: none;
+    }
+
+    .nav-btn.primary {
+      background: linear-gradient(135deg, #d97706, #b45309);
+      border-color: #f59e0b;
+      color: #fff;
+    }
+
+    .nav-btn.cyan {
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      border-color: #38bdf8;
+      color: #fff;
+    }
+
+    .nav-btn.active {
+      background: #f59e0b;
+      color: #090d16;
+      border-color: #f59e0b;
+      font-weight: 700;
+    }
+
+    .checklist-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 10px;
+      font-size: 13px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      background: rgba(30, 41, 59, 0.25);
+    }
+
+    .checklist-item.done {
+      border-left: 3px solid var(--green);
+    }
+
+    .checklist-item.pending {
+      border-left: 3px solid var(--amber);
+    }
+
+    .checklist-item i {
+      margin-top: 3px;
+      font-size: 14px;
+    }
+
+    /* Thumbnails and modal */
+    .part-thumb {
+      width: 48px;
+      height: 48px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid #475569;
+      background: #0f172a;
+      cursor: pointer;
+      transition: transform 0.15s, border-color 0.15s;
+    }
+
+    .part-thumb:hover {
+      transform: scale(1.1);
+      border-color: var(--copper-glow);
+    }
+
+    .thumb-cell {
+      text-align: center;
+      width: 60px;
+    }
+
+    .spec-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #7dd3fc;
+      margin-top: 4px;
+    }
+
+    .spec-link:hover {
+      background: rgba(56, 189, 248, 0.25);
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .vendor-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: #38bdf8;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    /* Modal Styles */
+    .image-modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(3, 7, 18, 0.85);
+      backdrop-filter: blur(8px);
+    }
+
+    .modal-content-wrap {
+      position: relative;
+      background: #0f172a;
+      margin: 5% auto;
+      padding: 20px;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      max-width: 640px;
+      width: 90%;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+      text-align: center;
+    }
+
+    .modal-img {
+      max-width: 100%;
+      max-height: 480px;
+      object-fit: contain;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      background: #020617;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      font-size: 24px;
+      color: #94a3b8;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .modal-close:hover {
+      color: #fff;
+    }
+
+    .modal-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #f59e0b;
+      margin-top: 12px;
+      margin-bottom: 4px;
+    }
+
+    .modal-caption {
+      font-size: 13px;
+      color: #94a3b8;
+    }
+
+    /* Progress Bar */
+    .prog-bar-bg {
+      background: #1e293b;
+      border-radius: 999px;
+      height: 14px;
+      overflow: hidden;
+      border: 1px solid #334155;
+      margin: 10px 0;
+    }
+
+    .prog-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #22c55e, #10b981);
+      border-radius: 999px;
+      transition: width 0.4s ease;
+    }
+
+    @media print {
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+      }
+
+      .top-nav,
+      .no-print,
+      .filter-bar {
+        display: none !important;
+      }
+
+      .glass-card {
+        background: #ffffff !important;
+        border: 1px solid #cccccc !important;
+        box-shadow: none !important;
+        color: #000000 !important;
+        padding: 12px !important;
+        margin-bottom: 16px !important;
+      }
+
+      .custom-table th {
+        background: #f1f5f9 !important;
+        color: #000000 !important;
+        border: 1px solid #ccc !important;
+      }
+
+      .custom-table td {
+        color: #000000 !important;
+        border: 1px solid #ccc !important;
+      }
+
+      .code-block {
+        background: #f8fafc !important;
+        color: #000000 !important;
+        border-color: #cccccc !important;
+      }
+
+      .section-title {
+        color: #000000 !important;
+        border-bottom-color: #000000 !important;
+      }
+
+      .stat-box {
+        background: #f8fafc !important;
+        border: 1px solid #ccc !important;
+      }
+
+      .stat-val {
+        color: #000000 !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Top Sticky Navigation Bar -->
+  <header class="top-nav">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <i class="fa fa-cube w3-text-amber" style="font-size: 22px;"></i>
+      <span style="font-weight: 800; font-size: 16px; letter-spacing: 0.5px;">COPPER CHIMNEY V2</span>
+      <span class="badge badge-copper">5.1 Analog Amp</span>
+    </div>
+
+    <div class="nav-links">
+      <a href="TECHNICAL_EVALUATION.html" class="nav-btn primary" target="_blank">
+        <i class="fa fa-shield"></i> Technical Evaluation
+      </a>
+      <a href="CHASSIS_360_VIEWER.html" class="nav-btn cyan" target="_blank">
+        <i class="fa fa-repeat"></i> 360° 3D Studio
+      </a>
+      <a href="WIRING_DIAGRAM.html" class="nav-btn" target="_blank">
+        <i class="fa fa-sitemap"></i> Wiring Blueprint
+      </a>
+      <a href="CIRCUIT_DIAGRAM.html" class="nav-btn" target="_blank" style="border-color: #8b5cf6;">
+        <i class="fa fa-cogs w3-text-purple"></i> Circuit Schematic
+      </a>
+      <a href="QUALITY_MANAGEMENT_FMEA_CP.html" class="nav-btn" target="_blank" style="border-color: #f59e0b;">
+        <i class="fa fa-shield w3-text-amber"></i> FMEA & Quality Plan
+      </a>
+      <a href="ASSEMBLY_MANUAL.html" class="nav-btn" target="_blank" style="border-color: #10b981;">
+        <i class="fa fa-wrench w3-text-green"></i> Assembly Manual
+      </a>
+      <a href="#stock-overview" class="nav-btn">
+        <i class="fa fa-check-circle w3-text-green"></i> Stock Status
+      </a>
+      <a href="#bom" class="nav-btn">
+        <i class="fa fa-calculator"></i> BOM Tables
+      </a>
+      <a href="#mechanical" class="nav-btn">
+        <i class="fa fa-wrench"></i> Mechanical
+      </a>
+      <a href="#decisions" class="nav-btn">
+        <i class="fa fa-balance-scale"></i> Decisions
+      </a>
+      <button id="printBtn" class="nav-btn no-print">
+        <i class="fa fa-print"></i> Print / PDF
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="w3-container" style="max-width: 1320px; margin: 24px auto; padding: 0 16px;">
+
+    <!-- Hero Header Card -->
+    <div class="glass-card" style="border-top: 4px solid #f59e0b;">
+      <div class="w3-row-padding">
+        <div class="w3-col l8 m7">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+            <span class="badge badge-copper"><i class="fa fa-map-marker"></i> Pimpri / Chakan Prototype</span>
+            <span class="badge badge-cyan"><i class="fa fa-inr"></i> Total: ₹ 16,049 (₹ 11,251 in hand)</span>
+            <span class="badge badge-green"><i class="fa fa-lock"></i> Design Locked — Sourcing Phase</span>
+            <span class="badge badge-amber"><i class="fa fa-calendar"></i> Updated October 2026</span>
+          </div>
+          <h1 style="margin: 6px 0 10px 0; font-size: 28px; font-weight: 800; color: #ffffff;">
+            DIY 5.1 Analog Amplifier — Copper Chimney V2
+          </h1>
+          <p style="color: var(--text-muted); font-size: 14px; margin: 0 0 16px 0; max-width: 780px;">
+            A compact, fanless, audiophile 5.1 home-theater amplifier built in a 160mm aluminum cube. Combines a pure
+            analog signal path, ESP32 digital supervisory control, natural chimney thermosiphon cooling, and 360°
+            RF-transparent polycarbonate architecture.
+          </p>
+
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="CHASSIS_360_VIEWER.html" class="nav-btn cyan" target="_blank">
+              <i class="fa fa-cube"></i> Open 360° Turntable &amp; GIF Studio
+            </a>
+            <a href="WIRING_DIAGRAM.html" class="nav-btn" target="_blank">
+              <i class="fa fa-bolt"></i> View Wiring Blueprint
+            </a>
+            <a href="CIRCUIT_DIAGRAM.html" class="nav-btn" target="_blank">
+              <i class="fa fa-cogs"></i> Electronic Schematic
+            </a>
+            <a href="TECHNICAL_EVALUATION.html" class="nav-btn" target="_blank">
+              <i class="fa fa-bar-chart"></i> View Acoustic &amp; Thermal Data
+            </a>
+          </div>
+        </div>
+
+        <div class="w3-col l4 m5">
+          <div class="w3-row-padding" style="margin-top: 8px;">
+            <div class="w3-col s6" style="margin-bottom: 10px;">
+              <div class="stat-box">
+                <div class="stat-val">300W</div>
+                <div class="stat-lbl">Peak Capacity (6ch)</div>
+              </div>
+            </div>
+            <div class="w3-col s6" style="margin-bottom: 10px;">
+              <div class="stat-box">
+                <div class="stat-val">0 dB</div>
+                <div class="stat-lbl">Fan Noise (Fanless)</div>
+              </div>
+            </div>
+            <div class="w3-col s6">
+              <div class="stat-box">
+                <div class="stat-val">160mm</div>
+                <div class="stat-lbl">Cube Footprint</div>
+              </div>
+            </div>
+            <div class="w3-col s6">
+              <div class="stat-box">
+                <div class="stat-val" style="color: var(--green);">96%</div>
+                <div class="stat-lbl">Core Electronics In Hand</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STOCK & PROCUREMENT INTELLIGENCE DASHBOARD -->
+    <div id="stock-overview" class="glass-card" style="border-left: 4px solid var(--green);">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+        <h2 class="section-title" style="margin: 0; border: none; padding: 0;">
+          <i class="fa fa-cubes w3-text-green"></i> Stock &amp; Inventory Status Overview
+        </h2>
+        <span class="badge badge-green" style="font-size: 12px; padding: 5px 10px;">
+          <i class="fa fa-check-circle"></i> 28 Module &amp; Component Units On Hand (16 Items)
+        </span>
+      </div>
+
+      <div style="margin-top: 14px; margin-bottom: 16px;">
+        <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; color: #cbd5e1;">
+          <span>Electronics &amp; Wiring Readiness</span>
+          <span style="color: var(--green-glow);">100% Electronics Sourced / In Transit (HY510 Paste Ordered)</span>
+        </div>
+        <div class="prog-bar-bg">
+          <div class="prog-bar-fill" style="width: 100%;"></div>
+        </div>
+      </div>
+
+      <div class="w3-row-padding" style="margin-bottom: 8px;">
+        <div class="w3-col l3 m6 s12 w3-margin-bottom">
+          <div class="stat-box" style="border-left: 3px solid var(--green);">
+            <div class="stat-val" style="color: var(--green);">18 Items</div>
+            <div class="stat-lbl">Modules, Wiring &amp; Caps In Hand</div>
+          </div>
+        </div>
+        <div class="w3-col l3 m6 s12 w3-margin-bottom">
+          <div class="stat-box" style="border-left: 3px solid var(--cyan);">
+            <div class="stat-val" style="color: var(--cyan);">0 Items</div>
+            <div class="stat-lbl">Electronic Pending (HY510 Ordered)</div>
+          </div>
+        </div>
+        <div class="w3-col l3 m6 s12 w3-margin-bottom">
+          <div class="stat-box" style="border-left: 3px solid var(--cyan);">
+            <div class="stat-val" style="color: var(--cyan);">₹ 11,251</div>
+            <div class="stat-lbl">Value of Parts In Hand</div>
+          </div>
+        </div>
+        <div class="w3-col l3 m6 s12 w3-margin-bottom">
+          <div class="stat-box" style="border-left: 3px solid #a855f7;">
+            <div class="stat-val" style="color: #c084fc;">₹ 4,798</div>
+            <div class="stat-lbl">Estimated Remaining Sourcing</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Stock Filter Buttons -->
+      <div class="filter-bar"
+        style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid #334155;">
+        <span style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">
+          <i class="fa fa-filter"></i> BOM Filter:
+        </span>
+        <button id="filterAllBtn" class="nav-btn active">
+          <i class="fa fa-list"></i> All Items (26)
+        </button>
+        <button id="filterInStockBtn" class="nav-btn">
+          <i class="fa fa-check-circle w3-text-green"></i> In Stock Only (16 items / 28 pcs)
+        </button>
+        <button id="filterPendingBtn" class="nav-btn">
+          <i class="fa fa-clock-o w3-text-amber"></i> To Procure / Sourcing (10 items)
+        </button>
+      </div>
+    </div>
+
+    <!-- 1. Project Overview & Features -->
+    <div class="glass-card">
+      <h2 class="section-title"><i class="fa fa-info-circle"></i> 1. Project Overview</h2>
+      <div class="w3-row-padding">
+        <div class="w3-col l4 m6 w3-margin-bottom">
+          <div
+            style="background: rgba(30, 41, 59, 0.5); border: 1px solid #334155; border-radius: 8px; padding: 16px; height: 100%;">
+            <div style="color: var(--cyan); font-weight: 700; margin-bottom: 6px;"><i class="fa fa-music"></i> Pure
+              Analog Signal Path</div>
+            <div style="font-size: 13px; color: var(--text-muted);">Zero DSP coloration or latency on audio. Pure NE5532
+              analog buffer, active 80–120 Hz crossover, and 5-band equalizer.</div>
+          </div>
+        </div>
+        <div class="w3-col l4 m6 w3-margin-bottom">
+          <div
+            style="background: rgba(30, 41, 59, 0.5); border: 1px solid #334155; border-radius: 8px; padding: 16px; height: 100%;">
+            <div style="color: var(--copper-glow); font-weight: 700; margin-bottom: 6px;"><i
+                class="fa fa-microchip"></i> ESP32-S3 Control Only</div>
+            <div style="font-size: 13px; color: var(--text-muted);">Digital supervision strictly isolated: SPI MCP4251
+              digital pots for volume/EQ trim, Bluetooth A2DP receiver, and 4.3" touch display.</div>
+          </div>
+        </div>
+        <div class="w3-col l4 m6 w3-margin-bottom">
+          <div
+            style="background: rgba(30, 41, 59, 0.5); border: 1px solid #334155; border-radius: 8px; padding: 16px; height: 100%;">
+            <div style="color: var(--green); font-weight: 700; margin-bottom: 6px;"><i class="fa fa-shield"></i>
+              Hybrid Modular Wiring</div>
+            <div style="font-size: 13px; color: var(--text-muted);">Soldered header pins on all dev boards, DACs, and
+              amp modules paired with WAGO 221 lever power distribution and JST-XH crimp disconnect harnesses. Fast
+              servicing with zero vibration fatigue.</div>
+          </div>
+        </div>
+        <div class="w3-col l4 m6 w3-margin-bottom">
+          <div
+            style="background: rgba(30, 41, 59, 0.5); border: 1px solid #334155; border-radius: 8px; padding: 16px; height: 100%;">
+            <div style="color: #f97316; font-weight: 700; margin-bottom: 6px;"><i class="fa fa-thermometer-half"></i>
+              Natural Convection Cooling</div>
+            <div style="font-size: 13px; color: var(--text-muted);">Central 35mm OD copper chimney + 4 corner tubes
+              draft cold air from bottom intake slots and exhaust hot air via natural thermosiphon. 0 dB fan noise.
+            </div>
+          </div>
+        </div>
+        <div class="w3-col l4 m6 w3-margin-bottom">
+          <div
+            style="background: rgba(30, 41, 59, 0.5); border: 1px solid #334155; border-radius: 8px; padding: 16px; height: 100%;">
+            <div style="color: #eab308; font-weight: 700; margin-bottom: 6px;"><i class="fa fa-wifi"></i> Polycarbonate
+              RF Architecture</div>
+            <div style="font-size: 13px; color: var(--text-muted);">Top, back, bottom, and front in shatterproof Lexan
+              polycarbonate (&epsilon;<sub>r</sub> &approx; 2.9). 100% Wi-Fi/BT transparency with naturally
+              non-conductive rear panel.</div>
+          </div>
+        </div>
+        <div class="w3-col l4 m6 w3-margin-bottom">
+          <div
+            style="background: rgba(30, 41, 59, 0.5); border: 1px solid #334155; border-radius: 8px; padding: 16px; height: 100%;">
+            <div style="color: #ec4899; font-weight: 700; margin-bottom: 6px;"><i class="fa fa-bolt"></i> External
+              Wall-Mounted SMPS</div>
+            <div style="font-size: 13px; color: var(--text-muted);">Mean Well LRS-350-24 mounted on wall; feeds amp via
+              heavy-duty GX16 4-pin umbilical (2 pins parallel per rail for 15A rating). Keeps desk tiny &amp; isolates
+              AC hum.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. System Architecture -->
+    <div class="glass-card">
+      <h2 class="section-title"><i class="fa fa-sitemap"></i> 2. System Architecture &amp; Signal Flow</h2>
+
+      <div class="code-block w3-margin-bottom">
+        Dual-ESP32-S3 Zero-Contention Architecture:
+        ├── Controller 1 (Touch HMI / Wireless Sofa Remote): Waveshare ESP32-S3 4.3B Touch LCD (Model 28141, 800×480
+        IPS, 16MB Flash, 8MB PSRAM)
+        │ ├── Dedicated 60fps LVGL Touch UI (Master Volume, 8-Zone Sliders, Crossover Freqs, EQ Presets)
+        │ ├── Links to Audio Engine via Wireless ESP-NOW / Wi-Fi (&lt;2ms latency, Battery Remote Mode) OR 2-Wire I2C
+        (GPIO 8 SDA / GPIO 9 SCL)
+        │ └── Built-in CS8501 3.7V LiPo Battery Charger + USB-C 5V + 7–36V DC Wide Input
+        └── Controller 2 (Internal 6-Ch Audio DSP Engine): Waveshare ESP32-S3 Dev Board with Pre-Soldered Header (SKU:
+        1552780, 16MB Flash, 2MB PSRAM)
+        ├── Analog Audio In (3.5mm Stereo AUX — CentIoT PJ392A-1) → PCM1808 24-Bit ADC (DIN = GPIO 4, MCLK = GPIO 0) +
+        Bluetooth 5.0 A2DP Sink
+        ├── Pure Digital Biquad Crossovers (&gt;100 Hz, &lt;100 Hz, &gt;10 kHz) &amp; 5-Band Parametric EQ
+        ├── 32-bit Floating-Point Master Volume &amp; Per-Channel Power Caps (30W / 20W / 10W)
+        └── Multi-Lane I2S Output Bus (Shared BCK = GPIO 15, LRCK = GPIO 16, 3x Independent DOUT Lanes)
+        ├── DOUT1 (GPIO 7) → PCM5102A DAC #1 → Amp Board #1 (FL 30W / FR 30W)
+        ├── DOUT2 (GPIO 6) → PCM5102A DAC #2 → Amp Board #2 (Sub 30W / Mid 20W + Voice 10W)
+        └── DOUT3 (GPIO 5) → PCM5102A DAC #3 → Amp Board #3 (Surround 10W×2 / Piezo 10W×2)
+        └── 3x XH-M562 TPA3116D2 Mini Amps (160W Configured / 300W Peak) → 16x Binding Posts (8 Output Pairs)
+
+        Power Distribution:
+        Mains 230V AC → Mean Well LRS-350-24 (24V, 14.6A, 350W) [Wall-Mounted External]
+        └── Umbilical (16 AWG Pair) via GX16 4-Pin Aviation Plug (2 Pins Parallel per Rail)
+        ├── Inline 10A DC Fuse (Positive Rail Infeed)
+        ├── WAGO 221-415 (+24V Bus Distribution Node)
+        ├── WAGO 221-415 (0V GND Bus Distribution Node)
+        ├── 4700µF 50V Low-ESR Bulk Reservoir Capacitor (Bus Stiffening)
+        ├── 3x XH-M562 TPA3116D2 Mini Amp Boards (Direct 24V Rail)
+        └── XL4015 DC-DC Buck Converter (24V → 5.0V Logic Rail)
+        └── ESP32-S3 Audio Engine (SKU: 1552780) + 3x PCM5102A DAC Modules + PCM1808 ADC Module
+      </div>
+
+      <h3 style="color: #cbd5e1; font-size: 15px; font-weight: 700; margin-top: 18px;">5.1 Channel &amp; 8-Output
+        Speaker Array Assignment (ESP32 Vol &amp; Freq Controlled)</h3>
+      <div class="w3-responsive" style="margin-bottom: 18px;">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Board</th>
+              <th>Channel A</th>
+              <th>Channel B</th>
+              <th>Configured Power</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Amp #1 (TPA3116D2 #1)</strong></td>
+              <td><strong>Ch 1:</strong> Front Left (FL) — 30W</td>
+              <td><strong>Ch 2:</strong> Front Right (FR) — 30W</td>
+              <td><span class="badge badge-cyan">60W (30W &times; 2)</span></td>
+              <td>Main stereo soundstage (9 ft wall + 18 ft floor pots in series = 8&Omega;)</td>
+            </tr>
+            <tr>
+              <td><strong>Amp #2 (TPA3116D2 #2)</strong></td>
+              <td><strong>Ch 3:</strong> Subwoofer (Sub) — 30W</td>
+              <td><strong>Ch 4:</strong> 8" Midrange (20W) + 4" Voice (10W)</td>
+              <td><span class="badge badge-amber">60W (30W + 30W)</span></td>
+              <td>Summed mono Sub (&lt; 100 Hz) + Full-Range Mid &amp; Center Voice</td>
+            </tr>
+            <tr>
+              <td><strong>Amp #3 (TPA3116D2 #3)</strong></td>
+              <td><strong>Ch 5:</strong> Surround L/R (10W &times; 2)</td>
+              <td><strong>Ch 6:</strong> Piezo Sparkle (10W &times; 2)</td>
+              <td><span class="badge badge-green">40W (20W + 20W)</span></td>
+              <td>Silver Dome Surrounds / Cymbals + Piezo Super-Tweeter Array</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="color: #38bdf8; font-size: 15px; font-weight: 700; margin-top: 18px;"><i class="fa fa-sliders"></i>
+        Master 8-Output Rear Binding Post Mapping (16&times; JS-910B Posts)</h3>
+      <div class="w3-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th style="width: 50px; text-align: center;">S.no</th>
+              <th>Rear Binding Post Pair</th>
+              <th>Connected Speaker 1</th>
+              <th>Connected Speaker 2</th>
+              <th>Internal Amp Source</th>
+              <th>ESP32 Digital Power Cap &amp; Filter</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="text-align: center;"><strong>1</strong></td>
+              <td><strong>Output #1 (FL)</strong></td>
+              <td>4" Queena in Porcelain (Left Wall, above listener, 9 ft from screen)</td>
+              <td>4" Queena in Mud Pot (Left bottom floor, 18 ft from screen)</td>
+              <td><strong>Amp #1 — Ch 1</strong></td>
+              <td><strong>30W (&gt; 100 Hz)</strong> &bull; ESP32 Vol &amp; Freq Control</td>
+            </tr>
+            <tr>
+              <td style="text-align: center;"><strong>2</strong></td>
+              <td><strong>Output #2 (FR)</strong></td>
+              <td>4" Queena in Porcelain (Right Wall, above listener, 9 ft from screen)</td>
+              <td>4" Queena in Porcelain (Right bottom floor, 18 ft from screen)</td>
+              <td><strong>Amp #1 — Ch 2</strong></td>
+              <td><strong>30W (&gt; 100 Hz)</strong> &bull; ESP32 Vol &amp; Freq Control</td>
+            </tr>
+            <tr>
+              <td style="text-align: center;"><strong>3</strong></td>
+              <td><strong>Output #3 (SL / Cymbal L)</strong></td>
+              <td>Silver Dome Tweeter #1 (or Surround L)</td>
+              <td>&mdash;</td>
+              <td><strong>Amp #3 — Ch 5</strong> <em>(Surround 1)</em></td>
+              <td><strong>10W</strong> Volume-Boosted Cymbal / Surround (ESP32 Vol &amp; Freq)</td>
+            </tr>
+            <tr>
+              <td style="text-align: center;"><strong>4</strong></td>
+              <td><strong>Output #4 (SR / Cymbal R)</strong></td>
+              <td>Silver Dome Tweeter #2 (or Surround R)</td>
+              <td>&mdash;</td>
+              <td><strong>Amp #3 — Ch 5</strong> <em>(Surround 2)</em></td>
+              <td><strong>10W</strong> Volume-Boosted Cymbal / Surround (ESP32 Vol &amp; Freq)</td>
+            </tr>
+            <tr>
+              <td style="text-align: center;"><strong>5</strong></td>
+              <td><strong>Output #5 (Center Voice)</strong></td>
+              <td><strong>4" Queena in Porcelain (Above Screen)</strong></td>
+              <td>&mdash;</td>
+              <td><strong>Amp #2 — Ch 4</strong> <em>(Branch A)</em></td>
+              <td><strong>10W Max</strong> (ESP32 Software Cap + 47&mu;F Cap &bull; Pure Voice)</td>
+            </tr>
+            <tr>
+              <td style="text-align: center;"><strong>6</strong></td>
+              <td><strong>Output #6 (Sub-Bass)</strong></td>
+              <td><strong>8" Sub-Bass Woofer</strong></td>
+              <td>&mdash;</td>
+              <td><strong>Amp #2 — Ch 3</strong></td>
+              <td><strong>30W Sub-Bass (&lt; 100 Hz)</strong> &bull; ESP32 Vol &amp; Freq Control</td>
+            </tr>
+            <tr>
+              <td style="text-align: center;"><strong>7</strong></td>
+              <td><strong>Output #7 (Full-Range Mono)</strong></td>
+              <td><strong>8" Full-Range + 45&deg; Porcelain Reflector</strong></td>
+              <td>&mdash;</td>
+              <td><strong>Amp #2 — Ch 4</strong> <em>(Branch B)</em></td>
+              <td><strong>20W Direct Midrange / Full-Range</strong> &bull; ESP32 Vol &amp; Freq</td>
+            </tr>
+            <tr>
+              <td style="text-align: center;"><strong>8</strong></td>
+              <td><strong>Output #8 (Piezo Sparkle)</strong></td>
+              <td><strong>Piezo Super-Tweeter Array (2&times; Piezos)</strong></td>
+              <td>&mdash;</td>
+              <td><strong>Amp #3 — Ch 6</strong></td>
+              <td><strong>10W &times; 2 (20W), High-Frequency Sparkle (&gt; 10 kHz)</strong> &bull; ESP32 Vol &amp; Freq
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 3. Mechanical Specification & 6-Face Layout -->
+    <div id="mechanical" class="glass-card">
+      <div
+        style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
+        <h2 class="section-title" style="margin: 0; border: none; padding: 0;"><i class="fa fa-cube"></i> 3. Mechanical
+          Specification &amp; Modular Layout (160&times;160&times;95 mm)</h2>
+        <a href="AMP_DESIGN_DRAWING.html" class="nav-btn primary"><i class="fa fa-compass"></i> Open Full Mechanical
+          Drawing &amp; Bolt/Nut BOM (M-01 to M-26)</a>
+      </div>
+
+      <div style="text-align: center; margin-bottom: 18px;">
+        <img src="./image/flush_chimney_subtle_v_wheel_concept.jpg"
+          alt="Flush Copper Chimney &amp; Click-In Touch Dock Concept"
+          style="max-width: 100%; max-height: 420px; border-radius: 8px; border: 1px solid #334155; box-shadow: 0 8px 24px rgba(0,0,0,0.5);">
+        <div style="font-size: 12px; color: #94a3b8; margin-top: 6px;">
+          <strong>Locked Modular Concept:</strong> Flush 35mm Central Copper Chimney &bull; Click-In Front 4.3" Wireless
+          Touch Dock &bull; Sideways 15mm Reflective V-Line Volume Wheel &bull; Separate / Open-Sided Wooden Shelf for
+          Mean Well SMPS
+        </div>
+      </div>
+
+      <div class="w3-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th style="width: 14%;">Face</th>
+              <th style="width: 31%;">Material / Component</th>
+              <th style="width: 55%;">Features &amp; Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong class="w3-text-amber">Front</strong></td>
+              <td>4mm Polycarbonate + 3-Slot Click-In Dock</td>
+              <td><strong>Click-In Touch Dock:</strong> Waveshare 4.3B Touch LCD (<code>Model 28141</code>) clicks into
+                front rails (charges via magnetic USB-C) and pops out as a handheld <strong>Wireless ESP-NOW/Wi-Fi
+                  Battery Sofa Remote</strong>.</td>
+            </tr>
+            <tr>
+              <td><strong class="w3-text-amber">Front-Right Edge</strong></td>
+              <td>Recessed <code>15 mm</code> Sideways Volume Wheel</td>
+              <td>Standard knurled knob mounted sideways in a <code>15 mm</code> slot with a <strong>painted/reflective
+                  tapered <code>V</code>-line (<code>0 to 15 mm</code> fill gauge)</strong> for instant visual volume
+                check.</td>
+            </tr>
+            <tr>
+              <td><strong class="w3-text-cyan">Rear</strong></td>
+              <td>4–5mm Polycarbonate Machined Panel</td>
+              <td><strong>Electric &amp; Audio I/O:</strong> GX16 4-Pin 24V power inlet (2 pins parallel per rail),
+                <strong>16&times; JS-910B binding posts (8 output pairs)</strong>, 3.5mm AUX, USB-C.
+                <strong>Non-conductive:</strong> eliminates BTL short circuit risk!
+              </td>
+            </tr>
+            <tr>
+              <td><strong class="w3-text-blue">Left &amp; Right</strong></td>
+              <td>AL6061 Finned Heatsink Plates</td>
+              <td><strong>Cooling Fins (Sides 1 &amp; 2):</strong> Standard extruded black anodized finned aluminum
+                heatsinks — primary heat rejection for the 3&times; TPA3116D2 amps.</td>
+            </tr>
+            <tr>
+              <td><strong class="w3-text-sand">Bottom</strong></td>
+              <td>4–5mm Polycarbonate Baseplate + <code>15 mm</code> Feet</td>
+              <td>Unobstructed cold-air intake aligned with the 35mm copper chimney; sits standalone or on top of an
+                <strong>Open-Sided 18mm Wooden Shelf</strong> (100% thermally isolating Mean Well SMPS below).
+              </td>
+            </tr>
+            <tr>
+              <td><strong class="w3-text-amber">Top</strong></td>
+              <td>4mm Matte-Black Polycarbonate / Acrylic</td>
+              <td><strong>100% Flush Top Deck:</strong> Central 35mm copper chimney collar and 4&times; 15mm corner
+                copper end-caps sit completely <strong>flush</strong> with the top surface.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="color: #cbd5e1; font-size: 15px; font-weight: 700; margin-top: 20px;">Thermal &amp; Convective Airflow
+        System</h3>
+      <div class="w3-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Component</th>
+              <th>Specification</th>
+              <th>Function</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Central Copper Chimney</strong></td>
+              <td>35 mm OD, 148 mm H, hollow open through-and-through</td>
+              <td>Main convective stack; draws cool air from bottom intake and exhausts hot air out top via natural
+                thermal siphon.</td>
+            </tr>
+            <tr>
+              <td><strong>Corner Frame (Base Spec)</strong></td>
+              <td>4&times; Copper Pillars (12 mm OD, 148 mm H, M4 threaded)</td>
+              <td>Corner structural tie + thermal spreading to top/bottom plates.</td>
+            </tr>
+            <tr>
+              <td><strong>Corner Frame (Upgrade Option — Budget Permitting)</strong></td>
+              <td>4&times; Hollow Copper Tubes (15 mm OD / 1/2" ID) open through-and-through</td>
+              <td>3D Copper tube frame: all 4 corner tubes + center tube open through-and-through, creating a 5-channel
+                vertical convective breathing matrix.</td>
+            </tr>
+            <tr>
+              <td><strong>External Aluminum Fins</strong></td>
+              <td>10 fins/side &times; 2 sides (2 mm thick, 12 mm deep)</td>
+              <td>Primary radiant/conductive heat rejection to room.</td>
+            </tr>
+            <tr>
+              <td><strong>Electronics Chamber Sealing</strong></td>
+              <td>Gasketed around copper tubes</td>
+              <td>The electronics compartment can remain dust-sealed, while the interiors of the copper tubes remain
+                open through-and-through for continuous convective cooling.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="color: #cbd5e1; font-size: 15px; font-weight: 700; margin-top: 20px;">RF &amp; Wi-Fi Transmission
+        Advantage</h3>
+      <div
+        style="background: rgba(56, 189, 248, 0.08); border-left: 4px solid var(--cyan); padding: 12px 16px; border-radius: 4px; font-size: 13px; color: #cbd5e1; margin-bottom: 20px;">
+        <p style="margin: 0 0 6px 0;">
+          <strong>4 RF-Transparent Faces:</strong> With Top, Back, Bottom, and Front constructed from
+          <strong>Polycarbonate (dielectric constant &epsilon;<sub>r</sub> &approx; 2.9)</strong>, 2.4 GHz Wi-Fi and
+          Bluetooth signals radiate freely in nearly 360 degrees without Faraday cage attenuation.
+        </p>
+        <p style="margin: 0;">
+          Only Left &amp; Right faces remain Aluminum (functioning as dedicated heatsinks).
+        </p>
+      </div>
+
+      <h3 style="color: #cbd5e1; font-size: 15px; font-weight: 700;">Vendor Brief (Box Maker)</h3>
+      <div class="code-block">
+        160 × 160 × 160 mm hybrid enclosure
+        Left & Right side plates: AL6061 aluminum, 5 mm wall with 10 cooling fins (2 mm thick, 12 mm deep)
+        Front panel: 4 mm Polycarbonate (frosted/tinted) with cutout for Waveshare 4.3"/5" Touch LCD
+        Rear panel: 4–5 mm Polycarbonate with cutouts for GX16 4-Pin (16mm), 12x Binding Posts (8mm), 3.5mm AUX (6mm),
+        USB-C (oval)
+        Bottom plate: 4–5 mm Polycarbonate with intake slots for 35mm central tube + 4x 15mm corner tubes + feet mounts
+        Top plate: 4 mm Polycarbonate (clear/frosted) with 35mm chimney + corner tube exhaust pass-throughs
+        Central chimney: 35 mm diameter copper pipe, center, open through-and-through
+        Corner frame: 4x 15 mm copper tube pass-throughs, open through-and-through
+        Mechanical only — no electronics
+      </div>
+    </div>
+
+    <!-- 4. Bill of Materials (BOM) & Inventory Status -->
+    <div id="bom" class="glass-card">
+      <div
+        style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
+        <h2 class="section-title" style="margin: 0; border: none; padding: 0;">
+          <i class="fa fa-calculator"></i> 4. Bill of Materials (BOM)
+        </h2>
+        <div style="font-size: 13px; color: var(--text-muted);">
+          Total Electronics BOM: <strong style="color: #38bdf8;">Rs 12,919</strong> &bull; Grand Total with Mechanical:
+          <strong style="color: #22c55e;">Rs 17,258</strong> (₹ 12,460 in hand / ordered)
+        </div>
+      </div>
+
+      <!-- 4.1 Power — 24V Bus -->
+      <div
+        style="margin-top: 18px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+        <h3 style="color: #38bdf8; font-size: 16px; font-weight: 700; margin: 0;">
+          4.1 Power — 24V Bus
+        </h3>
+        <span class="badge badge-cyan">Section Total: Rs 3,348</span>
+      </div>
+
+      <div class="w3-responsive">
+        <table class="custom-table bom-table">
+          <thead>
+            <tr>
+              <th style="width: 50px;">Photo</th>
+              <th>Item</th>
+              <th>Specification</th>
+              <th style="text-align: center;">Qty</th>
+              <th>Rate (₹)</th>
+              <th>Total (₹)</th>
+              <th>Stock Status</th>
+              <th>Vendor</th>
+              <th>Spec Sheet</th>
+              <th>Remarks</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr data-stock-status="in-stock">
+              <td class="thumb-cell">
+                <img src="./images/pasted_20261008-175433.png" alt="Mean Well LRS-350" class="part-thumb"
+                  data-full="./images/pasted_20261008-175433.png" data-name="Mean Well LRS-350-24"
+                  data-desc="24V 14.6A 350.4W Switching Power Supply">
+              </td>
+              <td><strong>Mean Well LRS-350-24</strong><br><span
+                  style="font-size: 11px; color: var(--text-muted);">(SMPS) Single Output</span></td>
+              <td>24V 14.6A 350.4W Switching Power Supply</td>
+              <td style="text-align: center;"><strong>1</strong></td>
+              <td>2,499</td>
+              <td><strong>2,499</strong></td>
+              <td><span class="badge badge-green"><i class="fa fa-check"></i> Stock: 1 (Available)</span></td>
+              <td><a href="https://hubtronics.in/lrs-350-24" target="_blank" class="vendor-link"><i
+                    class="fa fa-external-link"></i> Hubtronics.in</a></td>
+              <td><a href="./Mean Well LRS-350.pdf" target="_blank" class="spec-link"><i class="fa fa-file-pdf-o"></i>
+                  LRS-350 PDF</a></td>
+              <td>Available &bull; Wall-mounted</td>
+            </tr>
+
+            <tr data-stock-status="in-stock">
+              <td class="thumb-cell">
+                <img src="./image/PROJECT/1790956629945.png" alt="Wago 221-415" class="part-thumb"
+                  data-full="./image/PROJECT/1790956629945.png" data-name="WAGO 221-415"
+                  data-desc="5-Way Lever Nut Splicing Connector">
+              </td>
+              <td><strong>Wago 221-415</strong></td>
+              <td>5-way lever nut — 24V + GND rails</td>
+              <td style="text-align: center;"><strong>4</strong></td>
+              <td>99</td>
+              <td><strong>396</strong></td>
+              <td><span class="badge badge-green"><i class="fa fa-check"></i> Stock: 4 (Available)</span></td>
+              <td><a href="https://robu.in/product/wago-221-415-5-conductor-lever-connector/" target="_blank"
+                  class="vendor-link"><i class="fa fa-external-link"></i> Robu.in</a></td>
+              <td><a href="./wago 221 specs.md" target="_blank" class="spec-link"><i class="fa fa-file-text-o"></i> Wago
+                  221 Spec</a></td>
+              <td>Available &bull; 24V bus rails (4 &times; 99 = Rs 396)</td>
+            </tr>
+
+            <tr data-stock-status="in-stock">
+              <td class="thumb-cell">
+                <img src="./image/PROJECT/1790956686949.png" alt="Wago 221-412" class="part-thumb"
+                  data-full="./image/PROJECT/1790956686949.png" data-name="WAGO 221-412"
+                  data-desc="2-Way Lever Nut Splicing Connector">
+              </td>
+              <td><strong>Wago 221-412</strong></td>
+              <td>2-way lever nut — amp feeds</td>
+              <td style="text-align: center;"><strong>6</strong></td>
+              <td>49</td>
+              <td><strong>294</strong></td>
+              <td><span class="badge badge-green"><i class="fa fa-check"></i> Stock: 6 (Available)</span></td>
+              <td><a href="https://robu.in/product/wago-221-412-lever-wire-splicing-connector/" target="_blank"
+                  class="vendor-link"><i class="fa fa-external-link"></i> Robu.in</a></td>
+              <td><a href="./wago 221 412 2way spec.md" target="_blank" class="spec-link"><i
+                    class="fa fa-file-text-o"></i> 412 2-Way Spec</a></td>
+              <td>Available &bull; Amp power taps (6 &times; 49 = Rs 294)</td>
+            </tr>
+
+            <tr data-stock-status="in-stock">
+              <td class="thumb-cell">
+                <img src="./image/PROJECT/1790956992684.png" alt="Bulk Cap" class="part-thumb"
+                  data-full="./image/PROJECT/1790956992684.png" data-name="Bulk Electrolytic Capacitor"
+                  data-desc="4700uF 50V Low ESR">
+              </td>
+              <td><strong>Bulk Cap</strong></td>
+              <td>4700 &mu;F 50V Low ESR (35V min, 50V headroom)</td>
+              <td style="text-align: center;"><strong>2</strong></td>
+              <td>70</td>
+              <td><strong>140</strong></td>
+              <td><span class="badge badge-green"><i class="fa fa-check"></i> Stock: 2 (Available)</span></td>
+              <td><a href="https://robu.in/product/4700uf-50v-electrolytic-capacitor/" target="_blank"
+                  class="vendor-link"><i class="fa fa-external-link"></i> Robu.in</a></td>
+              <td><a href="./4700uF capacitor Spec Sheet.md" target="_blank" class="spec-link"><i
+                    class="fa fa-file-text-o"></i> 4700uF Spec</a></td>
+              <td>On 24V bus for ripple absorption &bull; 50V headroom</td>
+            </tr>
+
+            <tr data-stock-status="in-stock">
+              <td class="thumb-cell">
+                <img src="./image/PROJECT/1791221023178.png" alt="AMS1117" class="part-thumb"
+                  data-full="./image/PROJECT/1791221023178.png" data-name="AMS1117 Module"
+                  data-desc="3.3V Linear Power Supply Module">
+              </td>
+              <td><strong>AMS1117</strong></td>
+              <td>3.3V Power Supply Module</td>
+              <td style="text-align: center;"><strong>1</strong></td>
+              <td>19</td>
+              <td><strong>19</strong></td>
+              <td><span class="badge badge-green"><i class="fa fa-check"></i> Stock: 1 (Available)</span></td>
+              <td><a href="https://robu.in/product/ams1117-3-3v-power-supply-module/" target="_blank"
+                  class="vendor-link"><i class="fa fa-external-link"></i> Robu.in</a></td>
+              <td><a href="./AMS 117 3.3 V power supply module.md" target="_blank" class="spec-link"><i
+                    class="fa fa-file-text-o"></i> AMS1117 Spec</a></td>
+              <td>Auxiliary 3.3V rail</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 4.2 Amplifiers — 3x Stereo -->
+      <div
+        style="margin-top: 24px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+        <h3 style="color: #f59e0b; font-size: 16px; font-weight: 700; margin: 0;">
+          4.2 Amplifiers — 3x Stereo (6ch total)
+        </h3>
+        <span class="badge badge-amber">Section Total: Rs 867</span>
+      </div>
+
+      <div class="w3-responsive">
+        <table class="custom-table bom-table">
+          <thead>
+            <tr>
+              <th style="width: 50px;">Photo</th>
+              <th>Item</th>
+              <th>Specification</th>
+              <th style="text-align: center;">Qty</th>
+              <th>Rate (₹)</th>
+              <th>Total (₹)</th>
+              <th>Stock Status</th>
+              <th>Vendor</th>
+              <th>Spec Sheet</th>
+              <th>Remarks</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr data-stock-status="in-stock">
+              <td class="thumb-cell">
+                <img src="./image/PROJECT/1791126239021.png" alt="TPA3116D2" class="part-thumb"
+                  data-full="./image/PROJECT/1791126239021.png" data-name="TPA3116D2 Stereo Amplifier Board"
+                  data-desc="XH-M562 2x50W Class D Digital Amp (No Pot)">
+              </td>
+              <td><strong>TPA3116D2 50W+50W</strong><br><span style="font-size: 11px; color: var(--text-muted);">Dual
+                  Channel Mini Digital Class D (XH-M562)</span></td>
+              <td>2x50W @ 24V, 4 ohm, Dual Channel, No pot</td>
+              <td style="text-align: center;"><strong>3</strong></td>
+              <td>129</td>
+              <td><strong>387</strong></td>
+              <td><span class="badge badge-green"><i class="fa fa-check"></i> Stock: 3 (Available)</span></td>
+              <td><a
+                  href="https://robu.in/product/xh-m562-tpa3116d2-50w50w-dual-channel-mini-digital-amplifier-class-d-amplifier/"
+                  target="_blank" class="vendor-link"><i class="fa fa-external-link"></i> Robu.in</a></td>
+              <td><a href="./XH-M562 TPA3116D2.md" target="_blank" class="spec-link"><i class="fa fa-file-text-o"></i>
+                  XH-M562 Spec</a></td>
+              <td>3 boards = 6 channels &bull; In hand</td>
+            </tr>
+
+            <tr data-stock-status="ordered">
+              <td class="thumb-cell">
+                <img src="./image/PROJECT/hy510_thermal_paste.jpg" alt="HY510 Thermal Paste" class="part-thumb"
+                  data-full="./image/PROJECT/hy510_thermal_paste.jpg" data-name="HY510 Thermal Grease Paste (30g)"
+                  data-desc="Thermal Paste Compound for TPA3116 & Heatsink">
+              </td>
+              <td><strong>HY510 Thermal Grease Paste (30g)</strong></td>
+              <td>Thermal paste for TPA3116 chips (SKU: 07555)</td>
+              <td style="text-align: center;"><strong>1</strong></td>
+              <td>158</td>
+              <td><strong>158</strong></td>
+              <td><span class="badge badge-green"
+                  style="background: rgba(3, 105, 161, 0.2); border: 1px solid #0284c7; color: #38bdf8;"><i
+                    class="fa fa-truck"></i> Ordered (Hubtronics)</span></td>
+              <td><a href="https://hubtronics.in" target="_blank" class="vendor-link"><i
+                    class="fa fa-external-link"></i> Hubtronics.in</a></td>
+              <td><a href="./HY510 Spec.md" target="_blank" class="spec-link"><i class="fa fa-file-text-o"></i> Thermal
+                  Paste Spec</a></td>
+              <td>Couples 3x TPA3116D2 chip tops to L-Angle thermal bridges</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div
+        style="background: rgba(245, 158, 11, 0.1); border-left: 3px solid var(--amber); padding: 8px 12px; border-radius: 4px; font-size: 12px; margin-bottom: 20px;">
+        <i class="fa fa-lightbulb-o w3-text-amber"></i> <strong>Decision:</strong> Changed from 6x mono (Rs 1,800) to 3x
+        stereo (Rs 900) — same 6 channels, saves Rs 900.
+      </div>
+
+      <!-- 4.3 DAC + Brain -->
+      <div
+        style="margin-top: 24px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+        <h3 style="color: #22c55e; font-size: 16px; font-weight: 700; margin: 0;">
+          4.3 DAC + Brain (Dual-ESP32-S3 Architecture)
+        </h3>
+        <span class="badge badge-green">Section Total: Rs 8,204</span>
+      </div>
+
+      <div class="w3-responsive">
+        <table class="custom-table bom-table">
+          <thead>
+            <tr>
+              <th style="width: 50px;">Photo</th>
+              <th>Item</th>
+              <th>Specification</th>
+              <th style="text-align: center;">Qty</th>
+              <th>Rate (₹)</th>
+              <th>Total (₹)</th>
+              <th>Stock Status</th>
+              <th>Vendor</th>
+              <th>Spec Sheet</th>
+              <th>Remarks</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr data-stock-status="in-stock">
+              <td class="thumb-cell">
+                <img src="./image/PROJECT/1791222659512.png" alt="Waveshare ESP32-S3" class="part-thumb"
+                  data-full="./image/PROJECT/1791222659512.png" data-name="Waveshare ESP32-S3 4.3B Touch LCD"
+                  data-desc="800x480 Capacitive Touch, 16MB Flash, 8MB PSRAM">
+              </td>
+              <td><strong>Waveshare ESP32-S3 4.3B</strong><br><span
+                  style="font-size: 11px; color: var(--text-muted);">800&times;480 5-Point Touch Dev Board Type B (Model
+                  28141)</span>
+              </td>
+              <td>Built-in 16MB Flash and 8MB PSRAM + CS8501 Battery Charger</td>
+              <td style="text-align: center;"><strong>1</strong></td>
+              <td>5,349</td>
+              <td><strong>5,349</strong></td>
+              <td><span class="badge badge-green"><i class="fa fa-check"></i> Stock: 1 (Available)</span></td>
+              <td><a href="https://robu.in/product/waveshare-esp32-s3-4-3b-800x480/" target="_blank"
+                  class="vendor-link"><i class="fa fa-external-link"></i> Robu.in</a></td>
+              <td><a href="./Waveshare ESP32-S3 with Touch spec.md" target="_blank" class="spec-link"><i
+                    class="fa fa-file-text-o"></i> ESP32-S3 Touch Spec</a></td>
+              <td>Dedicated Touch HMI &bull; Wireless ESP-NOW/Wi-Fi Battery Sofa Remote or Docked I2C</td>
+            </tr>
+
+            <tr data-stock-status="in-stock">
+              <td class="thumb-cell">
+                <img src="./image/PROJECT/waveshare_esp32_s3_pico_1552780.jpg"
+                  alt="Waveshare ESP32-S3-Pico (SKU: 1552780)" class="part-thumb"
+                  data-full="./image/PROJECT/waveshare_esp32_s3_pico_1552780.jpg"
+                  data-name="Waveshare ESP32-S3-Pico Microcontroller Dev Board with Pin Header (SKU: 1552780)"
+                  data-desc="32-bit LX7 Dual-Core @ 240MHz, 16MB Flash, 2MB PSRAM, 512KB SRAM, CH343+CH334 Type-C, Pre-Soldered Headers">
+              </td>
+              <td><strong>Waveshare ESP32-S3-Pico Dev Board (With Header)</strong><br><span
+                  style="font-size: 11px; color: var(--text-muted);">SKU: 1552780 &bull; Pre-Soldered Yellow Pin
+                  Header</span>
+              </td>
+              <td>32-bit LX7 Dual-Core @ 240MHz, 16MB Flash, 2MB PSRAM, 512KB SRAM, 384KB ROM, CH343+CH334 Type-C</td>
+              <td style="text-align: center;"><strong>1</strong></td>
+              <td>1,209</td>
+              <td><strong>1,209</strong></td>
+              <td><span class="badge badge-cyan"><i class="fa fa-truck"></i> Ordered: 1 (Robu SKU: 1552780)</span></td>
+              <td><a href="https://robu.in/" target="_blank" class="vendor-link"><i class="fa fa-external-link"></i>
+                  Robu.in</a></td>
+              <td><a href="./esp32.md" target="_blank" class="spec-link"><i class="fa fa-file-text-o"></i> ESP32-S3-Pico
+                  Spec</a></td>
+              <td>Dedicated Internal 6-Ch I2S Audio DSP Engine (Drives 3&times; DACs + 1&times; ADC)</td>
+            </tr>
+
+            <tr data-stock-status="in-stock">
+              <td class="thumb-cell">
+                <img
+                  src="https://hubtronics.in/image/cache/catalog/sagar/PCM5102-DAC-Audio-Decoder-Module-1-550x550w.jpg"
+                  alt="PCM5102A" class="part-thumb"
+                  data-full="https://hubtronics.in/image/cache/catalog/sagar/PCM5102-DAC-Audio-Decoder-Module-1-550x550w.jpg"
+                  data-name="PCM5102A DAC Board" data-desc="Stereo I2S 112dB SNR Audio Decoder Module (HW-280)">
+              </td>
+              <td><strong>PCM5102A DAC Board</strong></td>
+              <td>Stereo I2S, HW-280 breakout</td>
+              <td style="text-align: center;"><strong>3</strong></td>
+              <td>449</td>
+              <td><strong>1,347</strong></td>
+              <td><span class="badge badge-green"><i class="fa fa-check"></i> Stock: 3 (Available)</span></td>
+              <td><a href="https://hubtronics.in/pcm5102-i2s-digital-audio-dac-decoder-module?search=06327"
+                  target="_blank" class="vendor-link"><i class="fa fa-external-link"></i> Hubtronics.in</a></td>
+              <td><a href="./PCM5102 12S Spec.md" target="_blank" class="spec-link"><i class="fa fa-file-text-o"></i>
+                  PCM5102 I2S Spec</a></td>
+              <td>3 boards = 6 channels &bull; In hand</td>
+            </tr>
+
+            <tr data-stock-status="in-stock">
+              <td class="thumb-cell">
+                <img src="./image/PROJECT/1791122464907.png" alt="PCM1808 ADC" class="part-thumb"
+                  data-full="./image/PROJECT/1791122464907.png" data-name="PCM1808 ADC Module"
+                  data-desc="24-bit 96kHz SNR Stereo Audio ADC">
+              </td>
+              <td><strong>PCM1808 24bit SNR Audio Stereo ADC</strong></td>
+              <td>Single-Ended Analog-Input Decoder Board</td>
+              <td style="text-align: center;"><strong>1</strong></td>
+              <td>209</td>
+              <td><strong>209</strong></td>
+              <td><span class="badge badge-green"><i class="fa fa-check"></i> Stock: 1 (Available)</span></td>
+              <td><a href="https://hubtronics.in/pcm1808-dac-module" target="_blank" class="vendor-link"><i
+                    class="fa fa-external-link"></i> Hubtronics.in</a></td>
+              <td><a href="./PCM1808 24bit SNR Audio Stereo ADC Single-Ended Analog-Input Decoder.md" target="_blank"
+                  class="spec-link"><i class="fa fa-file-text-o"></i> PCM1808 Spec</a></td>
+              <td>Analog 3.5mm AUX input decoding</td>
+            </tr>
+
+            <tr data-stock-status="in-stock">
+              <td class="thumb-cell">
+                <img
+                  src="https://robu.in/_next/image/?url=https%3A%2F%2Frobu-prod-media.s3.ap-south-1.amazonaws.com%2Fuploads%2F2023%2F03%2F4-4.jpg&w=1920&q=90"
+                  alt="XL4015 Buck" class="part-thumb"
+                  data-full="https://robu.in/_next/image/?url=https%3A%2F%2Frobu-prod-media.s3.ap-south-1.amazonaws.com%2Fuploads%2F2023%2F03%2F4-4.jpg&w=1920&q=90"
+                  data-name="XL4015 5A Buck Step Down Module" data-desc="24V to 5.0V 3A DC-DC Adjustable Step Down">
+              </td>
+              <td><strong>XL4015 5A DC-DC Buck Module</strong></td>
+              <td>24V &rarr; 5.0V, 3A Step Down Adjustable</td>
+              <td style="text-align: center;"><strong>1</strong></td>
+              <td>90</td>
+              <td><strong>90</strong></td>
+              <td><span class="badge badge-green"><i class="fa fa-check"></i> Stock: 1 (Available)</span></td>
+              <td><a
+                  href="https://robu.in/product/xl4015-5a-dc-dc-step-down-adjustable-power-supply-buck-module-led-with-heatsink/"
+                  target="_blank" class="vendor-link"><i class="fa fa-external-link"></i> Robu.in</a></td>
+              <td><a href="./XL4015 Spec.md" target="_blank" class="spec-link"><i class="fa fa-file-text-o"></i> XL4015
+                  Spec</a></td>
+              <td>For ESP32 + DACs logic supply</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 4.4 Wiring / Protection -->
+      <div
+        style="margin-top: 24px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+        <h3 style="color: #94a3b8; font-size: 16px; font-weight: 700; margin: 0;">
+          4.4 Wiring / Protection
+        </h3>
+        <span class="badge"
+          style="background: rgba(148, 163, 184, 0.2); border: 1px solid #64748b; color: #cbd5e1;">Section Total: Rs
+          500</span>
+      </div>
+
+      <div class="w3-responsive">
+        <table class="custom-table bom-table">
+          <thead>
+            <tr>
+              <th style="width: 50px;">Photo</th>
+              <th>Item</th>
+              <th>Specification</th>
+              <th style="text-align: center;">Qty</th>
+              <th>Rate (₹)</th>
+              <th>Total (₹)</th>
+              <th>Stock Status</th>
+              <th>Source / Notes</th>
+              <th>Spec Sheet</th>
+              <th>Remarks</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr data-stock-status="in-stock">
+              <td class="thumb-cell"><i class="fa fa-bolt w3-text-green" style="font-size: 20px;"></i></td>
+              <td><strong>DC Wire 16 AWG</strong></td>
+              <td>Standard copper electrical wire (1.0–1.5 sq mm) for 24V bus</td>
+              <td style="text-align: center;"><strong>2 m</strong></td>
+              <td>40</td>
+              <td><strong>80</strong></td>
+              <td><span class="badge badge-green"><i class="fa fa-check"></i> Stock: In Lab</span></td>
+              <td>In Lab (Approved)</td>
+              <td>—</td>
+              <td>Safe for 24V DC bus up to 15A</td>
+            </tr>
+
+            <tr data-stock-status="pending">
+              <td class="thumb-cell"><i class="fa fa-headphones w3-text-cyan" style="font-size: 20px;"></i></td>
+              <td><strong>Signal Wire</strong></td>
+              <td>Shielded 2-core low-noise audio cable</td>
+              <td style="text-align: center;"><strong>3 m</strong></td>
+              <td>40</td>
+              <td><strong>120</strong></td>
+              <td><span class="badge badge-amber"><i class="fa fa-clock-o"></i> Stock: 0 (To Buy)</span></td>
+              <td>Local Audio Shop</td>
+              <td>—</td>
+              <td>Shielded wire required to reject hum/PWM hash</td>
+            </tr>
+
+            <tr data-stock-status="in-stock">
+              <td class="thumb-cell"><i class="fa fa-shield w3-text-green" style="font-size: 20px;"></i></td>
+              <td><strong>Fuse + Holder</strong></td>
+              <td>10A slow-blow on 24V rail</td>
+              <td style="text-align: center;"><strong>1</strong></td>
+              <td>50</td>
+              <td><strong>50</strong></td>
+              <td><span class="badge badge-green"><i class="fa fa-check"></i> Stock: 1 (Available)</span></td>
+              <td>In Lab</td>
+              <td>—</td>
+              <td>Available in hand &bull; Overcurrent protection</td>
+            </tr>
+
+            <tr data-stock-status="in-stock">
+              <td class="thumb-cell"><i class="fa fa-plug w3-text-green" style="font-size: 20px;"></i></td>
+              <td><strong>Mains Cable</strong></td>
+              <td>3-pin with earth to PSU</td>
+              <td style="text-align: center;"><strong>1</strong></td>
+              <td>150</td>
+              <td><strong>150</strong></td>
+              <td><span class="badge badge-green"><i class="fa fa-check"></i> Stock: 1 (Available)</span></td>
+              <td>In Lab</td>
+              <td>—</td>
+              <td>Available in hand &bull; 230V AC connection</td>
+            </tr>
+
+            <tr data-stock-status="in-stock">
+              <td class="thumb-cell"><i class="fa fa-wrench w3-text-green" style="font-size: 20px;"></i></td>
+              <td><strong>Header Pins &amp; Soldering Kit</strong></td>
+              <td>2.54mm male/female headers + solder wire</td>
+              <td style="text-align: center;"><strong>1 set</strong></td>
+              <td>100</td>
+              <td><strong>100</strong></td>
+              <td><span class="badge badge-green"><i class="fa fa-check"></i> Stock: Available</span></td>
+              <td>In Lab</td>
+              <td>—</td>
+              <td>All module header pins to be soldered per build notes</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 4.5 Mechanical & Hardware (Estimate) -->
+      <div
+        style="margin-top: 24px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+        <h3 style="color: #f59e0b; font-size: 16px; font-weight: 700; margin: 0;">
+          4.5 Mechanical &amp; Hardware (Estimate)
+        </h3>
+        <span class="badge badge-copper">Section Total: Rs 4,339</span>
+      </div>
+
+      <div class="w3-responsive">
+        <table class="custom-table bom-table">
+          <thead>
+            <tr>
+              <th style="width: 50px;">Photo</th>
+              <th>Item</th>
+              <th>Specification</th>
+              <th style="text-align: center;">Qty</th>
+              <th>Est. Rate (₹)</th>
+              <th>Total (₹)</th>
+              <th>Stock Status</th>
+              <th>Source / Vendor</th>
+              <th>Spec Sheet</th>
+              <th>Remarks</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr data-stock-status="pending">
+              <td class="thumb-cell"><i class="fa fa-cube w3-text-blue" style="font-size: 20px;"></i></td>
+              <td><strong>AL6061 Finned Enclosure</strong></td>
+              <td>160mm cube, 5mm wall, 10 fins/side</td>
+              <td style="text-align: center;"><strong>1</strong></td>
+              <td>2,000</td>
+              <td><strong>2,000</strong></td>
+              <td><span class="badge badge-blue"><i class="fa fa-cogs"></i> Custom Fab</span></td>
+              <td>Chakan / Bhosari Job Shop</td>
+              <td>—</td>
+              <td>Primary heatsink enclosure</td>
+            </tr>
+
+            <tr data-stock-status="pending">
+              <td class="thumb-cell"><i class="fa fa-circle-o-notch w3-text-amber" style="font-size: 20px;"></i></td>
+              <td><strong>Copper Chimney</strong></td>
+              <td>OD 35mm, H 148mm hollow pipe</td>
+              <td style="text-align: center;"><strong>1</strong></td>
+              <td>400</td>
+              <td><strong>400</strong></td>
+              <td><span class="badge badge-amber"><i class="fa fa-clock-o"></i> Sourcing</span></td>
+              <td>Bhosari AC spares / scrap</td>
+              <td>—</td>
+              <td>Central thermal updraft pipe</td>
+            </tr>
+
+            <tr data-stock-status="pending">
+              <td class="thumb-cell"><i class="fa fa-columns w3-text-amber" style="font-size: 20px;"></i></td>
+              <td><strong>Copper Pillars</strong></td>
+              <td>OD 12mm, H 148mm, M4 threaded</td>
+              <td style="text-align: center;"><strong>4</strong></td>
+              <td>60</td>
+              <td><strong>240</strong></td>
+              <td><span class="badge badge-amber"><i class="fa fa-clock-o"></i> Sourcing</span></td>
+              <td>Nana Peth / Bhosari</td>
+              <td>—</td>
+              <td>Corner frame structural ties</td>
+            </tr>
+
+            <tr data-stock-status="pending">
+              <td class="thumb-cell"><i class="fa fa-square-o w3-text-cyan" style="font-size: 20px;"></i></td>
+              <td><strong>Polycarbonate Panels Set</strong></td>
+              <td>4–5mm Lexan (Top, Back, Bottom, Front)</td>
+              <td style="text-align: center;"><strong>1 set</strong></td>
+              <td>350</td>
+              <td><strong>350</strong></td>
+              <td><span class="badge badge-cyan"><i class="fa fa-clock-o"></i> CNC Cut</span></td>
+              <td>Pimpri Plastic Shop</td>
+              <td>—</td>
+              <td>Shatterproof &amp; 100% RF-transparent</td>
+            </tr>
+
+            <tr data-stock-status="in-stock">
+              <td class="thumb-cell"><i class="fa fa-volume-up w3-text-green" style="font-size: 20px;"></i></td>
+              <td><strong>Speaker Terminals (JS-910B 4mm)</strong></td>
+              <td>JS-910B Binding Posts: 6 Sets (12 pcs) In Hand + 2 Sets Ordered</td>
+              <td style="text-align: center;"><strong>16 pcs (8 sets)</strong></td>
+              <td>29</td>
+              <td><strong>464</strong></td>
+              <td><span class="badge badge-green"><i class="fa fa-check"></i> Stock: 12 pcs (+4 Ordered)</span></td>
+              <td>Robu.in</td>
+              <td>—</td>
+              <td>In Hand (6 sets = 12 pcs) + 2 extra sets ordered for speaker array</td>
+            </tr>
+
+            <tr data-stock-status="in-stock">
+              <td class="thumb-cell"><i class="fa fa-music w3-text-green" style="font-size: 20px;"></i></td>
+              <td><strong>Audio Input Jack</strong></td>
+              <td>CentIoT PJ392A-1 3.5mm Stereo Gold Plated (Pack of 5)</td>
+              <td style="text-align: center;"><strong>1 pack (5 pcs)</strong></td>
+              <td>160</td>
+              <td><strong>160</strong></td>
+              <td><span class="badge badge-green"><i class="fa fa-check"></i> Stock: 5 pcs (In Hand)</span></td>
+              <td>Amazon.in</td>
+              <td>—</td>
+              <td>In Hand (5 pcs available) &bull; Stereo AUX line-in TRS jack to PCM1808 ADC (+ spares for test
+                line-out)</td>
+            </tr>
+
+            <tr data-stock-status="in-stock">
+              <td class="thumb-cell"><i class="fa fa-headphones w3-text-cyan" style="font-size: 20px;"></i></td>
+              <td><strong>AUX 3.5mm Male-to-Male Cable</strong></td>
+              <td>AUX 3.5mm Audio Extension Cable 2m Grey (SKU: 1794441)</td>
+              <td style="text-align: center;"><strong>1 pc</strong></td>
+              <td>299</td>
+              <td><strong>299</strong></td>
+              <td><span class="badge badge-green"><i class="fa fa-truck"></i> Ordered (Robu.in)</span></td>
+              <td>Robu.in</td>
+              <td>—</td>
+              <td>Ordered on Robu.in &bull; 2m stereo TRS line-in cable from TV/Phone/PC to PJ392A-1 jack</td>
+            </tr>
+
+            <tr data-stock-status="in-stock">
+              <td class="thumb-cell"><i class="fa fa-chain w3-text-green" style="font-size: 20px;"></i></td>
+              <td><strong>24V Power Socket (GX16 4-Pin)</strong></td>
+              <td>GX16 4-Pin Metal Aviation Plug Set Male + Female</td>
+              <td style="text-align: center;"><strong>1 set</strong></td>
+              <td>81</td>
+              <td><strong>81</strong></td>
+              <td><span class="badge badge-green"><i class="fa fa-check"></i> Stock: 1 set (In Hand)</span></td>
+              <td>In Lab / Robu</td>
+              <td>—</td>
+              <td>In Hand (1 set available) &bull; 4-pin parallel config (Pins 1+2 = +24V, Pins 3+4 = GND, 15A
+                continuous)</td>
+            </tr>
+
+            <tr data-stock-status="in-stock">
+              <td class="thumb-cell"><i class="fa fa-usb w3-text-cyan" style="font-size: 20px;"></i></td>
+              <td><strong>USB-C Service Port &amp; Cable</strong></td>
+              <td>USB 3.1 Type-C Breakout Board + Male-Female Extension Cable</td>
+              <td style="text-align: center;"><strong>1 set</strong></td>
+              <td>60</td>
+              <td><strong>60</strong></td>
+              <td><span class="badge badge-green"><i class="fa fa-check"></i> Stock: 1 (Available)</span></td>
+              <td>Robu.in</td>
+              <td>—</td>
+              <td>Available in hand &bull; Breakout + Male-Female USB cable</td>
+            </tr>
+
+            <tr data-stock-status="pending">
+              <td class="thumb-cell"><i class="fa fa-wrench w3-text-muted" style="font-size: 20px;"></i></td>
+              <td><strong>M3/M4 Fasteners + Standoffs + Gaskets</strong></td>
+              <td>Brass standoffs, stainless bolts &amp; EPDM seals</td>
+              <td style="text-align: center;"><strong>1 set</strong></td>
+              <td>300</td>
+              <td><strong>300</strong></td>
+              <td><span class="badge badge-amber"><i class="fa fa-clock-o"></i> To Order</span></td>
+              <td>Local Fasteners</td>
+              <td>—</td>
+              <td>Chassis assembly &amp; tube sealing</td>
+            </tr>
+
+            <tr data-stock-status="pending">
+              <td class="thumb-cell"><i class="fa fa-code-fork w3-text-green" style="font-size: 20px;"></i></td>
+              <td><strong>JST-XH Connector Kit + SN-28B Tool</strong></td>
+              <td>JST-XH crimp assortment + crimping tool</td>
+              <td style="text-align: center;"><strong>1 set</strong></td>
+              <td>400</td>
+              <td><strong>400</strong></td>
+              <td><span class="badge badge-amber"><i class="fa fa-clock-o"></i> To Order</span></td>
+              <td>Amazon.in / Robu.in</td>
+              <td>—</td>
+              <td>Modular crimp signal harnesses to soldered header pins</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 5. Design Decisions Log -->
+    <div id="decisions" class="glass-card">
+      <h2 class="section-title"><i class="fa fa-balance-scale"></i> 5. Design Decisions Log</h2>
+      <div class="w3-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th style="width: 5%;">#</th>
+              <th style="width: 15%;">Decision</th>
+              <th style="width: 25%;">Chosen</th>
+              <th style="width: 20%;">Rejected</th>
+              <th style="width: 35%;">Reason</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>D1</strong></td>
+              <td>Amp topology</td>
+              <td><strong class="w3-text-green">TPA3116D2 Class-D</strong></td>
+              <td>Class-AB</td>
+              <td>Efficiency, low heat, fanless possible.</td>
+            </tr>
+            <tr>
+              <td><strong>D2</strong></td>
+              <td>Amp config</td>
+              <td><strong class="w3-text-green">3x stereo boards</strong></td>
+              <td>6x mono boards</td>
+              <td>Same 6 channels, saves Rs 900.</td>
+            </tr>
+            <tr>
+              <td><strong>D3</strong></td>
+              <td>Power supply</td>
+              <td><strong class="w3-text-green">Mean Well LRS-350-24</strong></td>
+              <td>Sturlite LED driver</td>
+              <td>Sturlite causes audible noise; MeanWell has fan ON/OFF.</td>
+            </tr>
+            <tr>
+              <td><strong>D4</strong></td>
+              <td>Power budget</td>
+              <td><strong class="w3-text-green">100% full capacity (350W peak)</strong></td>
+              <td>70% clamp</td>
+              <td>Mean Well LRS-350-24 (14.6A) handles full 300W audio peaks without load worries; typical listening
+                remains at ~20W silent draw.</td>
+            </tr>
+            <tr>
+              <td><strong>D5</strong></td>
+              <td>Wiring method</td>
+              <td><strong class="w3-text-green">Soldered Header Pins + WAGO / JST-XH</strong></td>
+              <td>Loose jumper headers</td>
+              <td>All module header pins soldered securely to boards; WAGO + JST-XH for modular interconnects.</td>
+            </tr>
+            <tr>
+              <td><strong>D6</strong></td>
+              <td>Enclosure</td>
+              <td><strong class="w3-text-green">AL6061, 5mm wall</strong></td>
+              <td>Plastic / steel</td>
+              <td>Thermal mass + premium look.</td>
+            </tr>
+            <tr>
+              <td><strong>D7</strong></td>
+              <td>Cooling</td>
+              <td><strong class="w3-text-green">Copper chimney + fins</strong></td>
+              <td>Active fan</td>
+              <td>Silent operation at all times.</td>
+            </tr>
+            <tr>
+              <td><strong>D8</strong></td>
+              <td>Transparent Panels</td>
+              <td><strong class="w3-text-green">Polycarbonate (Top, Back, Bottom, Front)</strong></td>
+              <td>Glass</td>
+              <td>Polycarbonate is shatterproof, easy to CNC drill/cut, 100% RF/Wi-Fi transparent, and non-conductive
+                for binding posts.</td>
+            </tr>
+            <tr>
+              <td><strong>D9</strong></td>
+              <td>DSP</td>
+              <td><strong class="w3-text-green">ESP32 audio firmware</strong></td>
+              <td>Dedicated DSP chip</td>
+              <td>Handles BT A2DP decoding, volume attenuation, and I2S DAC clocking.</td>
+            </tr>
+            <tr>
+              <td><strong>D10</strong></td>
+              <td>Volume control</td>
+              <td><strong class="w3-text-green">ESP32 32-bit Float Digital Trim</strong></td>
+              <td>MCP4251 digital pots</td>
+              <td>MCP4251 omitted / NOT required: Avoids 5V rail clipping and CMOS wiper distortion; ESP32 provides
+                bit-perfect 32-bit logarithmic volume &amp; per-channel trim feeding PCM5102A DACs directly.</td>
+            </tr>
+            <tr>
+              <td><strong>D11</strong></td>
+              <td>Audio Input</td>
+              <td><strong class="w3-text-green">3.5mm Stereo AUX (CentIoT PJ392A-1)</strong></td>
+              <td>6x RCA jacks</td>
+              <td>Modern TV/Projector/BT reality; future 5.1 via HDMI ARC/Optical; saves space &amp; ₹250.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 6. Power Budget -->
+    <div class="glass-card">
+      <h2 class="section-title"><i class="fa fa-bolt"></i> 6. Power Budget</h2>
+      <div class="code-block">
+        TPA3116D2 efficiency @ 24V, 4 ohm: ~85%
+        Peak output per stereo board: 2 x 50W = 100W
+        3 boards peak total output: 300W
+        Input from PSU at 85% efficiency: 300 / 0.85 = 353W
+
+        Mean Well LRS-350-24 100% Full Load Operation:
+        PSU rating: 24V @ 14.6A = 350.4W continuous (350W peak headroom)
+        Operating policy: 100% unconstrained — no artificial power ceiling needed
+        Peak movie transient load: ~353W (within Mean Well overload threshold)
+        Average listening level (75–80 dB): ~6% of max = ~18W output
+        Average PSU input: ~21W — completely silent, zero heat buildup
+      </div>
+    </div>
+
+    <!-- 7. ESP32 Firmware Notes -->
+    <div class="glass-card">
+      <h2 class="section-title"><i class="fa fa-code"></i> 7. Dual-ESP32-S3 Firmware Notes &amp; Pinout</h2>
+      <div class="w3-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>Implementation</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Controller 1 (Touch HMI / Wireless Remote)</strong></td>
+              <td>Waveshare ESP32-S3 4.3B Touch LCD (<code>Model 28141</code>)</td>
+              <td>800&times;480 IPS 60fps LVGL Touch UI; operates as a <strong>Wireless ESP-NOW / Wi-Fi Battery Sofa
+                  Remote</strong> (built-in <code>CS8501</code> 3.7V LiPo charger + switch) OR Docked 2-wire
+                <code>I2C</code> (<code>GPIO 8/9</code>)
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Controller 2 (Internal 6-Ch Audio DSP Engine)</strong></td>
+              <td>Waveshare ESP32-S3 Dev Board (<code>SKU: 1552780</code>, Pre-Soldered Headers)</td>
+              <td>Dedicated 240 MHz dual-core 6-channel I2S audio processor + biquad crossovers
+                (<code>&gt;100 Hz</code>, <code>&lt;100 Hz</code>, <code>&gt;10 kHz</code>) + Bluetooth A2DP sink</td>
+            </tr>
+            <tr>
+              <td><strong>6-channel output</strong></td>
+              <td>3x PCM5102A via Multi-Lane I2S on <code>SKU: 1552780</code></td>
+              <td>Shared <code>BCK</code> (<code>GPIO 15</code>), <code>LRCK</code> (<code>GPIO 16</code>), 3 discrete
+                <code>DOUT</code> lanes (<code>GPIO 7, 6, 5</code>) + <code>PCM1808 ADC</code> on <code>GPIO 4</code>
+                (<code>DIN</code>) &amp; <code>GPIO 0</code> (<code>MCLK</code>)
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Per-channel volume &amp; caps</strong></td>
+              <td>ESP32-S3 32-bit float software trim + biquad filters</td>
+              <td>Enforces exact speaker caps (<code>30W</code> FL/FR, <code>30W</code> Sub, <code>20W</code> Mid,
+                <code>10W</code> Voice, <code>10W&times;2</code> Surround, <code>10W&times;2</code> Piezo)
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Presets &amp; Fail-Safe</strong></td>
+              <td>Stored in NVS flash on Audio Engine (<code>SKU: 1552780</code>)</td>
+              <td>Amplifier retains last volume/EQ preset and continues playing seamlessly even if wireless touch remote
+                is turned off</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 8. Open Questions / TODO -->
+    <div class="glass-card">
+      <h2 class="section-title"><i class="fa fa-tasks"></i> 8. Open Questions &amp; Status</h2>
+
+      <div class="checklist-item done">
+        <i class="fa fa-check-circle w3-text-green"></i>
+        <span><strong>TPA3116D2 Amp Model Confirmed — RESOLVED:</strong> User confirmed XH-M562 dual-channel mini boards
+          (3 units in hand with header pins).</span>
+      </div>
+      <div class="checklist-item done">
+        <i class="fa fa-check-circle w3-text-green"></i>
+        <span><strong>GX16 Power Connector Upgrade — RESOLVED:</strong> Upgraded to GX16 4-Pin Metal Aviation Plug Set
+          (In Hand!). Pins 1 &amp; 2 in parallel for +24V, Pins 3 &amp; 4 in parallel for GND. Prevents 14.6A pin
+          melting.</span>
+      </div>
+      <div class="checklist-item done">
+        <i class="fa fa-check-circle w3-text-green"></i>
+        <span><strong>Inrush Current Protection — RESOLVED:</strong> Mandatory cold-plug sequence (mate GX16-4 before
+          switching on AC mains; Mean Well soft-start charges 9,400µF/4,700µF smoothly without spark).</span>
+      </div>
+      <div class="checklist-item done">
+        <i class="fa fa-check-circle w3-text-green"></i>
+        <span><strong>Multi-Lane I2S Pinout — RESOLVED:</strong> ESP32-S3 GPIO 12 (BCK), GPIO 13 (WS), GPIO 14 (DOUT0),
+          GPIO 15 (DOUT1), GPIO 16 (DOUT2), GPIO 4/5/6 (ADC).</span>
+      </div>
+      <div class="checklist-item done">
+        <i class="fa fa-check-circle w3-text-green"></i>
+        <span><strong>Rear I/O Panel Layout Finalized — RESOLVED:</strong> 3.5mm Stereo AUX (CentIoT PJ392A-1) + 12x
+          Binding Posts (JS-910B Blue/Black) + GX16 4-Pin Power (In Hand) + USB-C.</span>
+      </div>
+      <div class="checklist-item pending">
+        <i class="fa fa-circle-o w3-text-amber"></i>
+        <span>Get fabrication quote from Chakan box maker for AL6061 enclosure</span>
+      </div>
+      <div class="checklist-item pending">
+        <i class="fa fa-circle-o w3-text-amber"></i>
+        <span>Source 35mm OD copper chimney pipe (Bhosari AC spares) and 4x 12mm corner pillars</span>
+      </div>
+      <div class="checklist-item pending">
+        <i class="fa fa-circle-o w3-text-amber"></i>
+        <span>Order CNC cut 4–5mm Lexan polycarbonate panels (Pimpri Plastics)</span>
+      </div>
+    </div>
+
+    <!-- 9. Component References -->
+    <div class="glass-card">
+      <h2 class="section-title"><i class="fa fa-book"></i> 9. Component References</h2>
+      <div class="w3-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Component</th>
+              <th>Key Specs</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>TPA3116D2</strong></td>
+              <td>Class-D stereo, 2x50W @ 24V, 4 ohm</td>
+              <td>Fixed gain mode (GAIN pins to GND/VCC)</td>
+            </tr>
+            <tr>
+              <td><strong>PCM5102A</strong></td>
+              <td>112 dB SNR Stereo DAC, I2S, 3.3V</td>
+              <td>HW-280 breakout board</td>
+            </tr>
+            <tr>
+              <td><strong>NE5532</strong></td>
+              <td>Dual low-noise op-amp, &plusmn;15V</td>
+              <td>For buffer, HPF/LPF, 5-band EQ</td>
+            </tr>
+            <tr>
+              <td><strong>Mean Well LRS-350-24</strong></td>
+              <td>24V 14.6A 350W enclosed PSU</td>
+              <td>Amazon Rs 2,209 — LOCKED</td>
+            </tr>
+            <tr>
+              <td><strong>MCP4251</strong></td>
+              <td>Dual 256-pos SPI pot, 100k</td>
+              <td>Volume control per channel</td>
+            </tr>
+            <tr>
+              <td><strong>ESP32 DevKit V1</strong></td>
+              <td>30-pin, Xtensa LX6, BT + WiFi</td>
+              <td>I2S + SPI + UART</td>
+            </tr>
+            <tr>
+              <td><strong>LM2596</strong></td>
+              <td>3A step-down switcher</td>
+              <td>24V &rarr; 5V for logic</td>
+            </tr>
+            <tr>
+              <td><strong>Wago 221 series</strong></td>
+              <td>32A push-in lever nuts</td>
+              <td>221-415 (5-port), 221-412 (2-port)</td>
+            </tr>
+            <tr>
+              <td><strong>EC11</strong></td>
+              <td>Rotary encoder, 20 detents/rev</td>
+              <td>20mm aluminum knob</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="font-size: 12px; color: var(--text-muted); font-style: italic; margin-top: 14px;">
+        *Single source of truth. Update after each decision. Paste into chat for analysis.*
+      </p>
+    </div>
+
+    <!-- Footer -->
+    <footer style="text-align: center; padding: 24px 0 40px 0; color: #64748b; font-size: 12px;">
+      <p>Copper Chimney V2 &bull; DIY 5.1 Analog Amplifier Project &bull; Pimpri / Chakan Prototype</p>
+      <p>Single Source of Truth Document &bull; Updated October 2026</p>
+    </footer>
+
+  </main>
+
+  <!-- Image Lightbox Modal (DOM manipulated without HTML strings) -->
+  <div id="imageModal" class="image-modal">
+    <div class="modal-content-wrap">
+      <span id="modalCloseBtn" class="modal-close">&times;</span>
+      <img id="modalImg" class="modal-img" src="" alt="Component preview">
+      <div id="modalTitle" class="modal-title"></div>
+      <div id="modalCaption" class="modal-caption"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      // Print Handler
+      const printBtn = document.getElementById('printBtn');
+      if (printBtn) {
+        printBtn.addEventListener('click', function () {
+          window.print();
+        });
+      }
+
+      // Image Modal Elements
+      const modal = document.getElementById('imageModal');
+      const modalImg = document.getElementById('modalImg');
+      const modalTitle = document.getElementById('modalTitle');
+      const modalCaption = document.getElementById('modalCaption');
+      const modalCloseBtn = document.getElementById('modalCloseBtn');
+
+      // Click on any thumbnail opens modal
+      const thumbs = document.querySelectorAll('.part-thumb');
+      thumbs.forEach(function (thumb) {
+        thumb.addEventListener('click', function () {
+          const fullSrc = thumb.getAttribute('data-full') || thumb.src;
+          const nameText = thumb.getAttribute('data-name') || thumb.alt || 'Component Preview';
+          const descText = thumb.getAttribute('data-desc') || '';
+
+          modalImg.src = fullSrc;
+          modalImg.alt = nameText;
+          modalTitle.textContent = nameText;
+          modalCaption.textContent = descText;
+          modal.style.display = 'block';
+        });
+      });
+
+      function closeModal() {
+        modal.style.display = 'none';
+        modalImg.src = '';
+      }
+
+      if (modalCloseBtn) {
+        modalCloseBtn.addEventListener('click', closeModal);
+      }
+
+      window.addEventListener('click', function (event) {
+        if (event.target === modal) {
+          closeModal();
+        }
+      });
+
+      window.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && modal.style.display === 'block') {
+          closeModal();
+        }
+      });
+
+      // Stock Filter Logic
+      const filterAllBtn = document.getElementById('filterAllBtn');
+      const filterInStockBtn = document.getElementById('filterInStockBtn');
+      const filterPendingBtn = document.getElementById('filterPendingBtn');
+      const allRows = document.querySelectorAll('.bom-table tbody tr');
+
+      function setFilter(filterType) {
+        // Toggle button active classes
+        [filterAllBtn, filterInStockBtn, filterPendingBtn].forEach(function (btn) {
+          if (btn) btn.classList.remove('active');
+        });
+
+        if (filterType === 'all' && filterAllBtn) filterAllBtn.classList.add('active');
+        if (filterType === 'in-stock' && filterInStockBtn) filterInStockBtn.classList.add('active');
+        if (filterType === 'pending' && filterPendingBtn) filterPendingBtn.classList.add('active');
+
+        // Apply display filter to table rows
+        allRows.forEach(function (row) {
+          const status = row.getAttribute('data-stock-status');
+          if (filterType === 'all') {
+            row.style.display = '';
+          } else if (filterType === 'in-stock') {
+            row.style.display = (status === 'in-stock') ? '' : 'none';
+          } else if (filterType === 'pending') {
+            row.style.display = (status === 'pending') ? '' : 'none';
+          }
+        });
+      }
+
+      if (filterAllBtn) {
+        filterAllBtn.addEventListener('click', function () {
+          setFilter('all');
+        });
+      }
+
+      if (filterInStockBtn) {
+        filterInStockBtn.addEventListener('click', function () {
+          setFilter('in-stock');
+        });
+      }
+
+      if (filterPendingBtn) {
+        filterPendingBtn.addEventListener('click', function () {
+          setFilter('pending');
+        });
+      }
+    })();
+  </script>
+</body>
+
+</html>

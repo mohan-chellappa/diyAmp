@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Printable Wiring Diagram — DIY 5.1 Amplifier (Copper Chimney V2)</title>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <style>
+    @page {
+      size: A4 landscape;
+      margin: 8mm 10mm;
+    }
+
+    :root {
+      --ink-dark: #0f172a;
+      --ink-muted: #475569;
+      --border-dark: #1e293b;
+      --border-light: #94a3b8;
+      --bg-blueprint: #ffffff;
+      --wire-red: #dc2626;
+      --wire-black: #0f172a;
+      --wire-orange: #ea580c;
+      --wire-blue: #0284c7;
+      --wire-green: #059669;
+      --wire-purple: #7c3aed;
+      --wire-gold: #d97706;
+    }
+
+    body {
+      background-color: #f8fafc;
+      color: var(--ink-dark);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    /* Screen UI Controls Bar */
+    .screen-controls {
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 10px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 999;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+
+    .btn-print {
+      background: #0284c7;
+      color: #fff;
+      font-weight: 700;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-print:hover { background: #0369a1; }
+
+    .btn-nav {
+      background: #334155;
+      color: #f1f5f9;
+      text-decoration: none;
+      padding: 8px 14px;
+      border-radius: 4px;
+      font-size: 12px;
+      margin-left: 8px;
+      display: inline-block;
+    }
+    .btn-nav:hover { background: #475569; }
+
+    /* Printable Page Container */
+    .print-sheet {
+      width: 100%;
+      max-width: 1380px;
+      margin: 16px auto;
+      background: #ffffff;
+      border: 2px solid var(--border-dark);
+      box-shadow: 0 4px 18px rgba(0,0,0,0.12);
+      padding: 14px 18px;
+      box-sizing: border-box;
+      position: relative;
+    }
+
+    /* Title Block (Standard Engineering Drawing Style) */
+    .title-block {
+      border: 2px solid var(--border-dark);
+      padding: 8px 12px;
+      margin-bottom: 12px;
+      background: #f8fafc;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .title-main {
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: 1.5px;
+      color: #0f172a;
+      margin: 0;
+      text-transform: uppercase;
+    }
+
+    .title-sub {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0369a1;
+      letter-spacing: 1px;
+      margin: 2px 0 0 0;
+    }
+
+    .meta-table {
+      border-collapse: collapse;
+      font-size: 10px;
+      text-align: left;
+    }
+    .meta-table td {
+      padding: 2px 6px;
+      border: 1px solid #cbd5e1;
+    }
+    .meta-table strong { color: #0f172a; }
+
+    /* Grid Layout for Schematic */
+    .schematic-grid {
+      display: grid;
+      grid-template-columns: 280px 240px 1fr 220px;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    /* Standard Module Blocks */
+    .mod-block {
+      border: 1.5px solid var(--border-dark);
+      border-radius: 4px;
+      background: #ffffff;
+      padding: 8px;
+      position: relative;
+      box-sizing: border-box;
+    }
+
+    .mod-header {
+      font-weight: 800;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+      padding: 3px 6px;
+      margin: -8px -8px 6px -8px;
+      border-top-left-radius: 3px;
+      border-top-right-radius: 3px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1.5px solid var(--border-dark);
+    }
+
+    .hdr-smps   { background: #e0f2fe; color: #0369a1; }
+    .hdr-wago   { background: #ffedd5; color: #c2410c; }
+    .hdr-brain  { background: #ede9fe; color: #6d28d9; }
+    .hdr-amp    { background: #e2e8f0; color: #0f172a; }
+    .hdr-spk    { background: #dcfce7; color: #15803d; }
+    .hdr-adc    { background: #fef08a; color: #854d0e; }
+
+    /* Component photo badge */
+    .mod-img {
+      max-height: 85px;
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 4px auto;
+      object-fit: contain;
+      border: 1px solid #e2e8f0;
+      border-radius: 3px;
+    }
+
+    /* Terminal connection tables */
+    .term-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 9.5px;
+      margin-top: 4px;
+    }
+    .term-table th, .term-table td {
+      padding: 2px 4px;
+      border: 1px solid #cbd5e1;
+      line-height: 1.25;
+    }
+    .term-table th {
+      background: #f1f5f9;
+      font-weight: 700;
+      text-align: left;
+    }
+
+    /* Wire Indicators & Badges */
+    .wire-tag {
+      display: inline-block;
+      font-family: ui-monospace, SFMono-Regular, monospace;
+      font-size: 9px;
+      font-weight: 800;
+      padding: 1px 4px;
+      border-radius: 2px;
+      border: 1px solid rgba(0,0,0,0.2);
+    }
+    .tag-24v   { background: #fee2e2; color: #b91c1c; border-color: #ef4444; }
+    .tag-gnd   { background: #f1f5f9; color: #0f172a; border-color: #64748b; }
+    .tag-5v    { background: #ffedd5; color: #c2410c; border-color: #f97316; }
+    .tag-i2s   { background: #e0f2fe; color: #0369a1; border-color: #0ea5e9; }
+    .tag-aud   { background: #dcfce7; color: #047857; border-color: #10b981; }
+    .tag-spk-p { background: #fee2e2; color: #b91c1c; border-color: #ef4444; }
+    .tag-spk-m { background: #f1f5f9; color: #334155; border-color: #64748b; }
+
+    /* WAGO Port Layout */
+    .wago-port-list {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      margin-top: 4px;
+    }
+    .wago-port-row {
+      display: flex;
+      align-items: center;
+      background: #fff7ed;
+      border: 1px solid #fdba74;
+      border-radius: 3px;
+      padding: 2px 5px;
+      font-size: 9.5px;
+    }
+    .wago-port-num {
+      font-weight: 900;
+      color: #c2410c;
+      width: 20px;
+    }
+
+    /* Warning callout box */
+    .warn-box {
+      border: 1.5px solid #dc2626;
+      background: #fef2f2;
+      color: #991b1b;
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* 3-Column Amps row inside center column */
+    .amps-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    /* Page break for printing */
+    .page-break {
+      page-break-before: always;
+      break-before: page;
+      margin-top: 24px;
+    }
+
+    /* Print Overrides */
+    @media print {
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+      }
+      .screen-controls { display: none !important; }
+      .print-sheet {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: 100% !important;
+      }
+      .mod-block {
+        break-inside: avoid !important;
+        border-color: #000 !important;
+      }
+      .title-block {
+        border-color: #000 !important;
+        background: #fff !important;
+      }
+      .btn-print, .btn-nav { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Screen Floating Control Bar (Hidden on print) -->
+  <div class="screen-controls">
+    <div class="w3-row" style="max-width: 1400px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between;">
+      <div>
+        <strong style="font-size: 14px; letter-spacing: 1px; color: #38bdf8;">
+          <i class="fa fa-print w3-margin-right"></i>PRINTABLE BENCH WIRING BLUEPRINT
+        </strong>
+        <span style="font-size: 11px; color: #94a3b8; margin-left: 10px;">
+          Optimized for A4 / Letter Landscape printing &amp; workshop reference
+        </span>
+      </div>
+      <div>
+        <button onclick="window.print()" class="btn-print">
+          <i class="fa fa-print w3-margin-right"></i>Print to Paper / PDF
+        </button>
+        <a href="CIRCUIT_DIAGRAM.html" class="btn-nav" style="background: #7c3aed;">
+          <i class="fa fa-cogs w3-margin-right"></i>Circuit Schematic
+        </a>
+        <a href="WIRING_DIAGRAM.html" class="btn-nav">
+          <i class="fa fa-desktop w3-margin-right"></i>Interactive View
+        </a>
+        <a href="PROJECT.html" class="btn-nav">
+          <i class="fa fa-book w3-margin-right"></i>BOM &amp; Spec
+        </a>
+        <a href="TECHNICAL_EVALUATION.html" class="btn-nav">
+          <i class="fa fa-shield w3-margin-right"></i>Tech Eval
+        </a>
+        <a href="QUALITY_MANAGEMENT_FMEA_CP.html" class="btn-nav" style="background: #b45309;">
+          <i class="fa fa-shield w3-margin-right"></i>Quality Plan
+        </a>
+        <a href="ASSEMBLY_MANUAL.html" class="btn-nav" style="background: #059669;">
+          <i class="fa fa-wrench w3-margin-right"></i>Assembly Manual
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- PAGE 1: MASTER PICTORIAL INTERCONNECTION & WIRING BLUEPRINT               -->
+  <!-- ========================================================================= -->
+  <div class="print-sheet">
+
+    <!-- Title Block -->
+    <div class="title-block">
+      <div>
+        <div class="title-main">DIY 5.1 AUDIO AMPLIFIER &bull; COPPER CHIMNEY V2</div>
+        <div class="title-sub">MASTER PICTORIAL SYSTEM WIRING DIAGRAM &amp; INTERCONNECTION BLUEPRINT</div>
+      </div>
+      <div>
+        <table class="meta-table">
+          <tr>
+            <td><strong>DWG NO:</strong> CCV2-WD-001</td>
+            <td><strong>REV:</strong> 2.2 (SSOT Locked)</td>
+            <td><strong>DATE:</strong> October 2026</td>
+          </tr>
+          <tr>
+            <td><strong>SUPPLY:</strong> 24V DC / 14.6A (Mean Well)</td>
+            <td><strong>AMPS:</strong> 3&times; XH-M562 TPA3116D2</td>
+            <td><strong>CHANNELS:</strong> 6 Channels (5.1 BTL)</td>
+          </tr>
+          <tr>
+            <td><strong>BRAIN:</strong> ESP32-S3 + Touch LCD</td>
+            <td><strong>DACs:</strong> 3&times; PCM5102A HW-280</td>
+            <td><strong>ADC:</strong> PCM1808 24-Bit AUX In</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Main 4-Column Schematic Layout -->
+    <div class="schematic-grid">
+
+      <!-- ================================================================= -->
+      <!-- COLUMN 1: EXTERNAL POWER (AC MAINS & MEAN WELL SMPS)              -->
+      <!-- ================================================================= -->
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+
+        <!-- SMPS Block -->
+        <div class="mod-block">
+          <div class="mod-header hdr-smps">
+            <span><i class="fa fa-bolt w3-margin-right"></i>MEAN WELL LRS-350-24</span>
+            <span style="font-size: 9px;">350.4W &bull; 24V 14.6A</span>
+          </div>
+          <div style="text-align: center;">
+            <img src="./Meanwell LRS-350-24 SMPS.png" alt="Mean Well LRS-350-24" class="mod-img">
+          </div>
+          <table class="term-table">
+            <tr>
+              <th style="width: 22px;">Term</th>
+              <th style="width: 48px;">Signal</th>
+              <th>Destination / Specification</th>
+            </tr>
+            <tr>
+              <td style="font-weight: 800;">1 (L)</td>
+              <td><span class="wire-tag tag-24v">AC Live</span></td>
+              <td>Via <strong>3A Slow-Blow 5&times;20mm fuse</strong></td>
+            </tr>
+            <tr>
+              <td style="font-weight: 800;">2 (N)</td>
+              <td><span class="wire-tag tag-gnd">AC Neutral</span></td>
+              <td>From 230V AC Mains Inlet</td>
+            </tr>
+            <tr>
+              <td style="font-weight: 800;">3 (&thinsp;&#x23da;&thinsp;)</td>
+              <td><span class="wire-tag" style="background: #ecfdf5; color: #047857;">PE Earth</span></td>
+              <td>Mains Safety Earth &amp; Bond to AL6061</td>
+            </tr>
+            <tr>
+              <td style="font-weight: 800;">4, 5, 6</td>
+              <td><span class="wire-tag tag-gnd">-V (GND)</span></td>
+              <td><strong>16 AWG Black</strong> &rarr; GX16 4-Pin Pins 3, 4 (Parallel GND)</td>
+            </tr>
+            <tr>
+              <td style="font-weight: 800;">7, 8, 9</td>
+              <td><span class="wire-tag tag-24v">+V (24V)</span></td>
+              <td><strong>16 AWG Red</strong> &rarr; GX16 4-Pin Pins 1, 2 (Parallel +24V)</td>
+            </tr>
+          </table>
+          <div style="font-size: 9px; color: #475569; margin-top: 4px;">
+            &bull; External wall-mounted position isolates transformer hash.<br>
+            &bull; Automatic fan activates only above 70% load (~245W).
+          </div>
+        </div>
+
+        <!-- Disconnect & DC Fuse Block -->
+        <div class="mod-block">
+          <div class="mod-header hdr-smps">
+            <span><i class="fa fa-plug w3-margin-right"></i>DC INLET &amp; INLINE PROTECTION</span>
+            <span style="font-size: 9px;">GX16 4-PIN &bull; 10A FUSE</span>
+          </div>
+          <table class="term-table">
+            <tr>
+              <th>Component</th>
+              <th>Function / Wire Gauge</th>
+            </tr>
+            <tr>
+              <td><strong>GX16 4-Pin Plug</strong></td>
+              <td>4-Pin Aviation disconnect at rear panel (Pins 1+2: +24V, Pins 3+4: GND - 15A rating)</td>
+            </tr>
+            <tr>
+              <td><strong>10A DC Fuse</strong></td>
+              <td>In-line slow-blow fuse on +24V Red rail before WAGO distribution</td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- System Architecture Note -->
+        <div class="mod-block" style="background: #f8fafc;">
+          <div style="font-weight: 800; font-size: 10px; color: #0f172a; margin-bottom: 2px;">
+            <i class="fa fa-info-circle w3-text-blue w3-margin-right"></i>SIGNAL FLOW SUMMARY:
+          </div>
+          <div style="font-size: 9px; color: #475569; line-height: 1.35;">
+            SMPS &rarr; GX16 4-Pin (Parallel) &rarr; 10A Fuse &rarr; WAGO 221-415 Bus &rarr; 3&times; XH-M562 Amps + XL4015 Buck (5V) &rarr; ESP32-S3 Brain &rarr; 3&times; PCM5102A DACs &rarr; Amps &rarr; 12&times; Binding Posts.
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- COLUMN 2: INTERNAL POWER DISTRIBUTION (WAGO, CAP & BUCK)          -->
+      <!-- ================================================================= -->
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+
+        <!-- WAGO 221-415 Blocks -->
+        <div class="mod-block">
+          <div class="mod-header hdr-wago">
+            <span><i class="fa fa-share-alt w3-margin-right"></i>WAGO 221-415 POWER BUS</span>
+            <span style="font-size: 9px;">32A / 450V</span>
+          </div>
+          <div style="text-align: center;">
+            <img src="./WAGO 221-415 5-Conductor Lever Splicing Connector.png" alt="WAGO 221-415" class="mod-img" style="max-height: 60px;">
+          </div>
+
+          <!-- +24V Rail -->
+          <div style="font-weight: 800; font-size: 10px; color: #b91c1c; margin-top: 4px;">
+            BLOCK 1: +24V DC POSITIVE BUS (ORANGE LEVER)
+          </div>
+          <div class="wago-port-list">
+            <div class="wago-port-row">
+              <span class="wago-port-num">P1</span>
+              <span><strong>16 AWG Red:</strong> +24V Input from GX16-4 (Pins 1+2) / Fuse</span>
+            </div>
+            <div class="wago-port-row">
+              <span class="wago-port-num">P2</span>
+              <span><strong>20 AWG Red:</strong> Amp #1 VCC (Front L/R Pad 8)</span>
+            </div>
+            <div class="wago-port-row">
+              <span class="wago-port-num">P3</span>
+              <span><strong>20 AWG Red:</strong> Amp #2 VCC (Rear L/R Pad 8)</span>
+            </div>
+            <div class="wago-port-row">
+              <span class="wago-port-num">P4</span>
+              <span><strong>20 AWG Red:</strong> Amp #3 VCC (Center/Sub Pad 8)</span>
+            </div>
+            <div class="wago-port-row">
+              <span class="wago-port-num">P5</span>
+              <span><strong>20 AWG Red:</strong> XL4015 Buck Converter IN+</span>
+            </div>
+          </div>
+
+          <!-- GND Rail -->
+          <div style="font-weight: 800; font-size: 10px; color: #0f172a; margin-top: 8px;">
+            BLOCK 2: 0V DC POWER GROUND BUS
+          </div>
+          <div class="wago-port-list">
+            <div class="wago-port-row" style="background: #f1f5f9; border-color: #cbd5e1;">
+              <span class="wago-port-num" style="color: #334155;">P1</span>
+              <span><strong>16 AWG Black:</strong> 0V GND Input from GX16-4 (Pins 3+4)</span>
+            </div>
+            <div class="wago-port-row" style="background: #f1f5f9; border-color: #cbd5e1;">
+              <span class="wago-port-num" style="color: #334155;">P2</span>
+              <span><strong>20 AWG Black:</strong> Amp #1 GND (Pad 9)</span>
+            </div>
+            <div class="wago-port-row" style="background: #f1f5f9; border-color: #cbd5e1;">
+              <span class="wago-port-num" style="color: #334155;">P3</span>
+              <span><strong>20 AWG Black:</strong> Amp #2 GND (Pad 9)</span>
+            </div>
+            <div class="wago-port-row" style="background: #f1f5f9; border-color: #cbd5e1;">
+              <span class="wago-port-num" style="color: #334155;">P4</span>
+              <span><strong>20 AWG Black:</strong> Amp #3 GND (Pad 9)</span>
+            </div>
+            <div class="wago-port-row" style="background: #f1f5f9; border-color: #cbd5e1;">
+              <span class="wago-port-num" style="color: #334155;">P5</span>
+              <span><strong>20 AWG Black:</strong> XL4015 Buck Converter IN-</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4700uF Bulk Reservoir Cap -->
+        <div class="mod-block">
+          <div class="mod-header hdr-wago">
+            <span><i class="fa fa-database w3-margin-right"></i>4700&micro;F 35V/50V BULK CAPACITOR</span>
+            <span style="font-size: 9px;">LOW ESR</span>
+          </div>
+          <table class="term-table">
+            <tr>
+              <td><strong>Positive (+)</strong></td>
+              <td>Bridged to WAGO +24V Rail (absorbs bass transient dips)</td>
+            </tr>
+            <tr>
+              <td><strong>Negative (&minus;)</strong></td>
+              <td>Bridged to WAGO GND Rail (filters switching ripple)</td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- XL4015 Buck Converter -->
+        <div class="mod-block">
+          <div class="mod-header hdr-wago">
+            <span><i class="fa fa-sliders w3-margin-right"></i>XL4015 BUCK CONVERTER</span>
+            <span style="font-size: 9px;">24V &rarr; 5.00V (5A)</span>
+          </div>
+          <table class="term-table">
+            <tr>
+              <th>Pad</th>
+              <th>Voltage</th>
+              <th>Destination</th>
+            </tr>
+            <tr>
+              <td><strong>IN+ / IN-</strong></td>
+              <td>+24V / GND</td>
+              <td>From WAGO Port 5 (20 AWG)</td>
+            </tr>
+            <tr>
+              <td><strong>OUT+</strong></td>
+              <td><span class="wire-tag tag-5v">+5.00V DC</span></td>
+              <td>ESP32 5V + 3&times; DACs VCC + ADC</td>
+            </tr>
+            <tr>
+              <td><strong>OUT-</strong></td>
+              <td><span class="wire-tag tag-gnd">Logic GND</span></td>
+              <td>Common digital ground rail</td>
+            </tr>
+          </table>
+          <div style="font-size: 9px; color: #b91c1c; font-weight: 700; margin-top: 3px;">
+            &bull; Trim potentiometer to exactly 5.00V BEFORE connecting electronics!
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- COLUMN 3: BRAIN, DACs, ADC & AMPLIFIER SUBSYSTEM                  -->
+      <!-- ================================================================= -->
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+
+        <!-- Digital Audio Brain Section (ESP32-S3 + DACs + ADC) -->
+        <div class="mod-block">
+          <div class="mod-header hdr-brain">
+            <span><i class="fa fa-microchip w3-margin-right"></i>LOGIC BRAIN &amp; DIGITAL AUDIO (I2S BUS)</span>
+            <span style="font-size: 9px;">ESP32-S3 &bull; 3&times; PCM5102A &bull; PCM1808 ADC</span>
+          </div>
+
+          <!-- Top row: ESP32 + ADC -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 6px;">
+            <div>
+              <div style="font-weight: 800; font-size: 10px; color: #6d28d9;">Waveshare ESP32-S3 Touch LCD (4.3B)</div>
+              <table class="term-table">
+                <tr>
+                  <th>Pin</th>
+                  <th>Function / Bus</th>
+                </tr>
+                <tr>
+                  <td><strong>5V / GND</strong></td>
+                  <td>Power from XL4015 Buck (5.00V)</td>
+                </tr>
+                <tr>
+                  <td><strong>GPIO 15</strong></td>
+                  <td><span class="wire-tag tag-i2s">BCK (Bit Clock)</span> &rarr; Shared to 3&times; DACs</td>
+                </tr>
+                <tr>
+                  <td><strong>GPIO 16</strong></td>
+                  <td><span class="wire-tag tag-i2s">LRCK (Word Select)</span> &rarr; Shared to 3&times; DACs</td>
+                </tr>
+                <tr>
+                  <td><strong>GPIO 7</strong></td>
+                  <td><span class="wire-tag tag-i2s">DOUT 1</span> &rarr; DAC #1 DIN (Front L/R)</td>
+                </tr>
+                <tr>
+                  <td><strong>GPIO 6</strong></td>
+                  <td><span class="wire-tag tag-i2s">DOUT 2</span> &rarr; DAC #2 DIN (Surround L/R)</td>
+                </tr>
+                <tr>
+                  <td><strong>GPIO 5</strong></td>
+                  <td><span class="wire-tag tag-i2s">DOUT 3</span> &rarr; DAC #3 DIN (Center/Sub)</td>
+                </tr>
+                <tr>
+                  <td><strong>GPIO 4</strong></td>
+                  <td><span class="wire-tag tag-i2s">DIN</span> &larr; PCM1808 ADC DOUT (3.5mm AUX)</td>
+                </tr>
+              </table>
+            </div>
+
+            <div>
+              <div style="font-weight: 800; font-size: 10px; color: #854d0e;">PCM1808 ADC (Stereo AUX In)</div>
+              <table class="term-table">
+                <tr>
+                  <th>Pin</th>
+                  <th>Connection</th>
+                </tr>
+                <tr>
+                  <td><strong>VCC / GND</strong></td>
+                  <td>5.0V from Buck / Logic GND</td>
+                </tr>
+                <tr>
+                  <td><strong>BCK / LRCK</strong></td>
+                  <td>ESP32 GPIO 15 &amp; 16 (Clock Master)</td>
+                </tr>
+                <tr>
+                  <td><strong>DOUT</strong></td>
+                  <td>ESP32 GPIO 4 (ADC Data In)</td>
+                </tr>
+                <tr>
+                  <td><strong>LIN / RIN</strong></td>
+                  <td>From 3.5mm Stereo AUX Jack</td>
+                </tr>
+              </table>
+              <div style="font-size: 9px; color: #475569; margin-top: 3px;">
+                CentIoT PJ392A-1 3.5mm Gold-Plated Jack mounted on Polycarbonate rear panel.
+              </div>
+            </div>
+          </div>
+
+          <!-- DACs Table -->
+          <div style="font-weight: 800; font-size: 10px; color: #6d28d9; margin-bottom: 2px;">
+            3&times; PCM5102A I2S DAC Modules (HW-280 &bull; 32-Bit 384kHz Stereo)
+          </div>
+          <table class="term-table">
+            <tr>
+              <th>Module</th>
+              <th>Digital Input (I2S)</th>
+              <th>Jumper Configuration</th>
+              <th>Analog Audio Output</th>
+            </tr>
+            <tr>
+              <td><strong>DAC #1</strong> (Front)</td>
+              <td>BCK=GPIO 15, LCK=GPIO 16, DIN=GPIO 7</td>
+              <td rowspan="3">
+                <strong>SCK &rarr; GND</strong> (Internal PLL)<br>
+                FLT &rarr; GND (Normal latency)<br>
+                DMP &rarr; GND (De-emphasis OFF)<br>
+                FMT &rarr; GND (Standard I2S)<br>
+                XMT &rarr; High (Soft mute OFF)
+              </td>
+              <td>L/R &rarr; Amp #1 (Shielded 2-Core)</td>
+            </tr>
+            <tr>
+              <td><strong>DAC #2</strong> (Surround)</td>
+              <td>BCK=GPIO 15, LCK=GPIO 16, DIN=GPIO 6</td>
+              <td>L/R &rarr; Amp #2 (Shielded 2-Core)</td>
+            </tr>
+            <tr>
+              <td><strong>DAC #3</strong> (Center/Sub)</td>
+              <td>BCK=GPIO 15, LCK=GPIO 16, DIN=GPIO 5</td>
+              <td>L=Center, R=Sub &rarr; Amp #3</td>
+            </tr>
+          </table>
+          <div style="font-size: 9px; color: #047857; margin-top: 2px;">
+            &bull; Cable shield braid soldered to DAC AGND only (eliminates ground loop hum).
+          </div>
+        </div>
+
+        <!-- 3x XH-M562 Amplifier Boards Row -->
+        <div class="mod-block">
+          <div class="mod-header hdr-amp">
+            <span><i class="fa fa-volume-up w3-margin-right"></i>3&times; XH-M562 TPA3116D2 AMPLIFIER BOARDS</span>
+            <span style="font-size: 9px;">2&times;50W @ 24V 4&Omega; &bull; Fanless &bull; Solder-Pad Version</span>
+          </div>
+
+          <div class="amps-row">
+
+            <!-- Amp #1 -->
+            <div style="border: 1px solid #0284c7; border-radius: 3px; padding: 5px;">
+              <div style="font-weight: 800; font-size: 10px; color: #0284c7; text-align: center;">AMP #1: FRONT L / R</div>
+              <img src="./image/PROJECT/1791126129975.png" alt="XH-M562 Amp #1" class="mod-img" style="max-height: 55px;">
+              <table class="term-table">
+                <tr><td>P1: INL</td><td>&larr; DAC #1 L Out</td></tr>
+                <tr><td>P2: GND</td><td>&larr; DAC #1 AGND (Shield)</td></tr>
+                <tr><td>P3: INR</td><td>&larr; DAC #1 R Out</td></tr>
+                <tr><td>P4: SPL-</td><td>&rarr; Front Left Post (&minus;)</td></tr>
+                <tr><td>P5: SPL+</td><td>&rarr; Front Left Post (+)</td></tr>
+                <tr><td>P6: SPR-</td><td>&rarr; Front Right Post (&minus;)</td></tr>
+                <tr><td>P7: SPR+</td><td>&rarr; Front Right Post (+)</td></tr>
+                <tr><td>P8: VCC</td><td>&larr; WAGO +24V Port 2</td></tr>
+                <tr><td>P9: GND</td><td>&larr; WAGO GND Port 2</td></tr>
+                <tr><td>P10: CS</td><td>Leave Floating (ON)</td></tr>
+              </table>
+            </div>
+
+            <!-- Amp #2 -->
+            <div style="border: 1px solid #7c3aed; border-radius: 3px; padding: 5px;">
+              <div style="font-weight: 800; font-size: 10px; color: #7c3aed; text-align: center;">AMP #2: REAR L / R</div>
+              <img src="./image/PROJECT/1791126129975.png" alt="XH-M562 Amp #2" class="mod-img" style="max-height: 55px;">
+              <table class="term-table">
+                <tr><td>P1: INL</td><td>&larr; DAC #2 L Out</td></tr>
+                <tr><td>P2: GND</td><td>&larr; DAC #2 AGND (Shield)</td></tr>
+                <tr><td>P3: INR</td><td>&larr; DAC #2 R Out</td></tr>
+                <tr><td>P4: SPL-</td><td>&rarr; Rear Left Post (&minus;)</td></tr>
+                <tr><td>P5: SPL+</td><td>&rarr; Rear Left Post (+)</td></tr>
+                <tr><td>P6: SPR-</td><td>&rarr; Rear Right Post (&minus;)</td></tr>
+                <tr><td>P7: SPR+</td><td>&rarr; Rear Right Post (+)</td></tr>
+                <tr><td>P8: VCC</td><td>&larr; WAGO +24V Port 3</td></tr>
+                <tr><td>P9: GND</td><td>&larr; WAGO GND Port 3</td></tr>
+                <tr><td>P10: CS</td><td>Leave Floating (ON)</td></tr>
+              </table>
+            </div>
+
+            <!-- Amp #3 -->
+            <div style="border: 1px solid #059669; border-radius: 3px; padding: 5px;">
+              <div style="font-weight: 800; font-size: 10px; color: #059669; text-align: center;">AMP #3: CENTER / SUB</div>
+              <img src="./image/PROJECT/1791126129975.png" alt="XH-M562 Amp #3" class="mod-img" style="max-height: 55px;">
+              <table class="term-table">
+                <tr><td>P1: INL</td><td>&larr; DAC #3 L (Center)</td></tr>
+                <tr><td>P2: GND</td><td>&larr; DAC #3 AGND (Shield)</td></tr>
+                <tr><td>P3: INR</td><td>&larr; DAC #3 R (Sub)</td></tr>
+                <tr><td>P4: SPL-</td><td>&rarr; Center Post (&minus;)</td></tr>
+                <tr><td>P5: SPL+</td><td>&rarr; Center Post (+)</td></tr>
+                <tr><td>P6: SPR-</td><td>&rarr; Subwoofer Post (&minus;)</td></tr>
+                <tr><td>P7: SPR+</td><td>&rarr; Subwoofer Post (+)</td></tr>
+                <tr><td>P8: VCC</td><td>&larr; WAGO +24V Port 4</td></tr>
+                <tr><td>P9: GND</td><td>&larr; WAGO GND Port 4</td></tr>
+                <tr><td>P10: CS</td><td>Leave Floating (ON)</td></tr>
+              </table>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- COLUMN 4: 12x BINDING POSTS & BTL SAFETY RULES                    -->
+      <!-- ================================================================= -->
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+
+        <!-- Binding Posts Block -->
+        <div class="mod-block">
+          <div class="mod-header hdr-spk">
+            <span><i class="fa fa-bullhorn w3-margin-right"></i>12&times; BINDING POSTS</span>
+            <span style="font-size: 9px;">JS-910B GOLD</span>
+          </div>
+          <table class="term-table">
+            <tr>
+              <th>Channel</th>
+              <th>Red (+) Post</th>
+              <th>Black (&minus;) Post</th>
+            </tr>
+            <tr>
+              <td><strong>Front Left</strong></td>
+              <td><span class="wire-tag tag-spk-p">Amp1 Pad 5</span></td>
+              <td><span class="wire-tag tag-spk-m">Amp1 Pad 4</span></td>
+            </tr>
+            <tr>
+              <td><strong>Front Right</strong></td>
+              <td><span class="wire-tag tag-spk-p">Amp1 Pad 7</span></td>
+              <td><span class="wire-tag tag-spk-m">Amp1 Pad 6</span></td>
+            </tr>
+            <tr>
+              <td><strong>Rear Left</strong></td>
+              <td><span class="wire-tag tag-spk-p">Amp2 Pad 5</span></td>
+              <td><span class="wire-tag tag-spk-m">Amp2 Pad 4</span></td>
+            </tr>
+            <tr>
+              <td><strong>Rear Right</strong></td>
+              <td><span class="wire-tag tag-spk-p">Amp2 Pad 7</span></td>
+              <td><span class="wire-tag tag-spk-m">Amp2 Pad 6</span></td>
+            </tr>
+            <tr>
+              <td><strong>Center</strong></td>
+              <td><span class="wire-tag tag-spk-p">Amp3 Pad 5</span></td>
+              <td><span class="wire-tag tag-spk-m">Amp3 Pad 4</span></td>
+            </tr>
+            <tr>
+              <td><strong>Subwoofer</strong></td>
+              <td><span class="wire-tag tag-spk-p">Amp3 Pad 7</span></td>
+              <td><span class="wire-tag tag-spk-m">Amp3 Pad 6</span></td>
+            </tr>
+          </table>
+          <div style="font-size: 9px; color: #475569; margin-top: 4px;">
+            &bull; Mounted through <strong>non-conductive 4mm Polycarbonate</strong> rear panel.<br>
+            &bull; Eliminates metal chassis short circuits.
+          </div>
+        </div>
+
+        <!-- BTL Safety Warning -->
+        <div class="warn-box">
+          <i class="fa fa-exclamation-triangle" style="font-size: 16px;"></i>
+          <div>
+            CRITICAL BTL RULE:<br>
+            <span style="font-size: 9px; font-weight: normal;">
+              NEVER connect speaker negative (&minus;) leads to Ground or Chassis! TPA3116 outputs are Bridge-Tied Loads. Shorting SPL&minus; or SPR&minus; to ground destroys the chip instantly.
+            </span>
+          </div>
+        </div>
+
+        <!-- Wire Schedule Quick Key -->
+        <div class="mod-block">
+          <div class="mod-header hdr-amp">
+            <span><i class="fa fa-paint-brush w3-margin-right"></i>WIRE COLOR CODE</span>
+          </div>
+          <table class="term-table">
+            <tr><td><span class="wire-tag tag-24v">+24V DC</span></td><td>16/20 AWG Red</td></tr>
+            <tr><td><span class="wire-tag tag-gnd">Power GND</span></td><td>16/20 AWG Black</td></tr>
+            <tr><td><span class="wire-tag tag-5v">+5.0V Logic</span></td><td>22 AWG Orange</td></tr>
+            <tr><td><span class="wire-tag tag-i2s">I2S Clock</span></td><td>26 AWG Cyan/Blue</td></tr>
+            <tr><td><span class="wire-tag tag-aud">Audio L/R</span></td><td>26 AWG Shielded</td></tr>
+            <tr><td><span class="wire-tag tag-spk-p">Speaker +</span></td><td>16/18 AWG Red</td></tr>
+            <tr><td><span class="wire-tag tag-spk-m">Speaker &minus;</span></td><td>16/18 AWG Black</td></tr>
+          </table>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Drawing Footer -->
+    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-light); padding-top: 6px; font-size: 9px; color: var(--ink-muted);">
+      <div>
+        <strong>PROJECT:</strong> Copper Chimney V2 (160mm Natural Convection Cube) &bull; 
+        <strong>LOCATION:</strong> Pimpri / Chakan Hub &bull; 
+        <strong>ARCH:</strong> ESP32 Software Volume (MCP4251 Omitted)
+      </div>
+      <div>
+        Page 1 of 2 &bull; Master System Schematic &bull; Confidential DIY Audio Blueprint
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ========================================================================= -->
+  <!-- PAGE 2: BENCH WIRING SCHEDULE, COMPONENT PINOUTS & TESTING CHECKLIST      -->
+  <!-- ========================================================================= -->
+  <div class="print-sheet page-break">
+
+    <!-- Title Block Page 2 -->
+    <div class="title-block">
+      <div>
+        <div class="title-main">DIY 5.1 AUDIO AMPLIFIER &bull; BENCH TEST &amp; PINOUT SCHEDULE</div>
+        <div class="title-sub">WIRING GAUGE SCHEDULE &bull; SOLDER CHECKLIST &bull; PRE-POWER VERIFICATION</div>
+      </div>
+      <div>
+        <table class="meta-table">
+          <tr>
+            <td><strong>DWG NO:</strong> CCV2-WD-002</td>
+            <td><strong>SHEET:</strong> 2 of 2</td>
+            <td><strong>STATUS:</strong> Verified</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Two-Column Page 2 Content -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+
+      <!-- Left Column: Detailed Pinouts & Solder Rules -->
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+
+        <!-- XH-M562 Detailed Pinout -->
+        <div class="mod-block">
+          <div class="mod-header hdr-amp">
+            <span><i class="fa fa-microchip w3-margin-right"></i>XH-M562 TPA3116D2 SOLDER PAD PINOUT (10 PADS)</span>
+            <span style="font-size: 9px;">50W+50W &bull; Solder-Pad Version</span>
+          </div>
+          <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 6px;">
+            <img src="./image/PROJECT/1791126129975.png" alt="XH-M562" class="mod-img" style="max-height: 80px;">
+            <div style="font-size: 9.5px; color: #475569;">
+              <strong>Model:</strong> XH-M562 Dual Channel Class-D Mini<br>
+              <strong>Dimensions:</strong> 25.6 &times; 37.2 mm<br>
+              <strong>Gain:</strong> 36 dB &bull; <strong>Operating Voltage:</strong> 12V to 24V DC<br>
+              <strong>Heatsink Coupling:</strong> Arctic MX-4 thermal paste clamped to AL6061 finned side plates.
+            </div>
+          </div>
+          <table class="term-table">
+            <tr>
+              <th style="width: 50px;">Pad</th>
+              <th style="width: 70px;">Signal</th>
+              <th>Connection Details &amp; Wire Gauge</th>
+            </tr>
+            <tr>
+              <td><strong>Pad 1</strong></td>
+              <td><span class="wire-tag tag-aud">INL</span></td>
+              <td>Left Audio In from DAC Analog L (Core 1 of 26 AWG shielded cable)</td>
+            </tr>
+            <tr>
+              <td><strong>Pad 2</strong></td>
+              <td><span class="wire-tag tag-gnd">GND</span></td>
+              <td>Audio Signal Ground from DAC AGND (Braided shield of audio cable)</td>
+            </tr>
+            <tr>
+              <td><strong>Pad 3</strong></td>
+              <td><span class="wire-tag tag-aud">INR</span></td>
+              <td>Right Audio In from DAC Analog R (Core 2 of 26 AWG shielded cable)</td>
+            </tr>
+            <tr>
+              <td><strong>Pad 4</strong></td>
+              <td><span class="wire-tag tag-spk-m">SPL-</span></td>
+              <td>Left Speaker Negative (BTL) &rarr; Black Binding Post (16/18 AWG)</td>
+            </tr>
+            <tr>
+              <td><strong>Pad 5</strong></td>
+              <td><span class="wire-tag tag-spk-p">SPL+</span></td>
+              <td>Left Speaker Positive (BTL) &rarr; Red Binding Post (16/18 AWG)</td>
+            </tr>
+            <tr>
+              <td><strong>Pad 6</strong></td>
+              <td><span class="wire-tag tag-spk-m">SPR-</span></td>
+              <td>Right Speaker Negative (BTL) &rarr; Black Binding Post (16/18 AWG)</td>
+            </tr>
+            <tr>
+              <td><strong>Pad 7</strong></td>
+              <td><span class="wire-tag tag-spk-p">SPR+</span></td>
+              <td>Right Speaker Positive (BTL) &rarr; Red Binding Post (16/18 AWG)</td>
+            </tr>
+            <tr>
+              <td><strong>Pad 8</strong></td>
+              <td><span class="wire-tag tag-24v">VCC</span></td>
+              <td>+24V DC Power Input &larr; WAGO 221-415 Block 1 (20 AWG Red)</td>
+            </tr>
+            <tr>
+              <td><strong>Pad 9</strong></td>
+              <td><span class="wire-tag tag-gnd">GND</span></td>
+              <td>0V DC Power Ground &larr; WAGO 221-415 Block 2 (20 AWG Black)</td>
+            </tr>
+            <tr>
+              <td><strong>Pad 10</strong></td>
+              <td><span class="wire-tag tag-gnd">CS</span></td>
+              <td>Chip Select / Standby &rarr; <strong>Leave Floating</strong> for normal active operation</td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- Soldering Guidelines -->
+        <div class="mod-block">
+          <div class="mod-header hdr-smps">
+            <span><i class="fa fa-wrench w3-margin-right"></i>WORKSHOP SOLDERING BEST PRACTICES</span>
+          </div>
+          <ol style="margin: 4px 0 0 16px; padding: 0; font-size: 9.5px; line-height: 1.4; color: #334155;">
+            <li><strong>Pre-Tin Wire Strands:</strong> Strip 2–3 mm of wire insulation. Twist strands tight and tin bare wire before inserting into PCB eyelets.</li>
+            <li><strong>The 3-Second Rule:</strong> Apply iron tip to pad and lead, feed 1 mm of 60/40 solder, count <em>1-2-3</em>, remove heat to avoid lifting pads.</li>
+            <li><strong>Inspect for Bridges:</strong> Backlight the board and inspect with a loupe between Pads 4 &amp; 5, 6 &amp; 7, and 8 &amp; 9.</li>
+            <li><strong>Strain Relief:</strong> Apply a dab of neutral RTV silicone or hot-melt glue at board wire exit edges to prevent copper fatigue.</li>
+          </ol>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Wire Schedule & Bench Checklist -->
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+
+        <!-- Wire Gauge Schedule -->
+        <div class="mod-block">
+          <div class="mod-header hdr-wago">
+            <span><i class="fa fa-table w3-margin-right"></i>SYSTEM WIRE GAUGE SCHEDULE</span>
+          </div>
+          <table class="term-table">
+            <tr>
+              <th>Circuit Function</th>
+              <th>Gauge</th>
+              <th>Wire Type</th>
+              <th>Max Current</th>
+            </tr>
+            <tr>
+              <td>AC Mains Input (L, N, PE)</td>
+              <td><strong>18 AWG</strong></td>
+              <td>3-Core IEC Copper Flex</td>
+              <td>10A Rated</td>
+            </tr>
+            <tr>
+              <td>DC Power Bus (SMPS &rarr; WAGO)</td>
+              <td><strong>16 AWG</strong></td>
+              <td>High-Strand Silicone (Red/Black)</td>
+              <td>15A Continuous</td>
+            </tr>
+            <tr>
+              <td>Amp DC Feeds (WAGO &rarr; Amps)</td>
+              <td><strong>20 AWG</strong></td>
+              <td>UL1007 PVC Stranded Copper</td>
+              <td>5A Peak</td>
+            </tr>
+            <tr>
+              <td>Logic DC Rail (Buck &rarr; ESP32)</td>
+              <td><strong>22 AWG</strong></td>
+              <td>Flexible Copper (Orange/Black)</td>
+              <td>3A Rated</td>
+            </tr>
+            <tr>
+              <td>Speaker BTL Lines (Amps &rarr; Posts)</td>
+              <td><strong>16 / 18 AWG</strong></td>
+              <td>Twisted Pair Copper Wire</td>
+              <td>8A Peak</td>
+            </tr>
+            <tr>
+              <td>Analog Audio (DACs &rarr; Amps)</td>
+              <td><strong>26 AWG</strong></td>
+              <td>2-Core + Braided Shielded Cable</td>
+              <td>Signal Level (&lt; 2V RMS)</td>
+            </tr>
+            <tr>
+              <td>Digital I2S Clocks &amp; Data</td>
+              <td><strong>26 AWG</strong></td>
+              <td>Direct Jumper / Ribbon (< 100mm)</td>
+              <td>3.3V Logic (&lt; 10mA)</td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- Pre-Power Verification Checklist -->
+        <div class="mod-block">
+          <div class="mod-header hdr-spk">
+            <span><i class="fa fa-check-square-o w3-margin-right"></i>6-STEP BENCH PRE-POWER CHECKLIST</span>
+          </div>
+          <table class="term-table">
+            <tr>
+              <th style="width: 20px;">#</th>
+              <th>Test Step</th>
+              <th>Expected Measurement / Action</th>
+              <th style="width: 40px; text-align: center;">Status</th>
+            </tr>
+            <tr>
+              <td style="font-weight: 800;">1</td>
+              <td><strong>Mains Earth Continuity</strong></td>
+              <td>Resistance between IEC Earth pin and AL6061 chassis &lt; 0.2 &Omega;</td>
+              <td style="text-align: center;">[&emsp;]</td>
+            </tr>
+            <tr>
+              <td style="font-weight: 800;">2</td>
+              <td><strong>24V Bus Resistance</strong></td>
+              <td>Resistance between +24V WAGO rail and GND WAGO rail &gt; 10 k&Omega;</td>
+              <td style="text-align: center;">[&emsp;]</td>
+            </tr>
+            <tr>
+              <td style="font-weight: 800;">3</td>
+              <td><strong>BTL Ground Isolation</strong></td>
+              <td>Resistance between all 12 binding posts and chassis is INFINITE (&infin;)</td>
+              <td style="text-align: center;">[&emsp;]</td>
+            </tr>
+            <tr>
+              <td style="font-weight: 800;">4</td>
+              <td><strong>XL4015 Voltage Trim</strong></td>
+              <td>Multimeter across Buck OUT+ and OUT- reads EXACTLY 5.00V DC</td>
+              <td style="text-align: center;">[&emsp;]</td>
+            </tr>
+            <tr>
+              <td style="font-weight: 800;">5</td>
+              <td><strong>DAC Pin Jumper Check</strong></td>
+              <td>PCM5102A SCK pin is tied to GND (internal PLL activated)</td>
+              <td style="text-align: center;">[&emsp;]</td>
+            </tr>
+            <tr>
+              <td style="font-weight: 800;">6</td>
+              <td><strong>Initial Smoke Test</strong></td>
+              <td>Power on with no speakers connected. Check for hot chips or buzzing.</td>
+              <td style="text-align: center;">[&emsp;]</td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- Thermal Design Note -->
+        <div class="mod-block" style="background: #f8fafc;">
+          <div style="font-weight: 800; font-size: 10px; color: #0f172a; margin-bottom: 2px;">
+            <i class="fa fa-thermometer-half w3-text-red w3-margin-right"></i>NATURAL CONVECTION THERMAL DESIGN:
+          </div>
+          <div style="font-size: 9px; color: #475569; line-height: 1.35;">
+            Zero cooling fans. 35mm central copper chimney draws cool air through bottom baseplate intake slots and exhausts via thermal siphon. Maximum listening dissipation (18–30W) is easily rejected by chimney (8.1W) + 20 external aluminum fins (22.1W) at &Delta;T = 20&deg;C.
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Drawing Footer Page 2 -->
+    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-light); padding-top: 6px; font-size: 9px; color: var(--ink-muted); margin-top: 10px;">
+      <div>
+        <strong>DOCUMENT:</strong> CCV2-WD-002 (Bench Test &amp; Pinout Schedule) &bull; 
+        <strong>AUTHOR:</strong> DIY Engineering Team &bull; 
+        <strong>CHASSIS:</strong> 160&times;160&times;160 mm Cube
+      </div>
+      <div>
+        Page 2 of 2 &bull; Printable Wiring &amp; Test Specification
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

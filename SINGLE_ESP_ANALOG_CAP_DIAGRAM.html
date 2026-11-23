@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Single-ESP32 5.1 Architecture (Passive Analog Surround)</title>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <style>
+    body { background: #0a0e17; color: #e2e8f0; font-family: Arial, Helvetica, sans-serif; }
+    .page-wrap { max-width: 1280px; margin: 0 auto; padding: 12px; }
+    .diagram-card { background: #111827; border: 1px solid #374151; border-radius: 6px; padding: 8px; }
+    #diagram { width: 100%; height: auto; display: block; }
+    .w3-table td, .w3-table th { color: #cbd5e1; font-size: 13px; }
+    .w3-table th { background: #1f2937; color: #e2e8f0; }
+    .legend-dot { display: inline-block; width: 12px; height: 12px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
+    .note-box { background: #0f172a; border: 1px solid #334155; border-radius: 4px; padding: 8px 12px; font-size: 13px; line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <div class="page-wrap">
+    <div class="w3-center" style="margin: 6px 0 12px 0;">
+      <div style="font-size: 26px; font-weight: 300;">Single-ESP32 5.1 Application Diagram</div>
+      <div style="font-size: 13px; color: #94a3b8;">1&times; ESP32-S3-Pico &bull; 2&times; PCM5102A DACs &bull; Passive Analog Cap Matrix for Surrounds &bull; 3&times; XH-M562 Amps</div>
+    </div>
+
+    <div class="diagram-card">
+      <svg id="diagram" viewBox="0 0 1200 560" role="img" aria-label="Single-ESP32 5.1 block diagram with analog capacitor surround tap"></svg>
+    </div>
+
+    <div id="legend" class="w3-margin-top" style="font-size: 13px;"></div>
+
+    <div class="w3-margin-top" style="font-size: 15px; font-weight: bold; color: #e2e8f0;">Connection Breakdown</div>
+    <div class="w3-responsive">
+      <table class="w3-table w3-bordered" id="conn-table"></table>
+    </div>
+
+    <div class="note-box w3-margin-top" id="notes"></div>
+  </div>
+
+<script>
+// ===========================================================================
+// DATA (2D arrays) - Single ESP32 + 2x DAC + Analog Cap Matrix
+// ===========================================================================
+
+var BLOCKS = [
+  // Left: Inputs & UI
+  [20,  30,  160, 44, '#94a3b8', '#1e293b', 'AUX Jack / VHM-314 BT', 'Stereo Analog Line-In', '', ''],
+  [20,  100, 160, 58, '#eab308', '#422006', 'PCM1808 Stereo ADC', '24-Bit 96kHz Digitizer', 'SCK <- MCLK (GPIO 2)', ''],
+  [20,  280, 160, 75, '#38bdf8', '#082f49', '4.3B Touch HMI', 'Main Vol / Voice / Sub EQ', 'Sofa Remote (Battery)', 'ESP-NOW Radio Link'],
+
+  // Center: Single MCU Brain
+  [280, 85,  190, 200, '#8b5cf6', '#1e1b4b', 'ESP32-S3-Pico (SOLE MCU)', 'Single Brain - 100% Sync', 'I2S0: Front L/R Stereo', 'I2S1: Mono Summed (Ctr/Sub)'],
+
+  // DACs (Only 2 DACs!)
+  [560, 85,  150, 70, '#10b981', '#052e16', 'PCM5102A DAC #1', 'FRONT L / R STEREO', 'HW-280 (112dB SNR)', ''],
+  [560, 215, 150, 70, '#10b981', '#052e16', 'PCM5102A DAC #2', 'VOICE + SUBWOOFER', 'Ch A: Voice | Ch B: Sub', ''],
+
+  // Passive Analog Cap Matrix Stage
+  [560, 395, 150, 80, '#f59e0b', '#451a03', 'ANALOG CAP MATRIX', 'Taps DAC #1 (L & R)', 'High-Pass Capacitors (C)', 'Extracts Ambiance / M-S'],
+
+  // 3x Amps
+  [790, 85,  150, 70, '#22c55e', '#14532d', 'Amp #1 (XH-M562)', 'Front L & R (2x50W)', 'Direct Pure Stereo', ''],
+  [790, 215, 150, 70, '#22c55e', '#14532d', 'Amp #2 (XH-M562)', 'Center & Sub (2x50W)', 'DSP Active Crossover', ''],
+  [790, 400, 150, 70, '#22c55e', '#14532d', 'Amp #3 (XH-M562)', 'Surround L & R (2x50W)', 'Cap-Coupled Highs/Mids', ''],
+
+  // 6x Speaker Channels
+  [1000, 75,  160, 32, '#f8fafc', '#1e293b', 'Front Left Speaker', '', '', ''],
+  [1000, 125, 160, 32, '#f8fafc', '#1e293b', 'Front Right Speaker', '', '', ''],
+  [1000, 205, 160, 32, '#f8fafc', '#1e293b', 'Center (Voice) Speaker', '', '', ''],
+  [1000, 255, 160, 32, '#f8fafc', '#1e293b', 'Subwoofer Speaker', '', '', ''],
+  [1000, 390, 160, 32, '#f8fafc', '#1e293b', 'Surround Left Speaker', '', '', ''],
+  [1000, 440, 160, 32, '#f8fafc', '#1e293b', 'Surround Right Speaker', '', '', '']
+];
+
+var LINES = [
+  // Analog source -> ADC
+  ['100,74 100,100', '#94a3b8', 2.5, 0, 1],
+  // ADC -> Pico
+  ['180,129 280,129', '#eab308', 2.5, 0, 1],
+  // Pico MCLK -> ADC
+  ['280,150 140,150 140,158', '#f97316', 2, 0, 1],
+  // HMI -> Pico (ESP-NOW)
+  ['180,317 280,240', '#38bdf8', 2, 1, 1],
+
+  // Shared Clock Bus (BCK + LRCK)
+  ['470,110 515,110', '#06b6d4', 3.5, 0, 0],
+  ['515,110 515,240', '#06b6d4', 3.5, 0, 0],
+  ['515,110 560,110', '#06b6d4', 3.5, 0, 1],
+  ['515,240 560,240', '#06b6d4', 3.5, 0, 1],
+
+  // Dedicated DOUTs
+  ['470,130 560,130', '#a855f7', 2.5, 0, 1],
+  ['470,260 560,260', '#a855f7', 2.5, 0, 1],
+
+  // DAC #1 -> Amp #1
+  ['710,120 790,120', '#10b981', 3, 0, 1],
+  // DAC #2 -> Amp #2
+  ['710,250 790,250', '#10b981', 3, 0, 1],
+
+  // ANALOG TAP from DAC #1 to CAP MATRIX
+  ['745,120 745,350 510,350 510,435 560,435', '#f59e0b', 2.5, 1, 1],
+
+  // Cap Matrix -> Amp #3
+  ['710,435 790,435', '#f59e0b', 3, 0, 1],
+
+  // Amp Outputs to Speakers
+  ['940,105 1000,91', '#f8fafc', 2, 0, 1],
+  ['940,135 1000,141', '#f8fafc', 2, 0, 1],
+  ['940,235 1000,221', '#f8fafc', 2, 0, 1],
+  ['940,265 1000,271', '#f8fafc', 2, 0, 1],
+  ['940,420 1000,406', '#f8fafc', 2, 0, 1],
+  ['940,450 1000,456', '#f8fafc', 2, 0, 1]
+];
+
+var TEXTS = [
+  [230, 122, 'DIN', '#eab308', 11, 'middle'],
+  [210, 165, 'MCLK (GPIO 2)', '#f97316', 10, 'middle'],
+  [215, 290, 'ESP-NOW Radio', '#38bdf8', 11, 'middle'],
+
+  [515, 80, 'BCK / LRCK Bus', '#06b6d4', 11, 'middle'],
+  [515, 142, 'DOUT1 (Stereo)', '#a855f7', 10, 'middle'],
+  [515, 272, 'DOUT2 (Mono)', '#a855f7', 10, 'middle'],
+
+  [750, 110, 'Analog L/R', '#10b981', 11, 'middle'],
+  [750, 240, 'Voice/Sub', '#10b981', 11, 'middle'],
+  [610, 342, 'Analog Stereo Tap (Pre-Amp)', '#f59e0b', 11, 'middle'],
+  [750, 425, 'Filtered L/R', '#f59e0b', 11, 'middle'],
+
+  [20, 540, 'Zero Multi-MCU Complexity: 100% sample-locked digital processing for Fronts + Sub + Center; Passive Cap Matrix powers Surrounds.', '#94a3b8', 11, 'start']
+];
+
+var LEGEND = [
+  ['#8b5cf6', 'ESP32-S3-Pico Core Brain'],
+  ['#06b6d4', 'I2S Shared Clock (Pico Master)'],
+  ['#a855f7', 'I2S Digital Audio Streams'],
+  ['#10b981', 'Active DSP Analog Audio'],
+  ['#f59e0b', 'Passive Analog Cap Matrix (Surround)'],
+  ['#38bdf8', 'Wireless Touch Remote (ESP-NOW)']
+];
+
+var CONNECTIONS = [
+  ['Subsystem', 'Source Output', 'Destination Input', 'Description & Signal Type'],
+  ['Digital Audio 1', 'Pico I2S0 (GPIO 7 DOUT1)', 'PCM5102A DAC #1 DIN', 'Independent Front Left & Right Stereo DSP Stream'],
+  ['Digital Audio 2', 'Pico I2S1 (GPIO 6 DOUT2)', 'PCM5102A DAC #2 DIN', 'Mono-Summed: Ch A = Speech Center (>150Hz), Ch B = Subwoofer (<100Hz)'],
+  ['Master Clocks', 'Pico GPIO 15 & 16', 'DAC #1, #2 & PCM1808', 'Shared BCK + LRCK clock lines (Pico is sole Master)'],
+  ['ADC System', 'PCM1808 DOUT & SCK', 'Pico GPIO 4 & GPIO 2', 'Aux / BT 24-bit digitization with jitter-free master clock'],
+  ['Amp #1 Feed', 'DAC #1 Analog Out', 'Amp #1 (XH-M562) Inputs', 'Drives Front L & Front R speakers (Full range, high clarity)'],
+  ['Amp #2 Feed', 'DAC #2 Analog Out', 'Amp #2 (XH-M562) Inputs', 'Drives Center (dialogue) & Subwoofer (dedicated bass channel)'],
+  ['Amp #3 Feed', 'DAC #1 Analog Tap', 'Amp #3 via Passive Caps', 'Series non-polar caps filter out bass; feeds high/ambient reverb to Surrounds']
+];
+
+var NOTES = [
+  'Zero Multi-MCU sync risks: Eliminates clock drift, I2S buffer slips, and WiFi preemption clicks entirely.',
+  'Capacitor Sizing: 2.2 µF to 4.7 µF non-polar film/bipolar caps in series with Amp #3 input block low frequencies below 150 Hz.',
+  'Surround Tracking: Rear surround sound level naturally scales with the master volume knob/slider without separate code.',
+  'Saves Parts: Your ordered ESP32-WROOM-32 can be kept as a spare, saving perfboard space and wiring time.'
+];
+
+// ===========================================================================
+// RENDERING
+// ===========================================================================
+var NS = 'http://www.w3.org/2000/svg';
+var svg = document.getElementById('diagram');
+
+function svgEl(name, attrs, parent) {
+  var e = document.createElementNS(NS, name);
+  Object.keys(attrs || {}).forEach(function (k) { e.setAttribute(k, attrs[k]); });
+  if (parent) { parent.appendChild(e); }
+  return e;
+}
+
+function htmlEl(name, props, parent) {
+  var e = document.createElement(name);
+  Object.keys(props || {}).forEach(function (k) {
+    if (k === 'text') { e.textContent = props[k]; } else if (k === 'style') { e.setAttribute('style', props[k]); } else { e.setAttribute(k, props[k]); }
+  });
+  if (parent) { parent.appendChild(e); }
+  return e;
+}
+
+function drawBackground() {
+  svgEl('rect', { x: 0, y: 0, width: 1200, height: 560, fill: '#0f172a', rx: 6 }, svg);
+}
+
+function drawMarkers(defs) {
+  var seen = {};
+  LINES.forEach(function (ln) {
+    var c = ln[1];
+    if (seen[c]) { return; }
+    seen[c] = true;
+    var m = svgEl('marker', { id: 'ar' + c.replace('#', ''), viewBox: '0 0 10 10', refX: 9, refY: 5, markerUnits: 'userSpaceOnUse', markerWidth: 11, markerHeight: 11, orient: 'auto-start-reverse' }, defs);
+    svgEl('path', { d: 'M0,0 L10,5 L0,10 z', fill: c }, m);
+  });
+}
+
+function drawLines() {
+  LINES.forEach(function (ln) {
+    var a = { points: ln[0], fill: 'none', stroke: ln[1], 'stroke-width': ln[2], 'stroke-linejoin': 'round' };
+    if (ln[3]) { a['stroke-dasharray'] = '6 4'; }
+    if (ln[4]) { a['marker-end'] = 'url(#ar' + ln[1].replace('#', '') + ')'; }
+    svgEl('polyline', a, svg);
+  });
+}
+
+function drawBlocks() {
+  BLOCKS.forEach(function (b) {
+    var x = b[0], y = b[1], w = b[2], h = b[3];
+    svgEl('rect', { x: x, y: y, width: w, height: h, fill: b[5], stroke: b[4], 'stroke-width': 2, rx: 4 }, svg);
+    var hasSub = b[7] !== '' || b[8] !== '' || b[9] !== '';
+    var ty = hasSub ? y + 18 : y + h / 2 + 5;
+    var t = svgEl('text', { x: x + w / 2, y: ty, 'text-anchor': 'middle', 'font-size': 12, 'font-weight': 'bold', fill: b[4], 'font-family': 'Arial, sans-serif' }, svg);
+    t.textContent = b[6];
+    for (var i = 0; i < 3; i++) {
+      var s = b[7 + i];
+      if (s === '') { continue; }
+      var st = svgEl('text', { x: x + w / 2, y: y + 36 + i * 15, 'text-anchor': 'middle', 'font-size': 10.5, fill: '#cbd5e1', 'font-family': 'Arial, sans-serif' }, svg);
+      st.textContent = s;
+    }
+  });
+}
+
+function drawTexts() {
+  TEXTS.forEach(function (t) {
+    var e = svgEl('text', { x: t[0], y: t[1], fill: t[3], 'font-size': t[4], 'text-anchor': t[5], 'font-family': 'Arial, sans-serif' }, svg);
+    e.textContent = t[2];
+  });
+}
+
+function drawLegend() {
+  var box = document.getElementById('legend');
+  LEGEND.forEach(function (l) {
+    var item = htmlEl('span', { style: 'margin-right: 18px; display: inline-block;' }, box);
+    htmlEl('span', { 'class': 'legend-dot', style: 'background:' + l[0] }, item);
+    htmlEl('span', { text: l[1] }, item);
+  });
+}
+
+function drawTable() {
+  var table = document.getElementById('conn-table');
+  CONNECTIONS.forEach(function (row, i) {
+    var tr = htmlEl('tr', {}, table);
+    row.forEach(function (cell) {
+      htmlEl(i === 0 ? 'th' : 'td', { text: cell }, tr);
+    });
+  });
+}
+
+function drawNotes() {
+  var box = document.getElementById('notes');
+  NOTES.forEach(function (n) {
+    htmlEl('div', { text: '\u2022 ' + n }, box);
+  });
+}
+
+(function init() {
+  var defs = svgEl('defs', {}, svg);
+  drawBackground();
+  drawMarkers(defs);
+  drawLines();
+  drawBlocks();
+  drawTexts();
+  drawLegend();
+  drawTable();
+  drawNotes();
+})();
+</script>
+</body>
+</html>

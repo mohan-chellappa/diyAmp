@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PCM1808 Stereo ADC — Enlarged Soldering & Wiring Diagram</title>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <style>
+    :root {
+      --bg: #0a0e17; --panel: #111827; --card: #1f2937;
+      --cyan: #06b6d4; --green: #10b981; --purple: #a855f7;
+      --orange: #f97316; --yellow: #eab308; --red: #ef4444; --blue: #38bdf8;
+    }
+    body { background: var(--bg); color: #f9fafb; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 0; padding: 0; }
+    header { background: var(--panel); border-bottom: 2px solid var(--yellow); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+    .nav-btn { background: #374151; color: #f3f4f6; border: 1px solid #4b5563; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: 600; text-decoration: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+    .nav-btn:hover { background: #4b5563; }
+    .main { max-width: 1120px; margin: 0 auto; padding: 20px 16px; }
+    
+    .board-wrap { position: relative; display: block; width: 100%; max-width: 920px; margin: 0 auto; background: #ffffff; border-radius: 10px; border: 2px solid #eab308; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
+    .board-wrap img { width: 100%; display: block; }
+    .board-wrap svg.overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; margin-top: 20px; }
+    .card-box { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 16px; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th, td { padding: 7px 10px; border: 1px solid #334155; text-align: left; }
+    th { background: #1e293b; color: #94a3b8; }
+  </style>
+</head>
+<body>
+
+<header>
+  <span style="font-weight:800; font-size:15px; color:var(--yellow);">
+    <i class="fa fa-headphones"></i> PCM1808 24-Bit ADC — Enlarged Soldering &amp; Pinout Guide
+  </span>
+  <div style="display:flex; gap:8px;">
+    <a href="DAC_PINOUT_ANNOTATED.html" class="nav-btn">← DAC &amp; Amp Pinout</a>
+    <a href="CIRCUIT_DIAGRAM.html" class="nav-btn">Circuit Diagram</a>
+  </div>
+</header>
+
+<div class="main">
+  <p style="color:#cbd5e1; font-size:13px; margin-bottom:16px;">
+    Enlarged annotated view of your <strong>PCM1808 ADC module</strong> (15 pins total: 6 Left, 6 Right, 3 Top). 
+    <span style="color:#4ade80; font-weight:bold;">Green / Blue / Purple dots</span> = MUST SOLDER &amp; WIRE &nbsp;|&nbsp; 
+    <span style="color:#94a3b8; font-weight:bold;">Grey dots</span> = Leave empty (config pins handled internally).
+  </p>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       ENLARGED BOARD PHOTO WITH EXACT COORDINATE ANNOTATIONS
+       Source image: 642 x 577 px -> viewBox="0 0 642 577"
+  ══════════════════════════════════════════════════════════════════ -->
+  <div class="board-wrap">
+    <img src="./image/pcm1808_adc.png" alt="PCM1808 ADC Module">
+
+    <svg class="overlay" viewBox="0 0 642 577" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="pa-g" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#10b981"/></marker>
+        <marker id="pa-b" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#38bdf8"/></marker>
+        <marker id="pa-p" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#a855f7"/></marker>
+        <marker id="pa-o" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#f97316"/></marker>
+        <marker id="pa-r" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#ef4444"/></marker>
+        <marker id="pa-y" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#eab308"/></marker>
+        <marker id="pa-s" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#64748b"/></marker>
+      </defs>
+
+      <!-- ══════════════════════════════════════════════
+           TOP HEADER (3 PINS: RIN, -, LIN)
+      ══════════════════════════════════════════════ -->
+      <!-- RIN (351, 130) -->
+      <circle cx="351" cy="130" r="6" fill="#ec4899" stroke="#ffffff" stroke-width="1.5"/>
+      <line x1="351" y1="130" x2="290" y2="75" stroke="#ec4899" stroke-width="2" marker-end="url(#pa-r)"/>
+      <rect x="170" y="45" width="125" height="30" rx="4" fill="#0d1117" stroke="#ec4899" stroke-width="1.2" opacity="0.95"/>
+      <text x="232" y="58" font-size="10" fill="#ec4899" text-anchor="middle" font-family="monospace" font-weight="bold">RIN (Right In)</text>
+      <text x="232" y="70" font-size="8.5" fill="#f8fafc" text-anchor="middle" font-family="monospace">← 3.5mm Aux Ring</text>
+
+      <!-- AGND / - (377, 146) -->
+      <circle cx="377" cy="146" r="6" fill="#38bdf8" stroke="#ffffff" stroke-width="1.5"/>
+      <line x1="377" y1="146" x2="395" y2="85" stroke="#38bdf8" stroke-width="2" marker-end="url(#pa-b)"/>
+      <rect x="330" y="45" width="130" height="30" rx="4" fill="#0d1117" stroke="#38bdf8" stroke-width="1.2" opacity="0.95"/>
+      <text x="395" y="58" font-size="10" fill="#38bdf8" text-anchor="middle" font-family="monospace" font-weight="bold">AGND (Ground -)</text>
+      <text x="395" y="70" font-size="8.5" fill="#f8fafc" text-anchor="middle" font-family="monospace">← 3.5mm Aux Sleeve</text>
+
+      <!-- LIN (403, 163) -->
+      <circle cx="403" cy="163" r="6" fill="#10b981" stroke="#ffffff" stroke-width="1.5"/>
+      <line x1="403" y1="163" x2="500" y2="95" stroke="#10b981" stroke-width="2" marker-end="url(#pa-g)"/>
+      <rect x="475" y="55" width="135" height="30" rx="4" fill="#0d1117" stroke="#10b981" stroke-width="1.2" opacity="0.95"/>
+      <text x="542" y="68" font-size="10" fill="#10b981" text-anchor="middle" font-family="monospace" font-weight="bold">LIN (Left In)</text>
+      <text x="542" y="80" font-size="8.5" fill="#f8fafc" text-anchor="middle" font-family="monospace">← 3.5mm Aux Tip</text>
+
+
+      <!-- ══════════════════════════════════════════════
+           LEFT HEADER (6 PINS: FMT, MD1, MD0, GND, 3.3, +5V)
+      ══════════════════════════════════════════════ -->
+      <!-- FMT (245, 152) -->
+      <circle cx="245" cy="152" r="5" fill="#64748b" stroke="#ffffff" stroke-width="1"/>
+      <line x1="245" y1="152" x2="155" y2="120" stroke="#64748b" stroke-width="1.5" stroke-dasharray="3 2" marker-end="url(#pa-s)"/>
+      <!-- MD1 (233, 170) -->
+      <circle cx="233" cy="170" r="5" fill="#64748b" stroke="#ffffff" stroke-width="1"/>
+      <line x1="233" y1="170" x2="155" y2="145" stroke="#64748b" stroke-width="1.5" stroke-dasharray="3 2"/>
+      <!-- MD0 (221, 189) -->
+      <circle cx="221" cy="189" r="5" fill="#64748b" stroke="#ffffff" stroke-width="1"/>
+      <line x1="221" y1="189" x2="155" y2="165" stroke="#64748b" stroke-width="1.5" stroke-dasharray="3 2"/>
+
+      <rect x="15" y="110" width="145" height="58" rx="4" fill="#0d1117" stroke="#64748b" stroke-width="1.2" opacity="0.95"/>
+      <text x="87" y="125" font-size="9.5" fill="#94a3b8" text-anchor="middle" font-family="monospace" font-weight="bold">FMT · MD1 · MD0</text>
+      <text x="87" y="138" font-size="8.5" fill="#cbd5e1" text-anchor="middle" font-family="monospace">❌ LEAVE UNWIRED</text>
+      <text x="87" y="150" font-size="7.5" fill="#64748b" text-anchor="middle" font-family="monospace">Internally pulled LOW</text>
+      <text x="87" y="160" font-size="7.5" fill="#64748b" text-anchor="middle" font-family="monospace">(Default 24-bit I2S)</text>
+
+      <!-- GND Left (209, 207) -->
+      <circle cx="209" cy="207" r="6" fill="#38bdf8" stroke="#ffffff" stroke-width="1.5"/>
+      <line x1="209" y1="207" x2="135" y2="200" stroke="#38bdf8" stroke-width="2" marker-end="url(#pa-b)"/>
+      <rect x="10" y="182" width="125" height="28" rx="4" fill="#0d1117" stroke="#38bdf8" stroke-width="1.2" opacity="0.95"/>
+      <text x="72" y="195" font-size="9.5" fill="#38bdf8" text-anchor="middle" font-family="monospace" font-weight="bold">GND (Power)</text>
+      <text x="72" y="206" font-size="8" fill="#cbd5e1" text-anchor="middle" font-family="monospace">Common GND Rail</text>
+
+      <!-- 3.3V Left (197, 225) -->
+      <circle cx="197" cy="225" r="6" fill="#eab308" stroke="#ffffff" stroke-width="1.5"/>
+      <line x1="197" y1="225" x2="135" y2="232" stroke="#eab308" stroke-width="2" marker-end="url(#pa-y)"/>
+      <rect x="10" y="218" width="125" height="28" rx="4" fill="#0d1117" stroke="#eab308" stroke-width="1.2" opacity="0.95"/>
+      <text x="72" y="231" font-size="9.5" fill="#eab308" text-anchor="middle" font-family="monospace" font-weight="bold">3.3V (Logic)</text>
+      <text x="72" y="242" font-size="8" fill="#cbd5e1" text-anchor="middle" font-family="monospace">From ESP32 3V3 / LDO</text>
+
+      <!-- +5V Left (185, 243) -->
+      <circle cx="185" cy="243" r="6" fill="#f97316" stroke="#ffffff" stroke-width="1.5"/>
+      <line x1="185" y1="243" x2="135" y2="268" stroke="#f97316" stroke-width="2" marker-end="url(#pa-o)"/>
+      <rect x="10" y="254" width="125" height="30" rx="4" fill="#0d1117" stroke="#f97316" stroke-width="1.2" opacity="0.95"/>
+      <text x="72" y="267" font-size="9.5" fill="#f97316" text-anchor="middle" font-family="monospace" font-weight="bold">+5V (Analog Vcc)</text>
+      <text x="72" y="278" font-size="8" fill="#cbd5e1" text-anchor="middle" font-family="monospace">From 5.0V Buck Out</text>
+
+
+      <!-- ══════════════════════════════════════════════
+           RIGHT HEADER (6 PINS: BCK, OUT, LRC, SCK, GND, 3.3V)
+      ══════════════════════════════════════════════ -->
+      <!-- BCK (416, 260) -->
+      <circle cx="416" cy="260" r="6" fill="#38bdf8" stroke="#ffffff" stroke-width="1.5"/>
+      <line x1="416" y1="260" x2="485" y2="230" stroke="#38bdf8" stroke-width="2" marker-end="url(#pa-b)"/>
+      <rect x="485" y="210" width="145" height="28" rx="4" fill="#0d1117" stroke="#38bdf8" stroke-width="1.2" opacity="0.95"/>
+      <text x="557" y="222" font-size="9.5" fill="#38bdf8" text-anchor="middle" font-family="monospace" font-weight="bold">BCK (Bit Clock)</text>
+      <text x="557" y="233" font-size="8" fill="#cbd5e1" text-anchor="middle" font-family="monospace">← ESP32 GPIO 15</text>
+
+      <!-- OUT / DOUT (404, 279) -->
+      <circle cx="404" cy="279" r="6.5" fill="#a855f7" stroke="#ffffff" stroke-width="1.5"/>
+      <line x1="404" y1="279" x2="485" y2="262" stroke="#a855f7" stroke-width="2.2" marker-end="url(#pa-p)"/>
+      <rect x="485" y="244" width="145" height="28" rx="4" fill="#0d1117" stroke="#a855f7" stroke-width="1.5" opacity="0.95"/>
+      <text x="557" y="256" font-size="9.5" fill="#c084fc" text-anchor="middle" font-family="monospace" font-weight="bold">OUT (I2S Data)</text>
+      <text x="557" y="267" font-size="8" fill="#f8fafc" text-anchor="middle" font-family="monospace">➔ ESP32 GPIO 4 (DIN)</text>
+
+      <!-- LRC / LRCK (392, 297) -->
+      <circle cx="392" cy="297" r="6" fill="#06b6d4" stroke="#ffffff" stroke-width="1.5"/>
+      <line x1="392" y1="297" x2="485" y2="294" stroke="#06b6d4" stroke-width="2" marker-end="url(#pa-b)"/>
+      <rect x="485" y="278" width="145" height="28" rx="4" fill="#0d1117" stroke="#06b6d4" stroke-width="1.2" opacity="0.95"/>
+      <text x="557" y="290" font-size="9.5" fill="#06b6d4" text-anchor="middle" font-family="monospace" font-weight="bold">LRC (Word Select)</text>
+      <text x="557" y="301" font-size="8" fill="#cbd5e1" text-anchor="middle" font-family="monospace">← ESP32 GPIO 16</text>
+
+      <!-- SCK (380, 315) -->
+      <circle cx="380" cy="315" r="6" fill="#eab308" stroke="#ffffff" stroke-width="1.5"/>
+      <line x1="380" y1="315" x2="485" y2="330" stroke="#eab308" stroke-width="2" marker-end="url(#pa-y)"/>
+      <rect x="485" y="314" width="145" height="32" rx="4" fill="#0d1117" stroke="#eab308" stroke-width="1.2" opacity="0.95"/>
+      <text x="557" y="327" font-size="9.5" fill="#facc15" text-anchor="middle" font-family="monospace" font-weight="bold">SCK (Master Clk)</text>
+      <text x="557" y="339" font-size="7.8" fill="#cbd5e1" text-anchor="middle" font-family="monospace">ESP32 MCLK / GPIO 0</text>
+
+      <!-- GND Right (368, 333) -->
+      <circle cx="368" cy="333" r="6" fill="#38bdf8" stroke="#ffffff" stroke-width="1.5"/>
+      <line x1="368" y1="333" x2="485" y2="365" stroke="#38bdf8" stroke-width="2" marker-end="url(#pa-b)"/>
+      <rect x="485" y="352" width="145" height="24" rx="4" fill="#0d1117" stroke="#38bdf8" stroke-width="1.2" opacity="0.95"/>
+      <text x="557" y="367" font-size="9.5" fill="#38bdf8" text-anchor="middle" font-family="monospace" font-weight="bold">GND (Digital GND)</text>
+
+      <!-- 3.3V Right (356, 351) -->
+      <circle cx="356" cy="351" r="5" fill="#64748b" stroke="#ffffff" stroke-width="1"/>
+      <line x1="356" y1="351" x2="485" y2="395" stroke="#64748b" stroke-width="1.5" stroke-dasharray="3 2"/>
+      <rect x="485" y="382" width="145" height="24" rx="4" fill="#0d1117" stroke="#64748b" stroke-width="1.2" opacity="0.95"/>
+      <text x="557" y="397" font-size="9" fill="#94a3b8" text-anchor="middle" font-family="monospace">3.3V (Tied to L 3.3V)</text>
+
+    </svg>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       SOLDERING & WIRING INSTRUCTIONS
+  ══════════════════════════════════════════════════════════════════ -->
+  <div class="grid-2">
+    <div class="card-box" style="border-left:4px solid #eab308;">
+      <h4 style="color:#facc15; margin-top:0; font-size:14px;"><i class="fa fa-fire"></i> What Header Pins Should You Solder?</h4>
+      <p style="font-size:12px; color:#cbd5e1; line-height:1.6;">
+        Your kit includes two 6-pin header strips (plus the 3-pin top analog input). 
+      </p>
+      <ul style="font-size:12px; color:#cbd5e1; line-height:1.8; padding-left:18px;">
+        <li><strong style="color:#4ade80;">Top 3 Holes (LIN / AGND / RIN):</strong> Solder a 3-pin header or solder your shielded 3.5mm Aux cable wires directly into these holes.</li>
+        <li><strong style="color:#38bdf8;">Right 6 Holes (BCK, OUT, LRC, SCK, GND, 3.3V):</strong> Solder the full 6-pin header strip here. You will connect 5 of these to the ESP32.</li>
+        <li><strong style="color:#f97316;">Left 6 Holes (FMT, MD1, MD0, GND, 3.3, +5V):</strong> Solder the full 6-pin header strip for mechanical strength, <strong>but ONLY wire +5V, 3.3V, and GND</strong>. Leave <code>FMT</code>, <code>MD1</code>, and <code>MD0</code> completely empty!</li>
+      </ul>
+      <div style="background:#450a0a; border:1px solid #dc2626; border-radius:4px; padding:8px; font-size:11px; color:#fca5a5; margin-top:8px;">
+        <strong>⚠ IMPORTANT POWER RULE:</strong> The PCM1808 chip needs <strong>BOTH +5V</strong> (for its high-dynamic-range analog input stage) <strong>AND 3.3V</strong> (for its digital I2S logic stage). Do not skip either power pin!
+      </div>
+    </div>
+
+    <div class="card-box" style="border-left:4px solid #10b981;">
+      <h4 style="color:#34d399; margin-top:0; font-size:14px;"><i class="fa fa-table"></i> Complete PCM1808 Wiring Table</h4>
+      <table>
+        <tr>
+          <th>Board Pin</th>
+          <th>Connect To</th>
+          <th>Purpose</th>
+        </tr>
+        <tr>
+          <td style="color:#10b981; font-family:monospace; font-weight:bold;">LIN</td>
+          <td>3.5mm Aux Jack (Tip)</td>
+          <td>Left Channel Audio In</td>
+        </tr>
+        <tr>
+          <td style="color:#ec4899; font-family:monospace; font-weight:bold;">RIN</td>
+          <td>3.5mm Aux Jack (Ring)</td>
+          <td>Right Channel Audio In</td>
+        </tr>
+        <tr>
+          <td style="color:#38bdf8; font-family:monospace; font-weight:bold;">- (AGND)</td>
+          <td>3.5mm Aux Jack (Sleeve)</td>
+          <td>Analog Input Ground</td>
+        </tr>
+        <tr>
+          <td style="color:#f97316; font-family:monospace; font-weight:bold;">+5V</td>
+          <td>5.0V Buck Converter (+)</td>
+          <td>Analog ADC Core Power</td>
+        </tr>
+        <tr>
+          <td style="color:#eab308; font-family:monospace; font-weight:bold;">3.3V</td>
+          <td>ESP32 3V3 / AMS1117 3.3V</td>
+          <td>Digital Logic Power</td>
+        </tr>
+        <tr>
+          <td style="color:#38bdf8; font-family:monospace; font-weight:bold;">GND</td>
+          <td>Common Ground Bus</td>
+          <td>Digital Return Ground</td>
+        </tr>
+        <tr>
+          <td style="color:#38bdf8; font-family:monospace; font-weight:bold;">BCK</td>
+          <td>ESP32 GPIO 15 (Shared)</td>
+          <td>I2S Bit Clock</td>
+        </tr>
+        <tr>
+          <td style="color:#06b6d4; font-family:monospace; font-weight:bold;">LRC</td>
+          <td>ESP32 GPIO 16 (Shared)</td>
+          <td>I2S Word Select</td>
+        </tr>
+        <tr>
+          <td style="color:#a855f7; font-family:monospace; font-weight:bold;">OUT</td>
+          <td>ESP32 GPIO 4 (DIN)</td>
+          <td>Digitized Audio to ESP32</td>
+        </tr>
+        <tr>
+          <td style="color:#facc15; font-family:monospace; font-weight:bold;">SCK</td>
+          <td>ESP32 GPIO 0 (MCLK)</td>
+          <td>Master Clock (256×fs)</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       QUICK SOLDERING VISUAL SCHEMATIC
+  ══════════════════════════════════════════════════════════════════ -->
+  <div class="card-box" style="margin-top:16px; border:1px solid #38bdf8;">
+    <div style="color:#38bdf8; font-weight:bold; font-size:13px; margin-bottom:10px;">
+      🔌 Quick Signal Flow: 3.5mm Aux Jack ➔ PCM1808 ➔ ESP32-S3
+    </div>
+    <div style="overflow-x:auto;">
+      <svg viewBox="0 0 850 150" style="width:100%; min-width:650px; background:#0a0e17; border-radius:6px;">
+        <!-- Aux Jack -->
+        <rect x="20" y="25" width="160" height="100" rx="5" fill="#1e293b" stroke="#eab308" stroke-width="1.5"/>
+        <text x="100" y="45" font-size="11" fill="#facc15" text-anchor="middle" font-family="monospace" font-weight="bold">3.5mm AUX IN</text>
+        <text x="35" y="68" font-size="9.5" fill="#10b981" font-family="monospace">Tip    (Left)</text>
+        <text x="35" y="88" font-size="9.5" fill="#38bdf8" font-family="monospace">Sleeve (GND)</text>
+        <text x="35" y="108" font-size="9.5" fill="#ec4899" font-family="monospace">Ring   (Right)</text>
+
+        <!-- Wires Aux -> PCM1808 -->
+        <line x1="180" y1="65" x2="270" y2="65" stroke="#10b981" stroke-width="2.5"/>
+        <line x1="180" y1="85" x2="270" y2="85" stroke="#38bdf8" stroke-width="2" stroke-dasharray="4 2"/>
+        <line x1="180" y1="105" x2="270" y2="105" stroke="#ec4899" stroke-width="2.5"/>
+
+        <!-- PCM1808 -->
+        <rect x="270" y="15" width="240" height="120" rx="5" fill="#2e1065" stroke="#a855f7" stroke-width="2"/>
+        <text x="390" y="38" font-size="12" fill="#e9d5ff" text-anchor="middle" font-family="monospace" font-weight="bold">PCM1808 ADC</text>
+        <text x="390" y="52" font-size="9" fill="#c084fc" text-anchor="middle" font-family="monospace">24-Bit / 96kHz Digitizer</text>
+        
+        <text x="282" y="68" font-size="9" fill="#10b981" font-family="monospace">LIN</text>
+        <text x="282" y="88" font-size="9" fill="#38bdf8" font-family="monospace">AGND</text>
+        <text x="282" y="108" font-size="9" fill="#ec4899" font-family="monospace">RIN</text>
+
+        <text x="498" y="62" font-size="9" fill="#38bdf8" text-anchor="end" font-family="monospace">BCK</text>
+        <text x="498" y="80" font-size="9" fill="#06b6d4" text-anchor="end" font-family="monospace">LRC</text>
+        <text x="498" y="98" font-size="9" fill="#a855f7" text-anchor="end" font-family="monospace" font-weight="bold">OUT</text>
+        <text x="498" y="116" font-size="9" fill="#facc15" text-anchor="end" font-family="monospace">SCK</text>
+
+        <!-- Wires PCM1808 -> ESP32 -->
+        <line x1="510" y1="59" x2="620" y2="59" stroke="#38bdf8" stroke-width="2"/>
+        <line x1="510" y1="77" x2="620" y2="77" stroke="#06b6d4" stroke-width="2"/>
+        <line x1="510" y1="95" x2="620" y2="95" stroke="#a855f7" stroke-width="2.5"/>
+        <line x1="510" y1="113" x2="620" y2="113" stroke="#facc15" stroke-width="2"/>
+
+        <!-- ESP32 -->
+        <rect x="620" y="25" width="210" height="105" rx="5" fill="#0f172a" stroke="#10b981" stroke-width="2"/>
+        <text x="725" y="45" font-size="11" fill="#4ade80" text-anchor="middle" font-family="monospace" font-weight="bold">ESP32-S3 MCU</text>
+        <text x="635" y="62" font-size="9" fill="#38bdf8" font-family="monospace">GPIO 15 (Shared BCK)</text>
+        <text x="635" y="80" font-size="9" fill="#06b6d4" font-family="monospace">GPIO 16 (Shared LRCK)</text>
+        <text x="635" y="98" font-size="9" fill="#c084fc" font-family="monospace" font-weight="bold">GPIO 4  (I2S Data In)</text>
+        <text x="635" y="116" font-size="9" fill="#facc15" font-family="monospace">GPIO 0  (MCLK Out)</text>
+      </svg>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
+

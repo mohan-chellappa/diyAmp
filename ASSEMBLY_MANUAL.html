@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Shop Floor Master Assembly Manual and Interactive Workbench Traveler for the DIY 5.1 Analog Amplifier Copper Chimney V2.">
+  <title>DIY 5.1 Analog Amplifier - Shop Floor Master Assembly Manual & Workbench Traveler</title>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0b0f19;
+      --bg-card: #111827;
+      --bg-card-hover: #1f2937;
+      --border-color: #374151;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --accent-copper: #f59e0b;
+      --accent-cyan: #06b6d4;
+      --accent-blue: #3b82f6;
+      --accent-emerald: #10b981;
+      --accent-rose: #f43f5e;
+      --accent-purple: #8b5cf6;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      margin: 0;
+      padding: 0;
+      line-height: 1.5;
+    }
+
+    h1, h2, h3, h4, h5, .brand-font {
+      font-family: 'Outfit', sans-serif;
+      letter-spacing: -0.02em;
+    }
+
+    .mono-font {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Top Sticky Navigation Bar */
+    .top-nav {
+      background: rgba(17, 24, 39, 0.96);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      display: inline-block;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: #ffffff;
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+    }
+
+    /* Hero Header */
+    .hero-banner {
+      background: linear-gradient(135deg, #111827 0%, #1e1b4b 50%, #111827 100%);
+      border-bottom: 1px solid var(--border-color);
+      padding: 32px 20px;
+    }
+
+    /* KPI Stat Cards */
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 16px 20px;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent-copper);
+    }
+
+    .stat-val {
+      font-size: 1.85rem;
+      font-weight: 800;
+      font-family: 'Outfit', sans-serif;
+      line-height: 1.2;
+    }
+
+    .stat-lbl {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Progress Tracker Bar */
+    .progress-bar-container {
+      background: #1f2937;
+      border-radius: 999px;
+      height: 12px;
+      overflow: hidden;
+      border: 1px solid #374151;
+      margin-top: 14px;
+    }
+
+    .progress-bar-fill {
+      background: linear-gradient(90deg, #f59e0b, #10b981);
+      height: 100%;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    /* Filter Panel */
+    .filter-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .search-input {
+      background: #0f172a;
+      border: 1px solid var(--border-color);
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      min-width: 280px;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--accent-copper);
+    }
+
+    .pill-btn {
+      background: #1e293b;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .pill-btn:hover, .pill-btn.active {
+      background: var(--accent-copper);
+      color: #111827;
+      font-weight: 600;
+      border-color: var(--accent-copper);
+    }
+
+    /* Step Cards Layout */
+    .steps-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .step-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 20px;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .step-card:hover {
+      border-color: #4b5563;
+      background: #151d2f;
+    }
+
+    .step-card.completed {
+      border-left: 6px solid var(--accent-emerald);
+      background: rgba(16, 185, 129, 0.04);
+    }
+
+    .step-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid #1f2937;
+      padding-bottom: 10px;
+    }
+
+    .step-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .step-number-badge {
+      background: var(--accent-copper);
+      color: #111827;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 1rem;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .step-card.completed .step-number-badge {
+      background: var(--accent-emerald);
+      color: #ffffff;
+    }
+
+    .step-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin: 0;
+    }
+
+    .step-phase-tag {
+      font-size: 0.8rem;
+      color: var(--accent-cyan);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .step-desc {
+      color: #e5e7eb;
+      font-size: 0.92rem;
+      line-height: 1.6;
+      margin-bottom: 14px;
+    }
+
+    .step-details-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 0.84rem;
+    }
+
+    .detail-item-title {
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 2px;
+    }
+
+    .detail-item-val {
+      color: #f3f4f6;
+      font-weight: 600;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+
+    .badge-copper {
+      background: rgba(245, 158, 11, 0.2);
+      color: #fcd34d;
+      border: 1px solid #f59e0b;
+    }
+
+    .badge-cyan {
+      background: rgba(6, 182, 212, 0.2);
+      color: #67e8f9;
+      border: 1px solid #06b6d4;
+    }
+
+    .badge-emerald {
+      background: rgba(16, 185, 129, 0.2);
+      color: #6ee7b7;
+      border: 1px solid #10b981;
+    }
+
+    .badge-rose {
+      background: rgba(244, 63, 94, 0.2);
+      color: #fda4af;
+      border: 1px solid #f43f5e;
+    }
+
+    /* Interactive Checkbox */
+    .check-btn {
+      background: #1f2937;
+      border: 1px solid var(--border-color);
+      color: #d1d5db;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .check-btn:hover {
+      background: #374151;
+      color: #ffffff;
+    }
+
+    .check-btn.checked {
+      background: var(--accent-emerald);
+      color: #111827;
+      border-color: var(--accent-emerald);
+    }
+
+    /* Table View Styles */
+    .table-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      overflow-x: auto;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+
+    .traveler-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      text-align: left;
+    }
+
+    .traveler-table th {
+      background: #1f2937;
+      color: #93c5fd;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      padding: 12px 14px;
+      border-bottom: 2px solid var(--border-color);
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .traveler-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #1f2937;
+      color: #e5e7eb;
+      vertical-align: top;
+    }
+
+    .traveler-table tr:hover td {
+      background: #1e293b;
+    }
+
+    /* Print Styles */
+    @media print {
+      body {
+        background: #fff;
+        color: #000;
+      }
+      .top-nav, .filter-panel, .no-print, .check-btn {
+        display: none !important;
+      }
+      .step-card {
+        border: 1px solid #999 !important;
+        background: #fff !important;
+        color: #000 !important;
+        break-inside: avoid;
+        page-break-inside: avoid;
+        margin-bottom: 16px !important;
+      }
+      .step-title, .step-desc, .detail-item-val {
+        color: #000 !important;
+      }
+      .step-details-grid {
+        background: #f8fafc !important;
+        border: 1px solid #ccc !important;
+      }
+      .traveler-table th {
+        background: #eee !important;
+        color: #000 !important;
+      }
+      .traveler-table td {
+        color: #000 !important;
+        border-bottom: 1px solid #ccc !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Sticky Navigation Bar -->
+  <nav class="top-nav w3-container w3-padding" id="mainNavbar">
+    <div class="w3-row" style="display: flex; align-items: center; justify-content: space-between;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-size: 1.25rem; font-weight: 800; color: var(--accent-copper); font-family: 'Outfit';">COPPER CHIMNEY V2</span>
+        <span class="badge badge-emerald" id="stdBadge">ASSEMBLY SOP & TRAVELER</span>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px;" id="navLinksContainer">
+        <a href="file:///d:/Documents/DIY%20Amp/PROJECT.html" class="nav-link" id="lnkProject">Master Overview</a>
+        <a href="file:///d:/Documents/DIY%20Amp/ASSEMBLY_GUIDE.md" class="nav-link active" id="lnkGuide">Assembly SOP (MD)</a>
+        <a href="file:///d:/Documents/DIY%20Amp/WIRING_DIAGRAM.html" class="nav-link" id="lnkWiring">Wiring Layout</a>
+        <a href="file:///d:/Documents/DIY%20Amp/PRINTABLE_WIRING_DIAGRAM.html" class="nav-link" id="lnkPrintWiring">Blueprint PDF</a>
+        <a href="file:///d:/Documents/DIY%20Amp/CIRCUIT_DIAGRAM.html" class="nav-link" id="lnkCircuit">Circuit Schematic</a>
+        <a href="file:///d:/Documents/DIY%20Amp/QUALITY_MANAGEMENT_FMEA_CP.html" class="nav-link" id="lnkQuality">FMEA & Control Plan</a>
+        <a href="file:///d:/Documents/DIY%20Amp/CHASSIS_360_VIEWER.html" class="nav-link" id="lnk360">360° Studio</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Header -->
+  <header class="hero-banner" id="heroBanner">
+    <div class="w3-content" style="max-width: 1400px;">
+      <div class="w3-row">
+        <div class="w3-col l8 m12">
+          <div style="color: var(--accent-copper); font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;">
+            Shop Floor Standard Operating Procedure & Build Traveler
+          </div>
+          <h1 style="margin: 0; font-size: 2.2rem; font-weight: 800; color: #ffffff;">
+            DIY 5.1 Analog Amplifier - Master Assembly Manual
+          </h1>
+          <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 8px; margin-bottom: 0;">
+            10-Phase, 20-Step standard work instructions for assembling the Copper Chimney V2 6-channel audiophile amplifier. Includes torque specifications, wire gauges, and quality checkpoints.
+          </p>
+
+          <!-- Interactive Build Progress Tracker -->
+          <div style="margin-top: 16px;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.84rem;">
+              <span style="color: var(--text-muted);">Workbench Progress: <strong id="progressText" style="color: #ffffff;">0 / 20 Steps Completed (0%)</strong></span>
+              <span style="color: var(--accent-copper); font-weight: 600;" id="activeUnitText">Unit: CCV2-2026-PUN-001 (Rev V2.2)</span>
+            </div>
+            <div class="progress-bar-container">
+              <div class="progress-bar-fill" id="progressBarFill"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="w3-col l4 m12" style="display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-top: 20px;">
+          <button class="pill-btn" id="btnToggleView" style="padding: 10px 16px; font-size: 0.88rem;">
+            🔄 Switch to Traveler Table View
+          </button>
+          <button class="pill-btn active" id="btnPrintManual" style="padding: 10px 18px; font-size: 0.88rem;">
+            🖨️ Print Assembly Traveler
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick KPI Stats Row -->
+      <div class="w3-row-padding" style="margin-top: 24px; margin-left: -8px; margin-right: -8px;" id="kpiStatsRow">
+        <div class="w3-col l3 m6 s6 w3-margin-bottom">
+          <div class="stat-card">
+            <div class="stat-val" style="color: var(--accent-copper);" id="statStepsTotal">20</div>
+            <div class="stat-lbl">Standard Work Steps</div>
+          </div>
+        </div>
+        <div class="w3-col l3 m6 s6 w3-margin-bottom">
+          <div class="stat-card">
+            <div class="stat-val" style="color: var(--accent-cyan);" id="statPhasesCount">10</div>
+            <div class="stat-lbl">Assembly Phases</div>
+          </div>
+        </div>
+        <div class="w3-col l3 m6 s6 w3-margin-bottom">
+          <div class="stat-card">
+            <div class="stat-val" style="color: var(--accent-emerald);" id="statStepsDone">0</div>
+            <div class="stat-lbl">Steps Completed</div>
+          </div>
+        </div>
+        <div class="w3-col l3 m6 s6 w3-margin-bottom">
+          <div class="stat-card">
+            <div class="stat-val" style="color: #a78bfa;" id="statOp90Gate">GATE OP-90</div>
+            <div class="stat-lbl">Mandatory Pre-Power Gate</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Dashboard -->
+  <main class="w3-content w3-padding" style="max-width: 1400px; margin-top: 20px;">
+
+    <!-- Filter & Search Controls -->
+    <div class="filter-panel" id="filterPanel">
+      <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+        <input type="text" id="searchInput" class="search-input" placeholder="Search assembly tasks, tools, parts, torque...">
+        <div style="display: flex; flex-wrap: wrap; gap: 6px;" id="phasePillsContainer">
+          <button class="pill-btn active" id="pillAllPhases" data-phase="all">All Phases</button>
+          <button class="pill-btn" data-phase="Phase 1">Phase 1: Mechanical</button>
+          <button class="pill-btn" data-phase="Phase 2">Phase 2: Board Prep</button>
+          <button class="pill-btn" data-phase="Phase 3">Phase 3: Thermal</button>
+          <button class="pill-btn" data-phase="Phase 4">Phase 4: Harness</button>
+          <button class="pill-btn" data-phase="Phase 5">Phase 5: Power</button>
+          <button class="pill-btn" data-phase="Phase 6">Phase 6: Rear I/O</button>
+          <button class="pill-btn" data-phase="Phase 7">Phase 7: Integration</button>
+          <button class="pill-btn" data-phase="Phase 8">Phase 8: OP-90 Gate</button>
+          <button class="pill-btn" data-phase="Phase 9">Phase 9: Burn-In</button>
+          <button class="pill-btn" data-phase="Phase 10">Phase 10: Sealing</button>
+        </div>
+      </div>
+      <div style="color: var(--text-muted); font-size: 0.85rem;" id="stepCounterText">
+        Showing 20 steps
+      </div>
+    </div>
+
+    <!-- View Mode 1: Step Cards List -->
+    <section id="sectionStepCards" class="steps-container">
+      <!-- Dynamically populated via DOM API -->
+    </section>
+
+    <!-- View Mode 2: Traveler Table View (Initially Hidden) -->
+    <section id="sectionTravelerTable" style="display: none;">
+      <div class="table-container">
+        <table class="traveler-table" id="tableTraveler">
+          <!-- Dynamically populated via DOM API -->
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="w3-container w3-padding-32 w3-center" style="border-top: 1px solid var(--border-color); margin-top: 40px; color: var(--text-muted); font-size: 0.85rem;" id="mainFooter">
+    <div style="font-family: 'Outfit'; font-weight: 700; color: #e5e7eb; margin-bottom: 6px;">
+      DIY 5.1 ANALOG AMPLIFIER ASSEMBLY & QUALITY MANAGEMENT SYSTEM
+    </div>
+    <div>Conforming to AIAG-VDA 1st Edition FMEA & IATF 16949 Standards</div>
+    <div style="margin-top: 8px;">
+      <a href="file:///d:/Documents/DIY%20Amp/ASSEMBLY_STEPS.tsv" style="color: var(--accent-copper); text-decoration: none; margin: 0 8px;">ASSEMBLY_STEPS.tsv</a> |
+      <a href="file:///d:/Documents/DIY%20Amp/ASSEMBLY_GUIDE.md" style="color: var(--accent-copper); text-decoration: none; margin: 0 8px;">ASSEMBLY_GUIDE.md</a> |
+      <a href="file:///d:/Documents/DIY%20Amp/assembly_tracking_schema.sql" style="color: var(--accent-copper); text-decoration: none; margin: 0 8px;">assembly_tracking_schema.sql</a> |
+      <a href="file:///d:/Documents/DIY%20Amp/QUALITY_MANAGEMENT_FMEA_CP.html" style="color: var(--accent-copper); text-decoration: none; margin: 0 8px;">QUALITY_MANAGEMENT_FMEA_CP.html</a>
+    </div>
+  </footer>
+
+  <!-- Vanilla JavaScript Application Logic (Strictly DOM API - NO HTML strings in JS) -->
+  <script>
+    (function () {
+      "use strict";
+
+      // 2D Array Master Assembly Dataset (Separating Data from UI)
+      const ASSEMBLY_HEADERS = [
+        "Step No", "Phase", "Operation Name", "Task Description", "Tools Required",
+        "Parts / Materials Used", "Torque Spec", "Wire Gauge", "Inspection Checkpoint",
+        "PFMEA Ref", "CP Ref"
+      ];
+
+      const ASSEMBLY_DATA = [
+        [
+          "01", "Phase 1: Mechanical Prep", "Chassis Panel Cutout Inspection",
+          "Deburr edges and verify 4x Polycarbonate panels and 2x AL6061 finned side plates against drawings",
+          "Vernier Caliper, Go/No-Go Gauge", "4mm Polycarbonate (Top, Bottom, Front, Back), AL6061 plates",
+          "N/A", "N/A", "Hole centers ±0.15mm, Chimney aperture ±0.20mm, edge finish",
+          "OP-10", "CP-10"
+        ],
+        [
+          "02", "Phase 1: Mechanical Prep", "Base Plate & Foot Assembly",
+          "Fit 4x 20mm rubber vibration-isolation feet to base plate with M3 stainless hardware",
+          "M3 Hex Driver, Tweezers", "4x Rubber Feet, 4x M3x8mm SS Screws, M3 Washers",
+          "0.60 N·m", "N/A", "Rubber feet seated flat, no rocking on granite surface plate",
+          "OP-10", "CP-10"
+        ],
+        [
+          "03", "Phase 1: Mechanical Prep", "Copper Chimney & Pillar Erection",
+          "Mount 35mm central copper chimney and 4x 15mm corner copper support tubes into base plate recess",
+          "M4 Hex Driver, Level Gauge", "35mm OD Copper Pipe, 4x 15mm OD Copper Pipes, M4 Standoffs",
+          "1.20 N·m", "N/A", "Pillars vertical (90° ± 0.5°), chimney base seating seated flush",
+          "OP-10", "CP-10"
+        ],
+        [
+          "04", "Phase 2: Board Prep", "ESP32-S3 Firmware Flashing",
+          "Flash ESP32-S3 firmware binary with volume limiter and I2S registers; verify SHA256 hash",
+          "PC, USB-C Data Cable, esptool.py", "Waveshare ESP32-S3 Touch LCD Dev Board",
+          "N/A", "N/A", "Boot log shows 83.6% voltage ceiling active, SHA256 verified",
+          "OP-80", "CP-80"
+        ],
+        [
+          "05", "Phase 2: Board Prep", "XL4015 Buck Converter Calibration",
+          "Power XL4015 on bench with 24.0V DC; trim potentiometer to exactly 5.00V; apply threadlocker",
+          "Bench DC PSU (24V), Fluke 87V DMM, Trimmer Tool", "XL4015 DC-DC Buck Converter, Loctite 290",
+          "N/A", "N/A", "Output voltage = 5.00V ± 0.05V (4.95V to 5.05V max); pot locked",
+          "OP-70", "CP-70"
+        ],
+        [
+          "06", "Phase 2: Board Prep", "XH-M562 Solder Pad Tinning",
+          "Pre-tin 10 solder pads on each of 3x XH-M562 boards; solder gold-plated header pins",
+          "Hakko FX-888D (350°C), 0.8mm 63/37 Solder, Flux", "3x XH-M562 TPA3116D2 Mini Boards, 2.54mm Header Pins",
+          "N/A", "N/A", "Bright concave solder fillets, dwell < 3.0s, zero solder bridges",
+          "OP-30", "CP-30"
+        ],
+        [
+          "07", "Phase 2: Board Prep", "PCM5102A & PCM1808 Jumper Prep",
+          "Solder SCK jumper to GND on 3x PCM5102A DACs; bridge format pins for I2S 24-bit slave",
+          "Soldering Iron (350°C), Fine Tweezers, Solder Wick", "3x PCM5102A DAC Boards, 1x PCM1808 ADC Board",
+          "N/A", "N/A", "SCK-to-GND solder bridge verified with DMM (< 0.1 ohm)",
+          "OP-30", "CP-30"
+        ],
+        [
+          "08", "Phase 3: Thermal Assembly", "Thermal Paste Dispensing",
+          "Clean TPA3116 chip tops with 99% IPA; dispense Arctic MX-4 in micro X-pattern",
+          "Lint-free wipes, 99% IPA, Micro-syringe dispenser", "Arctic MX-4 Thermal Paste (0.05g per chip)",
+          "N/A", "N/A", "Paste mass 0.05g ± 0.01g; no air bubbles or dry spots",
+          "OP-20", "CP-20"
+        ],
+        [
+          "09", "Phase 3: Thermal Assembly", "Amplifier Heatsink Clamping",
+          "Clamp 3x XH-M562 boards to AL6061 finned side plates using nylon standoffs and M3 screws",
+          "Calibrated Torque Driver, 2.5mm Hex Bit", "6x M3 Nylon Standoffs, 6x M3x12mm Screws, Arctic MX-4",
+          "0.35 N·m", "N/A", "Uniform paste squeeze-out around silicon perimeter, torque 0.35 N·m",
+          "OP-20", "CP-20"
+        ],
+        [
+          "10", "Phase 4: Harness Fabrication", "Signal Cable JST-XH Crimping",
+          "Strip 2-core shielded cable, crimp JST-XH terminals, slide 2:1 dual-wall heat-shrink on drain",
+          "Engineer PA-09 Crimper, Wire Stripper, Heat Gun", "2-Core Shielded Cable, JST-XH Pins & Housings, Heat-shrink",
+          "N/A", "24 AWG Shielded", "Pull test > 15N, heat-shrink covers shield transition completely",
+          "OP-50", "CP-50"
+        ],
+        [
+          "11", "Phase 4: Harness Fabrication", "Power Wire Stripping & Prep",
+          "Strip 16 AWG red/black main feeds and 20 AWG branch lines to exactly 11.0mm",
+          "Calibrated Automatic Wire Stripper (11mm stop)", "16 AWG & 20 AWG High-Strand Silicone Wire",
+          "N/A", "16 / 20 AWG", "Exposed copper = 11.0mm (+1.0/-0.5mm), zero nicked strands",
+          "OP-40", "CP-40"
+        ],
+        [
+          "12", "Phase 5: Power Subsystem", "WAGO 221-415 Bus Assembly",
+          "Insert stripped wires into WAGO 221-415 blocks; solder 4700µF capacitor directly across rails",
+          "Wire Stripper, Soldering Iron, Heat-shrink", "2x WAGO 221-415 Blocks, 4700µF 50V Low-ESR Capacitor",
+          "N/A", "16 / 20 AWG", "Levers snapped 100% flat; 30N tug test passed on every port",
+          "OP-40", "CP-40"
+        ],
+        [
+          "13", "Phase 5: Power Subsystem", "XL4015 5V Logic Bus Integration",
+          "Connect XL4015 input to WAGO 221-415 bus; route 5.00V / GND harness to brain distribution",
+          "Wire Stripper, Soldering Iron", "20 AWG Red/Black Wires, JST-XH 2-pin connector",
+          "N/A", "20 AWG", "Polarity double-checked with DMM; 5.00V verified at JST connector",
+          "OP-70", "CP-70"
+        ],
+        [
+          "14", "Phase 6: Rear Panel I/O", "Binding Post Installation",
+          "Press-fit and bolt 12x JS-910B binding posts into 4mm Polycarbonate rear panel",
+          "0.8 N·m Preset Torque Socket, Vernier Depth Gauge", "12x JS-910B Gold Binding Posts, Nylon Step Washers",
+          "0.80 N·m", "N/A", "Rotational slip torque > 1.2 N·m; zero panel crazing or cracks",
+          "OP-60", "CP-60"
+        ],
+        [
+          "15", "Phase 6: Rear Panel I/O", "Power & AUX Connector Mounting",
+          "Mount GX16 4-pin aviation chassis socket (Pins 1+2 = +24V, Pins 3+4 = GND) and PJ392A 3.5mm stereo AUX jack on rear panel",
+          "Spanner Wrench, Threadlocker", "GX16 4-Pin Socket (In Hand), PJ392A-1 3.5mm Jack (In Hand: 5 pcs), 10A Fuse Holder",
+          "1.00 N·m", "16 AWG", "Connectors tight, Pins 1+2 & 3+4 parallel bridged, inline 10A fuse holder locked",
+          "OP-60", "CP-60"
+        ],
+        [
+          "16", "Phase 7: Interconnection", "Amplifier Wiring Harness Dressing",
+          "Connect 20 AWG power lines to Pad 8/9, signal lines to Pad 1/2/3, and twisted speaker wires",
+          "Soldering Iron (350°C), Hot Melt Glue, Cable Ties", "Silicone Wire, Zip Ties, Neutral RTV Silicone",
+          "N/A", "16 / 20 AWG", "Strain-relief silicone bead placed at board edge; clean routing",
+          "OP-30", "CP-30"
+        ],
+        [
+          "17", "Phase 7: Interconnection", "Front Panel & Brain Mounting",
+          "Mount ESP32-S3 and 3x PCM5102A DAC stack to front Polycarbonate panel; plug I2S harnesses",
+          "M2.5 Hex Driver, JST Cable Assemblies", "Waveshare ESP32-S3, 3x PCM5102A, M2.5 Standoffs",
+          "0.40 N·m", "24 AWG", "Short I2S ribbon runs (< 60mm); display seated flush in bezel",
+          "OP-50", "CP-50"
+        ],
+        [
+          "18", "Phase 8: Safety & Verification", "Pre-Power 6-Point Gate (OP-90)",
+          "Attach lock-out tag to IEC inlet; perform mandatory 6-point cold DC resistance checkout",
+          "Fluke 87V DMM, Insulation Tester (500V DC)", "Sign-Off Inspection Card, Physical Lock-Out Tag",
+          "N/A", "N/A", "PE bond < 0.1Ω; 24V bus > 10kΩ; BTL (-) to chassis = OPEN (∞ Ω)",
+          "OP-90", "CP-90"
+        ],
+        [
+          "19", "Phase 9: Commissioning", "Acoustic Sweep & 30-Min Burn-In",
+          "Remove lock-out tag; connect 24V supply; run 6-channel full load sweep into 4Ω dummy load bank",
+          "QuantAsylum QA403 Analyzer, FLIR E4, 6x 4Ω 100W Loads", "Mean Well LRS-350-24 SMPS, Test Harness",
+          "N/A", "N/A", "THD+N < 0.05%; heatsink rise < 25°C above ambient; silent idle",
+          "OP-100", "CP-100"
+        ],
+        [
+          "20", "Phase 10: Final Closure", "Top Plate Sealing & Quality Seal",
+          "Fit high-temp silicone isolation ring over chimney flue; fasten top Polycarbonate plate; apply QA tag",
+          "M3 Hex Driver, Tamper-Evident QA Hologram", "M3x12mm SS Screws, High-Temp Silicone Grommet",
+          "0.50 N·m", "N/A", "Silicone gasket fully seated; top plate screws torqued; QA tag affixed",
+          "OP-10", "CP-10"
+        ]
+      ];
+
+      // In-Memory State
+      const completedSteps = {}; // e.g. { "01": true, "02": true }
+      let activePhaseFilter = "all";
+      let searchQuery = "";
+      let isTableView = false;
+
+      // Pure DOM Helper Functions (Strictly NO HTML Strings in JS)
+      function clearElement(el) {
+        while (el.firstChild) {
+          el.removeChild(el.firstChild);
+        }
+      }
+
+      function createBadge(text, typeClass) {
+        const span = document.createElement("span");
+        span.className = "badge " + typeClass;
+        span.textContent = text;
+        return span;
+      }
+
+      function updateProgressTracker() {
+        let count = 0;
+        for (let i = 0; i < ASSEMBLY_DATA.length; i++) {
+          const stepNo = ASSEMBLY_DATA[i][0];
+          if (completedSteps[stepNo]) {
+            count++;
+          }
+        }
+
+        const total = ASSEMBLY_DATA.length;
+        const pct = Math.round((count / total) * 100);
+
+        document.getElementById("statStepsDone").textContent = String(count);
+        document.getElementById("progressText").textContent = count + " / " + total + " Steps Completed (" + pct + "%)";
+        document.getElementById("progressBarFill").style.width = pct + "%";
+      }
+
+      // Render Step Cards View
+      function renderStepCards() {
+        const container = document.getElementById("sectionStepCards");
+        clearElement(container);
+
+        let visibleCount = 0;
+
+        for (let i = 0; i < ASSEMBLY_DATA.length; i++) {
+          const row = ASSEMBLY_DATA[i];
+          const stepNo = row[0];
+          const phase = row[1];
+          const opName = row[2];
+          const taskDesc = row[3];
+          const tools = row[4];
+          const parts = row[5];
+          const torque = row[6];
+          const wireGauge = row[7];
+          const checkpoint = row[8];
+          const pfmeaRef = row[9];
+          const cpRef = row[10];
+
+          // Phase Filter
+          if (activePhaseFilter !== "all" && phase.indexOf(activePhaseFilter) === -1) {
+            continue;
+          }
+
+          // Search Filter
+          if (searchQuery.trim() !== "") {
+            const q = searchQuery.toLowerCase();
+            let matches = false;
+            for (let c = 0; c < row.length; c++) {
+              if (row[c].toLowerCase().indexOf(q) !== -1) {
+                matches = true;
+                break;
+              }
+            }
+            if (!matches) continue;
+          }
+
+          visibleCount++;
+
+          const card = document.createElement("div");
+          card.className = "step-card";
+          if (completedSteps[stepNo]) {
+            card.className += " completed";
+          }
+
+          // Step Header
+          const header = document.createElement("div");
+          header.className = "step-header";
+
+          const titleWrap = document.createElement("div");
+          titleWrap.className = "step-title-wrap";
+
+          const numBadge = document.createElement("div");
+          numBadge.className = "step-number-badge";
+          numBadge.textContent = stepNo;
+          titleWrap.appendChild(numBadge);
+
+          const titleInfo = document.createElement("div");
+          const phaseTag = document.createElement("div");
+          phaseTag.className = "step-phase-tag";
+          phaseTag.textContent = phase;
+          titleInfo.appendChild(phaseTag);
+
+          const h2 = document.createElement("h2");
+          h2.className = "step-title";
+          h2.textContent = opName;
+          titleInfo.appendChild(h2);
+
+          titleWrap.appendChild(titleInfo);
+          header.appendChild(titleWrap);
+
+          // Action Area: References and Check Button
+          const actionWrap = document.createElement("div");
+          actionWrap.style.display = "flex";
+          actionWrap.style.alignItems = "center";
+          actionWrap.style.gap = "8px";
+
+          actionWrap.appendChild(createBadge(pfmeaRef, "badge-copper"));
+          actionWrap.appendChild(createBadge(cpRef, "badge-cyan"));
+
+          const checkBtn = document.createElement("button");
+          checkBtn.className = "check-btn";
+          if (completedSteps[stepNo]) {
+            checkBtn.className += " checked";
+            checkBtn.textContent = "✓ Completed";
+          } else {
+            checkBtn.textContent = "Mark Complete";
+          }
+
+          checkBtn.addEventListener("click", function () {
+            if (completedSteps[stepNo]) {
+              delete completedSteps[stepNo];
+            } else {
+              completedSteps[stepNo] = true;
+            }
+            renderViews();
+            updateProgressTracker();
+          });
+
+          actionWrap.appendChild(checkBtn);
+          header.appendChild(actionWrap);
+          card.appendChild(header);
+
+          // Task Description
+          const descP = document.createElement("div");
+          descP.className = "step-desc";
+          descP.textContent = taskDesc;
+          card.appendChild(descP);
+
+          // Details Grid
+          const grid = document.createElement("div");
+          grid.className = "step-details-grid";
+
+          // Detail 1: Tools
+          const dTools = document.createElement("div");
+          const t1 = document.createElement("div");
+          t1.className = "detail-item-title";
+          t1.textContent = "Tools & Equipment";
+          const v1 = document.createElement("div");
+          v1.className = "detail-item-val";
+          v1.textContent = tools;
+          dTools.appendChild(t1);
+          dTools.appendChild(v1);
+          grid.appendChild(dTools);
+
+          // Detail 2: Parts
+          const dParts = document.createElement("div");
+          const t2 = document.createElement("div");
+          t2.className = "detail-item-title";
+          t2.textContent = "Parts & Materials";
+          const v2 = document.createElement("div");
+          v2.className = "detail-item-val";
+          v2.textContent = parts;
+          dParts.appendChild(t2);
+          dParts.appendChild(v2);
+          grid.appendChild(dParts);
+
+          // Detail 3: Torque Spec
+          const dTorque = document.createElement("div");
+          const t3 = document.createElement("div");
+          t3.className = "detail-item-title";
+          t3.textContent = "Torque Specification";
+          const v3 = document.createElement("div");
+          v3.className = "detail-item-val mono-font";
+          v3.style.color = (torque !== "N/A") ? "var(--accent-copper)" : "#9ca3af";
+          v3.textContent = torque;
+          dTorque.appendChild(t3);
+          dTorque.appendChild(v3);
+          grid.appendChild(dTorque);
+
+          // Detail 4: Wire Gauge
+          const dWire = document.createElement("div");
+          const t4 = document.createElement("div");
+          t4.className = "detail-item-title";
+          t4.textContent = "Conductor Wire Gauge";
+          const v4 = document.createElement("div");
+          v4.className = "detail-item-val mono-font";
+          v4.style.color = (wireGauge !== "N/A") ? "var(--accent-cyan)" : "#9ca3af";
+          v4.textContent = wireGauge;
+          dWire.appendChild(t4);
+          dWire.appendChild(v4);
+          grid.appendChild(dWire);
+
+          // Detail 5: Inspection Checkpoint
+          const dCheck = document.createElement("div");
+          dCheck.style.gridColumn = "1 / -1";
+          const t5 = document.createElement("div");
+          t5.className = "detail-item-title";
+          t5.textContent = "Quality Inspection Checkpoint (Control Plan)";
+          const v5 = document.createElement("div");
+          v5.className = "detail-item-val";
+          v5.style.color = "var(--accent-emerald)";
+          v5.textContent = "🔍 " + checkpoint;
+          dCheck.appendChild(t5);
+          dCheck.appendChild(v5);
+          grid.appendChild(dCheck);
+
+          card.appendChild(grid);
+          container.appendChild(card);
+        }
+
+        return visibleCount;
+      }
+
+      // Render Traveler Table View
+      function renderTravelerTable() {
+        const table = document.getElementById("tableTraveler");
+        clearElement(table);
+
+        // Header
+        const thead = document.createElement("thead");
+        const trH = document.createElement("tr");
+        ["Step", "Phase", "Operation", "Torque", "Wire", "Inspection Check", "Ref", "Status"].forEach(function (h) {
+          const th = document.createElement("th");
+          th.textContent = h;
+          trH.appendChild(th);
+        });
+        thead.appendChild(trH);
+        table.appendChild(thead);
+
+        // Body
+        const tbody = document.createElement("tbody");
+        let visibleCount = 0;
+
+        for (let i = 0; i < ASSEMBLY_DATA.length; i++) {
+          const row = ASSEMBLY_DATA[i];
+          const stepNo = row[0];
+          const phase = row[1];
+          const opName = row[2];
+          const torque = row[6];
+          const wireGauge = row[7];
+          const checkpoint = row[8];
+          const pfmeaRef = row[9];
+          const cpRef = row[10];
+
+          if (activePhaseFilter !== "all" && phase.indexOf(activePhaseFilter) === -1) {
+            continue;
+          }
+
+          if (searchQuery.trim() !== "") {
+            const q = searchQuery.toLowerCase();
+            let matches = false;
+            for (let c = 0; c < row.length; c++) {
+              if (row[c].toLowerCase().indexOf(q) !== -1) {
+                matches = true;
+                break;
+              }
+            }
+            if (!matches) continue;
+          }
+
+          visibleCount++;
+
+          const tr = document.createElement("tr");
+
+          // Step No
+          const tdNo = document.createElement("td");
+          tdNo.className = "mono-font";
+          tdNo.style.fontWeight = "700";
+          tdNo.textContent = stepNo;
+          tr.appendChild(tdNo);
+
+          // Phase
+          const tdPhase = document.createElement("td");
+          tdPhase.style.color = "var(--accent-cyan)";
+          tdPhase.textContent = phase;
+          tr.appendChild(tdPhase);
+
+          // Op Name
+          const tdOp = document.createElement("td");
+          tdOp.style.fontWeight = "600";
+          tdOp.textContent = opName;
+          tr.appendChild(tdOp);
+
+          // Torque
+          const tdTorque = document.createElement("td");
+          tdTorque.className = "mono-font";
+          tdTorque.textContent = torque;
+          tr.appendChild(tdTorque);
+
+          // Wire
+          const tdWire = document.createElement("td");
+          tdWire.className = "mono-font";
+          tdWire.textContent = wireGauge;
+          tr.appendChild(tdWire);
+
+          // Checkpoint
+          const tdCheck = document.createElement("td");
+          tdCheck.textContent = checkpoint;
+          tr.appendChild(tdCheck);
+
+          // Ref
+          const tdRef = document.createElement("td");
+          tdRef.textContent = pfmeaRef + " / " + cpRef;
+          tr.appendChild(tdRef);
+
+          // Status & Checkbox
+          const tdStatus = document.createElement("td");
+          const btn = document.createElement("button");
+          btn.className = "check-btn";
+          btn.style.padding = "4px 8px";
+          btn.style.fontSize = "0.75rem";
+          if (completedSteps[stepNo]) {
+            btn.className += " checked";
+            btn.textContent = "✓ Done";
+          } else {
+            btn.textContent = "Pending";
+          }
+
+          btn.addEventListener("click", function () {
+            if (completedSteps[stepNo]) {
+              delete completedSteps[stepNo];
+            } else {
+              completedSteps[stepNo] = true;
+            }
+            renderViews();
+            updateProgressTracker();
+          });
+
+          tdStatus.appendChild(btn);
+          tr.appendChild(tdStatus);
+
+          tbody.appendChild(tr);
+        }
+
+        table.appendChild(tbody);
+        return visibleCount;
+      }
+
+      // Master View Updater
+      function renderViews() {
+        const counterEl = document.getElementById("stepCounterText");
+        let visibleCount = 0;
+
+        if (isTableView) {
+          document.getElementById("sectionStepCards").style.display = "none";
+          document.getElementById("sectionTravelerTable").style.display = "block";
+          visibleCount = renderTravelerTable();
+        } else {
+          document.getElementById("sectionStepCards").style.display = "flex";
+          document.getElementById("sectionTravelerTable").style.display = "none";
+          visibleCount = renderStepCards();
+        }
+
+        counterEl.textContent = "Showing " + visibleCount + " of " + ASSEMBLY_DATA.length + " Assembly Steps";
+      }
+
+      // Setup Event Listeners
+      function setupEvents() {
+        // Phase Filter Pills
+        const pills = document.querySelectorAll("#phasePillsContainer .pill-btn");
+        for (let i = 0; i < pills.length; i++) {
+          pills[i].addEventListener("click", function () {
+            for (let j = 0; j < pills.length; j++) {
+              pills[j].classList.remove("active");
+            }
+            this.classList.add("active");
+            activePhaseFilter = this.getAttribute("data-phase");
+            renderViews();
+          });
+        }
+
+        // Live Search Input
+        const searchBox = document.getElementById("searchInput");
+        searchBox.addEventListener("input", function () {
+          searchQuery = this.value;
+          renderViews();
+        });
+
+        // View Mode Toggle Button
+        const toggleBtn = document.getElementById("btnToggleView");
+        toggleBtn.addEventListener("click", function () {
+          isTableView = !isTableView;
+          if (isTableView) {
+            this.textContent = "📋 Switch to Step Cards View";
+          } else {
+            this.textContent = "🔄 Switch to Traveler Table View";
+          }
+          renderViews();
+        });
+
+        // Print Manual Button
+        const printBtn = document.getElementById("btnPrintManual");
+        printBtn.addEventListener("click", function () {
+          window.print();
+        });
+      }
+
+      // Initialize on DOM Ready
+      document.addEventListener("DOMContentLoaded", function () {
+        setupEvents();
+        renderViews();
+        updateProgressTracker();
+      });
+
+    })();
+  </script>
+</body>
+</html>

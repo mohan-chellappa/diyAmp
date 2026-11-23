@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PCM5102A DAC HW-280 — Annotated Pinout</title>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <style>
+    :root {
+      --bg: #0a0e17; --panel: #111827; --card: #1f2937;
+      --cyan: #06b6d4; --green: #10b981; --purple: #a855f7;
+      --orange: #f97316; --yellow: #eab308; --red: #ef4444; --blue: #38bdf8;
+    }
+    body { background: var(--bg); color: #f9fafb; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 0; padding: 0; }
+    header { background: var(--panel); border-bottom: 2px solid var(--cyan); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+    .nav-btn { background: #374151; color: #f3f4f6; border: 1px solid #4b5563; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: 600; text-decoration: none; cursor: pointer; }
+    .nav-btn:hover { background: #4b5563; }
+    .main { max-width: 1100px; margin: 0 auto; padding: 20px 16px; }
+    .board-wrap { position: relative; display: block; width: 100%; max-width: 920px; margin: 0 auto; }
+    .board-wrap img { width: 100%; display: block; border-radius: 8px; border: 2px solid #334155; }
+    .board-wrap svg.overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+    .legend { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; margin-top: 20px; }
+    .leg-card { background: var(--card); border-radius: 6px; padding: 12px 14px; border-left: 4px solid; }
+    .leg-card h4 { margin: 0 0 8px 0; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; }
+    .leg-card ul { margin: 0; padding-left: 16px; font-size: 12px; line-height: 1.9; color: #cbd5e1; }
+    .leg-card ul li strong { font-family: monospace; }
+    .pin-pwr { border-color: var(--orange); }
+    .pin-in  { border-color: var(--purple); }
+    .pin-out { border-color: var(--green); }
+    .pin-cfg { border-color: var(--yellow); }
+    table { font-size: 12px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <span style="font-weight:800; font-size:15px; color:var(--cyan);">
+    📌 PCM5102A DAC (HW-280) — Annotated Board Pinout
+  </span>
+  <div style="display:flex; gap:8px;">
+    <a href="CIRCUIT_DIAGRAM.html" class="nav-btn">← Circuit Diagram</a>
+    <a href="PCM1808_SOLDERING_GUIDE.html" class="nav-btn" style="background:#854d0e; border-color:#eab308;">ADC Soldering</a>
+    <a href="WIRING_DIAGRAM.html"  class="nav-btn">Wiring Diagram</a>
+  </div>
+</header>
+
+<div class="main">
+  <p style="color:#94a3b8; font-size:13px; margin-bottom:16px;">
+    Every pin on the HW-280 board labelled directly on the board photo.
+    <strong style="color:#fbbf24;">Purple dots</strong> = digital inputs &nbsp;|&nbsp;
+    <strong style="color:#10b981;">Green dots</strong> = analog outputs &nbsp;|&nbsp;
+    <strong style="color:#f97316;">Orange</strong> = power.
+  </p>
+
+  <!-- ═══════════════════════════════════
+       ANNOTATED BOARD PHOTO
+       Source image is square 1000×1000 px.
+       SVG viewBox matches exactly: 0 0 1000 1000
+  ═══════════════════════════════════ -->
+  <div class="board-wrap">
+    <img src="./image/pasted_20261003-052037.png" alt="PCM5102A HW-280 board">
+
+    <svg class="overlay" viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arr-g" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#10b981"/></marker>
+        <marker id="arr-p" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#a855f7"/></marker>
+        <marker id="arr-o" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#f97316"/></marker>
+        <marker id="arr-y" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#eab308"/></marker>
+        <marker id="arr-b" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#38bdf8"/></marker>
+        <marker id="arr-c" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#06b6d4"/></marker>
+      </defs>
+
+      <!-- ════════════════════════════════
+           RIGHT-EDGE HEADER PINS (EXACT COORDINATES)
+           1: VIN  (808, 497)
+           2: GND  (790, 538)
+           3: LCK  (772, 580)
+           4: DIN  (754, 622)
+           5: BCK  (736, 664)
+           6: SCK  (718, 706)
+      ═══════════════════════════════════ -->
+
+      <!-- 1: VIN -->
+      <circle cx="808" cy="497" r="9" fill="#f97316" stroke="#ffffff" stroke-width="2" opacity="0.95"/>
+      <line x1="808" y1="497" x2="880" y2="435" stroke="#f97316" stroke-width="2.5" marker-end="url(#arr-o)"/>
+      <rect x="850" y="405" width="140" height="34" rx="4" fill="#0d1117" stroke="#f97316" stroke-width="1.2" opacity="0.95"/>
+      <text x="920" y="420" font-size="13" fill="#f97316" text-anchor="middle" font-family="monospace" font-weight="bold">VIN (Pin 1)</text>
+      <text x="920" y="433" font-size="10" fill="#cbd5e1" text-anchor="middle" font-family="monospace">5V from Buck PSU</text>
+
+      <!-- 2: GND -->
+      <circle cx="790" cy="538" r="9" fill="#38bdf8" stroke="#ffffff" stroke-width="2" opacity="0.95"/>
+      <line x1="790" y1="538" x2="880" y2="485" stroke="#38bdf8" stroke-width="2.5" marker-end="url(#arr-b)"/>
+      <rect x="850" y="455" width="140" height="34" rx="4" fill="#0d1117" stroke="#38bdf8" stroke-width="1.2" opacity="0.95"/>
+      <text x="920" y="470" font-size="13" fill="#38bdf8" text-anchor="middle" font-family="monospace" font-weight="bold">GND (Pin 2)</text>
+      <text x="920" y="483" font-size="10" fill="#cbd5e1" text-anchor="middle" font-family="monospace">Logic Ground (0V)</text>
+
+      <!-- 3: LCK -->
+      <circle cx="772" cy="580" r="9" fill="#06b6d4" stroke="#ffffff" stroke-width="2" opacity="0.95"/>
+      <line x1="772" y1="580" x2="880" y2="540" stroke="#06b6d4" stroke-width="2.5" marker-end="url(#arr-c)"/>
+      <rect x="850" y="510" width="140" height="34" rx="4" fill="#0d1117" stroke="#06b6d4" stroke-width="1.2" opacity="0.95"/>
+      <text x="920" y="525" font-size="13" fill="#06b6d4" text-anchor="middle" font-family="monospace" font-weight="bold">LCK / LRCK (Pin 3)</text>
+      <text x="920" y="538" font-size="10" fill="#cbd5e1" text-anchor="middle" font-family="monospace">Word Select ← GPIO 16</text>
+
+      <!-- 4: DIN -->
+      <circle cx="754" cy="622" r="9" fill="#a855f7" stroke="#ffffff" stroke-width="2" opacity="0.95"/>
+      <line x1="754" y1="622" x2="880" y2="600" stroke="#a855f7" stroke-width="2.5" marker-end="url(#arr-p)"/>
+      <rect x="850" y="570" width="140" height="34" rx="4" fill="#0d1117" stroke="#a855f7" stroke-width="1.2" opacity="0.95"/>
+      <text x="920" y="585" font-size="13" fill="#a855f7" text-anchor="middle" font-family="monospace" font-weight="bold">DIN (Pin 4)</text>
+      <text x="920" y="598" font-size="10" fill="#cbd5e1" text-anchor="middle" font-family="monospace">Audio Data ← GPIO 7</text>
+
+      <!-- 5: BCK -->
+      <circle cx="736" cy="664" r="9" fill="#38bdf8" stroke="#ffffff" stroke-width="2" opacity="0.95"/>
+      <line x1="736" y1="664" x2="880" y2="660" stroke="#38bdf8" stroke-width="2.5" marker-end="url(#arr-b)"/>
+      <rect x="850" y="630" width="140" height="34" rx="4" fill="#0d1117" stroke="#38bdf8" stroke-width="1.2" opacity="0.95"/>
+      <text x="920" y="645" font-size="13" fill="#38bdf8" text-anchor="middle" font-family="monospace" font-weight="bold">BCK (Pin 5)</text>
+      <text x="920" y="658" font-size="10" fill="#cbd5e1" text-anchor="middle" font-family="monospace">Bit Clock ← GPIO 15</text>
+
+      <!-- 6: SCK -->
+      <circle cx="718" cy="706" r="9" fill="#eab308" stroke="#ffffff" stroke-width="2" opacity="0.95"/>
+      <line x1="718" y1="706" x2="880" y2="720" stroke="#eab308" stroke-width="2.5" marker-end="url(#arr-y)"/>
+      <rect x="850" y="690" width="140" height="34" rx="4" fill="#0d1117" stroke="#eab308" stroke-width="1.2" opacity="0.95"/>
+      <text x="920" y="705" font-size="13" fill="#eab308" text-anchor="middle" font-family="monospace" font-weight="bold">SCK (Pin 6)</text>
+      <text x="920" y="718" font-size="10" fill="#facc15" text-anchor="middle" font-family="monospace">Connect to GND (PLL)</text>
+
+      <!-- VISUAL JUMPER WIRE: Pin 6 (SCK) to Pin 2 (GND) -->
+      <path d="M 718 706 C 660 670, 680 570, 790 538" fill="none" stroke="#facc15" stroke-width="3" stroke-dasharray="5 3"/>
+      <rect x="525" y="670" width="185" height="44" rx="4" fill="#0d1117" stroke="#facc15" stroke-width="1.5" opacity="0.95"/>
+      <text x="617" y="687" font-size="11" fill="#facc15" text-anchor="middle" font-family="monospace" font-weight="bold">⚡ SCK TIE TO GND:</text>
+      <text x="617" y="701" font-size="9.5" fill="#f8fafc" text-anchor="middle" font-family="monospace">Wire Pin 6 (SCK) ➔ Pin 2 (GND)</text>
+      <text x="617" y="711" font-size="8.5" fill="#94a3b8" text-anchor="middle" font-family="monospace">(or solder Pin 6 to logic GND bus)</text>
+
+      <!-- ════════════════════════════════
+           LEFT SIDE — ANALOG OUTPUT PADS
+           L (220, 528)
+           G (266, 544)
+           R (312, 563)
+      ═══════════════════════════════════ -->
+
+      <!-- LOUT (L pad) -->
+      <circle cx="220" cy="528" r="9" fill="#10b981" stroke="#ffffff" stroke-width="2" opacity="0.95"/>
+      <line x1="220" y1="528" x2="130" y2="600" stroke="#10b981" stroke-width="2.5" marker-end="url(#arr-g)"/>
+      <rect x="20" y="585" width="150" height="34" rx="4" fill="#0d1117" stroke="#10b981" stroke-width="1.2" opacity="0.95"/>
+      <text x="95" y="600" font-size="13" fill="#10b981" text-anchor="middle" font-family="monospace" font-weight="bold">LOUT (L pad)</text>
+      <text x="95" y="613" font-size="10" fill="#cbd5e1" text-anchor="middle" font-family="monospace">Left audio → Amp Pad 1</text>
+
+      <!-- AGND (G pad) -->
+      <circle cx="266" cy="544" r="9" fill="#38bdf8" stroke="#ffffff" stroke-width="2" opacity="0.95"/>
+      <line x1="266" y1="544" x2="130" y2="660" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="5 3" marker-end="url(#arr-b)"/>
+      <rect x="15" y="645" width="165" height="34" rx="4" fill="#0d1117" stroke="#38bdf8" stroke-width="1.2" opacity="0.95"/>
+      <text x="97" y="660" font-size="13" fill="#38bdf8" text-anchor="middle" font-family="monospace" font-weight="bold">AGND (G pad)</text>
+      <text x="97" y="673" font-size="10" fill="#cbd5e1" text-anchor="middle" font-family="monospace">Shield → Amp Pad 2 (1-end)</text>
+
+      <!-- ROUT (R pad) -->
+      <circle cx="312" cy="563" r="9" fill="#10b981" stroke="#ffffff" stroke-width="2" opacity="0.95"/>
+      <line x1="312" y1="563" x2="130" y2="720" stroke="#10b981" stroke-width="2.5" marker-end="url(#arr-g)"/>
+      <rect x="20" y="705" width="150" height="34" rx="4" fill="#0d1117" stroke="#10b981" stroke-width="1.2" opacity="0.95"/>
+      <text x="95" y="720" font-size="13" fill="#10b981" text-anchor="middle" font-family="monospace" font-weight="bold">ROUT (R pad)</text>
+      <text x="95" y="733" font-size="10" fill="#cbd5e1" text-anchor="middle" font-family="monospace">Right audio → Amp Pad 3</text>
+
+      <!-- ════ 3.5mm HEADPHONE JACK (316, 320) ════ -->
+      <circle cx="316" cy="320" r="11" fill="#059669" stroke="#ffffff" stroke-width="2" opacity="0.95"/>
+      <line x1="316" y1="320" x2="130" y2="230" stroke="#10b981" stroke-width="2.5" marker-end="url(#arr-g)"/>
+      <rect x="20" y="200" width="180" height="36" rx="4" fill="#0d1117" stroke="#10b981" stroke-width="1.2" opacity="0.95"/>
+      <text x="110" y="216" font-size="13" fill="#10b981" text-anchor="middle" font-family="monospace" font-weight="bold">3.5mm JACK (LINE OUT)</text>
+      <text x="110" y="230" font-size="10" fill="#94a3b8" text-anchor="middle" font-family="monospace">Headphone / test monitor out</text>
+
+      <!-- ════ PCM5102A CHIP (562, 506) ════ -->
+      <circle cx="562" cy="506" r="11" fill="#7c3aed" stroke="#ffffff" stroke-width="2" opacity="0.95"/>
+      <line x1="562" y1="506" x2="520" y2="350" stroke="#c084fc" stroke-width="2"/>
+      <rect x="400" y="300" width="240" height="46" rx="4" fill="#0d1117" stroke="#c084fc" stroke-width="1.2" opacity="0.95"/>
+      <text x="520" y="318" font-size="14" fill="#c084fc" text-anchor="middle" font-family="monospace" font-weight="bold">PCM5102A DAC CHIP</text>
+      <text x="520" y="332" font-size="10" fill="#94a3b8" text-anchor="middle" font-family="monospace">32-bit DAC • 112 dB SNR • 384 kHz</text>
+      <text x="520" y="343" font-size="9" fill="#a855f7" text-anchor="middle" font-family="monospace">Hardware-controlled internal PLL</text>
+
+      <!-- ════ JUMPER CONFIG PADS (405, 595) to (546, 646) ════ -->
+      <circle cx="405" cy="595" r="7" fill="#eab308" opacity="0.95"/>
+      <circle cx="452" cy="612" r="7" fill="#eab308" opacity="0.95"/>
+      <circle cx="499" cy="629" r="7" fill="#eab308" opacity="0.95"/>
+      <circle cx="546" cy="646" r="7" fill="#eab308" opacity="0.95"/>
+
+      <line x1="475" y1="620" x2="350" y2="780" stroke="#eab308" stroke-width="2" stroke-dasharray="5 3" marker-end="url(#arr-y)"/>
+      <rect x="220" y="785" width="260" height="46" rx="4" fill="#0d1117" stroke="#eab308" stroke-width="1.5" opacity="0.95"/>
+      <text x="350" y="802" font-size="12" fill="#eab308" text-anchor="middle" font-family="monospace" font-weight="bold">⚙ JUMPER PADS (1 to 4)</text>
+      <text x="350" y="816" font-size="9.5" fill="#f8fafc" text-anchor="middle" font-family="monospace">1:FLT | 2:DMP | 3:FMT | 4:XMT</text>
+      <text x="350" y="826" font-size="8.5" fill="#94a3b8" text-anchor="middle" font-family="monospace">(1-3 tied GND, 4 pulled HIGH)</text>
+
+      <!-- ════ SIGNAL FLOW INSET BOX ════ -->
+      <rect x="620" y="30" width="355" height="135" rx="6" fill="#0f172a" stroke="#334155" stroke-width="1.5" opacity="0.95"/>
+      <text x="797" y="52" font-size="13" fill="#f9fafb" text-anchor="middle" font-family="monospace" font-weight="bold">SIGNAL FLOW SUMMARY</text>
+      <text x="635" y="72" font-size="11" fill="#a855f7" font-family="monospace">◀ DIGITAL INPUTS (I2S from ESP32)</text>
+      <text x="645" y="88" font-size="10" fill="#94a3b8" font-family="monospace">BCK  = Bit Clock           ← GPIO 15</text>
+      <text x="645" y="102" font-size="10" fill="#94a3b8" font-family="monospace">LCK  = L/R Word Select     ← GPIO 16</text>
+      <text x="645" y="116" font-size="10" fill="#94a3b8" font-family="monospace">DIN  = Audio Data          ← GPIO 7</text>
+      <text x="645" y="130" font-size="10" fill="#f97316" font-family="monospace">VIN  = 5V Power            ← Buck PSU</text>
+      <text x="635" y="146" font-size="11" fill="#10b981" font-family="monospace">▶ ANALOG OUT: LOUT + AGND + ROUT → Amp</text>
+    </svg>
+  </div>
+
+  <!-- LEGEND CARDS -->
+  <div class="legend">
+    <div class="leg-card pin-pwr">
+      <h4 style="color:#f97316;">⚡ Power Pins</h4>
+      <ul>
+        <li><strong>VIN</strong> — 5V in from Buck converter. The board's onboard LDO generates clean 3.3V VCC for the chip from this.</li>
+        <li><strong>GND</strong> — Logic ground, shared with ESP32 and all digital circuits.</li>
+      </ul>
+    </div>
+
+    <div class="leg-card pin-in">
+      <h4 style="color:#a855f7;">📥 Digital Inputs — I2S from ESP32</h4>
+      <ul>
+        <li><strong>BCK</strong> — Bit Clock. ~1.4 MHz at 44.1 kHz/16-bit. GPIO 15. All 3 DACs share this wire.</li>
+        <li><strong>LCK</strong> — Word Select. Toggles at 44,100 Hz. LOW=Left, HIGH=Right. GPIO 16. Shared.</li>
+        <li><strong>DIN</strong> — Serial audio data stream. Unique per DAC. DAC#1 = GPIO 7.</li>
+        <li><strong>SCK</strong> — System clock. <em>Solder bridge to GND</em> on board — enables internal PLL. Do NOT connect to ESP32.</li>
+      </ul>
+    </div>
+
+    <div class="leg-card pin-out">
+      <h4 style="color:#10b981;">📤 Analog Outputs → Amplifier</h4>
+      <ul>
+        <li><strong>LOUT</strong> — Left channel, ~1V line-level analog. → Amp Pad 1 (INL).</li>
+        <li><strong>AGND</strong> — Analog ground / cable shield return. → Amp Pad 2. Ground at <em>amp end only</em>.</li>
+        <li><strong>ROUT</strong> — Right channel, ~1V line-level analog. → Amp Pad 3 (INR).</li>
+        <li><strong>3.5mm Jack</strong> — Parallel headphone output. Same signal as LOUT/ROUT. Use or ignore.</li>
+      </ul>
+    </div>
+
+    <div class="leg-card pin-cfg">
+      <h4 style="color:#eab308;">⚙ Jumper Pads (solder bridges)</h4>
+      <ul>
+        <li><strong>SCK → GND</strong> — Internal PLL ON. Must do this.</li>
+        <li><strong>FLT → GND</strong> — Normal FIR filter roll-off.</li>
+        <li><strong>DMP → GND</strong> — De-emphasis OFF (correct for digital sources).</li>
+        <li><strong>FMT → GND</strong> — Standard I2S format.</li>
+        <li><strong>XMT → HIGH/VCC</strong> — Unmute! Leave low = silence.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- WIRING TABLE -->
+  <div style="background:#0f172a; border:1px solid #334155; border-radius:8px; padding:16px; margin-top:20px;">
+    <div style="color:#34d399; font-weight:800; font-size:14px; margin-bottom:12px;">📋 Wiring Table — DAC #1 (Front L/R)</div>
+    <table style="width:100%; border-collapse:collapse; font-size:12px;">
+      <tr style="background:#1e293b;">
+        <th style="padding:7px 10px; text-align:left; color:#94a3b8; border:1px solid #334155;">DAC Pin</th>
+        <th style="padding:7px 10px; text-align:left; color:#94a3b8; border:1px solid #334155;">Connect To</th>
+        <th style="padding:7px 10px; text-align:left; color:#94a3b8; border:1px solid #334155;">Wire</th>
+        <th style="padding:7px 10px; text-align:left; color:#94a3b8; border:1px solid #334155;">Note</th>
+      </tr>
+      <tr><td style="padding:5px 10px;border:1px solid #334155;color:#f97316;font-family:monospace;">VIN</td><td style="padding:5px 10px;border:1px solid #334155;color:#cbd5e1;">5V Buck +</td><td style="padding:5px 10px;border:1px solid #334155;color:#94a3b8;">22 AWG</td><td style="padding:5px 10px;border:1px solid #334155;color:#94a3b8;">All 3 DACs share same 5V rail</td></tr>
+      <tr style="background:#0f172a;"><td style="padding:5px 10px;border:1px solid #334155;color:#38bdf8;font-family:monospace;">GND</td><td style="padding:5px 10px;border:1px solid #334155;color:#cbd5e1;">Common GND</td><td style="padding:5px 10px;border:1px solid #334155;color:#94a3b8;">22 AWG black</td><td style="padding:5px 10px;border:1px solid #334155;color:#94a3b8;">Logic ground only</td></tr>
+      <tr><td style="padding:5px 10px;border:1px solid #334155;color:#38bdf8;font-family:monospace;">BCK</td><td style="padding:5px 10px;border:1px solid #334155;color:#cbd5e1;">ESP32 GPIO 15</td><td style="padding:5px 10px;border:1px solid #334155;color:#94a3b8;">26 AWG</td><td style="padding:5px 10px;border:1px solid #334155;color:#94a3b8;">Shared bus — all 3 DACs</td></tr>
+      <tr style="background:#0f172a;"><td style="padding:5px 10px;border:1px solid #334155;color:#06b6d4;font-family:monospace;">LCK</td><td style="padding:5px 10px;border:1px solid #334155;color:#cbd5e1;">ESP32 GPIO 16</td><td style="padding:5px 10px;border:1px solid #334155;color:#94a3b8;">26 AWG</td><td style="padding:5px 10px;border:1px solid #334155;color:#94a3b8;">Shared bus — all 3 DACs</td></tr>
+      <tr><td style="padding:5px 10px;border:1px solid #334155;color:#a855f7;font-family:monospace;">DIN</td><td style="padding:5px 10px;border:1px solid #334155;color:#cbd5e1;">ESP32 GPIO 7 (DOUT1)</td><td style="padding:5px 10px;border:1px solid #334155;color:#94a3b8;">26 AWG</td><td style="padding:5px 10px;border:1px solid #334155;color:#ef4444;font-weight:bold;">Unique per DAC!</td></tr>
+      <tr style="background:#0f172a;"><td style="padding:5px 10px;border:1px solid #334155;color:#eab308;font-family:monospace;">SCK</td><td style="padding:5px 10px;border:1px solid #334155;color:#cbd5e1;">GND (solder bridge)</td><td style="padding:5px 10px;border:1px solid #334155;color:#94a3b8;">Solder blob bridge</td><td style="padding:5px 10px;border:1px solid #334155;color:#facc15;font-weight:bold;">MANDATORY: Bridge to GND pad to run internal PLL clock</td></tr>
+      <tr><td style="padding:5px 10px;border:1px solid #334155;color:#10b981;font-family:monospace;">LOUT + AGND + ROUT</td><td style="padding:5px 10px;border:1px solid #334155;color:#cbd5e1;">Amp Pad 1 / Pad 2 / Pad 3</td><td style="padding:5px 10px;border:1px solid #334155;color:#94a3b8;">Shielded 3-wire</td><td style="padding:5px 10px;border:1px solid #334155;color:#fbbf24;">Ground shield at AMP end only</td></tr>
+    </table>
+  </div>
+
+  <!-- SOLDER BRIDGES VISUAL GUIDE SECTION -->
+  <div style="background:#0f172a; border:2px solid #eab308; border-radius:8px; padding:16px; margin-top:20px;">
+    <div style="color:#facc15; font-weight:800; font-size:14px; margin-bottom:8px;">
+      <i class="fa fa-wrench"></i> Real-World Construction: SCK ➔ GND Thin Jumper Wire
+    </div>
+    <p style="color:#cbd5e1; font-size:12px; line-height:1.6; margin-bottom:14px;">
+      On the 6-pin input header, <strong>SCK is Pin 6</strong> and <strong>GND is Pin 2</strong>. Here is how builders solder a real thin wire jumper directly on the board:
+    </p>
+
+    <!-- Visual Realistic Graphic of the Real-World Thin Wire Jumper -->
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:14px; margin-bottom:16px;">
+      
+      <!-- Card 1: Top-side Hookup Jumper Wire -->
+      <div style="background:#1e293b; border-radius:6px; border:1px solid #334155; padding:12px;">
+        <div style="color:#38bdf8; font-weight:bold; font-size:12px; margin-bottom:8px;">
+          📸 Real-World Method 1: Insulated Top-Side Jumper Wire
+        </div>
+        <svg viewBox="0 0 360 190" style="width:100%; background:#0a0e17; border-radius:4px;">
+          <!-- Purple PCB edge snippet -->
+          <rect x="20" y="20" width="160" height="150" rx="4" fill="#3b0764" stroke="#a855f7" stroke-width="1.5"/>
+          <text x="100" y="38" font-size="10" fill="#c084fc" text-anchor="middle" font-family="monospace">HW-280 PCB</text>
+          
+          <!-- Header Pads row -->
+          <!-- Pin 1 VIN -->
+          <circle cx="150" cy="50" r="6" fill="#0d1117" stroke="#e2e8f0" stroke-width="1.5"/>
+          <text x="135" y="53" font-size="8" fill="#f97316" font-family="monospace" text-anchor="end">VIN</text>
+          <!-- Pin 2 GND -->
+          <circle cx="150" cy="72" r="7" fill="#0d1117" stroke="#38bdf8" stroke-width="2"/>
+          <text x="135" y="75" font-size="8" fill="#38bdf8" font-family="monospace" text-anchor="end" font-weight="bold">GND</text>
+          <!-- Pin 3 LCK -->
+          <circle cx="150" cy="94" r="6" fill="#0d1117" stroke="#e2e8f0" stroke-width="1.5"/>
+          <text x="135" y="97" font-size="8" fill="#94a3b8" font-family="monospace" text-anchor="end">LCK</text>
+          <!-- Pin 4 DIN -->
+          <circle cx="150" cy="116" r="6" fill="#0d1117" stroke="#e2e8f0" stroke-width="1.5"/>
+          <text x="135" y="119" font-size="8" fill="#94a3b8" font-family="monospace" text-anchor="end">DIN</text>
+          <!-- Pin 5 BCK -->
+          <circle cx="150" cy="138" r="6" fill="#0d1117" stroke="#e2e8f0" stroke-width="1.5"/>
+          <text x="135" y="141" font-size="8" fill="#94a3b8" font-family="monospace" text-anchor="end">BCK</text>
+          <!-- Pin 6 SCK -->
+          <circle cx="150" cy="160" r="7" fill="#0d1117" stroke="#facc15" stroke-width="2"/>
+          <text x="135" y="163" font-size="8" fill="#facc15" font-family="monospace" text-anchor="end" font-weight="bold">SCK</text>
+
+          <!-- The Real Insulated Wire Loop jumping Pin 6 to Pin 2 -->
+          <path d="M 150 160 C 215 155, 215 77, 150 72" fill="none" stroke="#facc15" stroke-width="3" stroke-linecap="round"/>
+          <!-- Solder joint fillet on Pin 6 -->
+          <circle cx="150" cy="160" r="4.5" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/>
+          <!-- Solder joint fillet on Pin 2 -->
+          <circle cx="150" cy="72" r="4.5" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/>
+
+          <!-- Callout pointers -->
+          <text x="260" y="105" font-size="10" fill="#facc15" font-family="monospace" font-weight="bold" text-anchor="middle">Thin 26/28 AWG</text>
+          <text x="260" y="120" font-size="9" fill="#cbd5e1" font-family="monospace" text-anchor="middle">Insulated Wire</text>
+          <text x="260" y="134" font-size="8" fill="#94a3b8" font-family="monospace" text-anchor="middle">Loops around edge</text>
+        </svg>
+        <div style="font-size:11px; color:#cbd5e1; margin-top:6px;">
+          • Strip ~2 mm insulation on each tip.<br>
+          • Insert one stripped tip into <strong>SCK</strong> hole, one into <strong>GND</strong>.<br>
+          • Solder both. The insulation prevents touching BCK, DIN, or LCK.
+        </div>
+      </div>
+
+      <!-- Card 2: Underside/Bottom Wire Jumper -->
+      <div style="background:#1e293b; border-radius:6px; border:1px solid #334155; padding:12px;">
+        <div style="color:#4ade80; font-weight:bold; font-size:12px; margin-bottom:8px;">
+          📸 Real-World Method 2: Solder Directly to Common GND Bus
+        </div>
+        <svg viewBox="0 0 360 190" style="width:100%; background:#0a0e17; border-radius:4px;">
+          <!-- DAC Board -->
+          <rect x="20" y="30" width="130" height="120" rx="4" fill="#3b0764" stroke="#a855f7" stroke-width="1.5"/>
+          <text x="85" y="48" font-size="9" fill="#c084fc" text-anchor="middle" font-family="monospace">PCM5102A</text>
+          
+          <circle cx="130" cy="70" r="6" fill="#0284c7"/>
+          <text x="118" y="73" font-size="8" fill="#38bdf8" text-anchor="end" font-family="monospace">GND</text>
+          <circle cx="130" cy="130" r="6" fill="#facc15"/>
+          <text x="118" y="133" font-size="8" fill="#facc15" text-anchor="end" font-family="monospace">SCK</text>
+
+          <!-- Ground Terminal Bus / WAGO block / Star Point -->
+          <rect x="230" y="55" width="105" height="70" rx="5" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5"/>
+          <text x="282" y="75" font-size="10" fill="#38bdf8" font-family="monospace" text-anchor="middle" font-weight="bold">GND BUS /</text>
+          <text x="282" y="90" font-size="10" fill="#38bdf8" font-family="monospace" text-anchor="middle" font-weight="bold">STAR TERMINAL</text>
+          <text x="282" y="108" font-size="8" fill="#94a3b8" font-family="monospace" text-anchor="middle">(Logic Ground)</text>
+
+          <!-- Wires going to GND bus -->
+          <line x1="130" y1="70" x2="230" y2="70" stroke="#38bdf8" stroke-width="2"/>
+          <circle cx="130" cy="70" r="3" fill="#ffffff"/>
+          <line x1="130" y1="130" x2="230" y2="105" stroke="#facc15" stroke-width="2"/>
+          <circle cx="130" cy="130" r="3" fill="#ffffff"/>
+
+          <text x="180" y="145" font-size="9" fill="#facc15" font-family="monospace" text-anchor="middle">SCK wire goes to GND bus</text>
+        </svg>
+        <div style="font-size:11px; color:#cbd5e1; margin-top:6px;">
+          • If you don't want a jumper loop on the PCB header, simply run the thin SCK wire alongside the GND wire to your <strong>WAGO block / common ground point</strong>.<br>
+          • Electrically 100% identical: SCK is held at 0V.
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Visual SVG Diagram of Solder Bridges -->
+    <div style="overflow-x:auto;">
+      <svg viewBox="0 0 920 210" style="width:100%; min-width:700px; background:#0a0e17; border-radius:6px; border:1px solid #334155;">
+        
+        <!-- Option A: Header Wiring (Wire jumper or tie to GND rail) -->
+        <g transform="translate(20, 20)">
+          <rect x="0" y="0" width="280" height="170" rx="6" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+          <text x="140" y="24" font-size="12" fill="#38bdf8" text-anchor="middle" font-family="monospace" font-weight="bold">METHOD A: HEADER PIN JUMPER WIRE</text>
+          
+          <!-- 6 Header Pins in Column -->
+          <g transform="translate(40, 40)">
+            <!-- VIN -->
+            <circle cx="15" cy="0" r="6" fill="#f97316"/> <text x="35" y="4" font-size="9" fill="#94a3b8" font-family="monospace">1: VIN (5V)</text>
+            <!-- GND -->
+            <circle cx="15" cy="22" r="7" fill="#0284c7" stroke="#38bdf8" stroke-width="2"/> <text x="35" y="26" font-size="10" fill="#38bdf8" font-family="monospace" font-weight="bold">2: GND</text>
+            <!-- LCK -->
+            <circle cx="15" cy="44" r="6" fill="#06b6d4"/> <text x="35" y="48" font-size="9" fill="#94a3b8" font-family="monospace">3: LCK</text>
+            <!-- DIN -->
+            <circle cx="15" cy="66" r="6" fill="#a855f7"/> <text x="35" y="70" font-size="9" fill="#94a3b8" font-family="monospace">4: DIN</text>
+            <!-- BCK -->
+            <circle cx="15" cy="88" r="6" fill="#38bdf8"/> <text x="35" y="92" font-size="9" fill="#94a3b8" font-family="monospace">5: BCK</text>
+            <!-- SCK -->
+            <circle cx="15" cy="110" r="7" fill="#d97706" stroke="#fbbf24" stroke-width="2"/> <text x="35" y="114" font-size="10" fill="#fbbf24" font-family="monospace" font-weight="bold">6: SCK</text>
+
+            <!-- Jumper Wire connecting Pin 6 SCK up to Pin 2 GND -->
+            <path d="M 8 110 C -25 90, -25 40, 8 22" fill="none" stroke="#facc15" stroke-width="3"/>
+            <circle cx="8" cy="110" r="3" fill="#ffffff"/>
+            <circle cx="8" cy="22" r="3" fill="#ffffff"/>
+          </g>
+
+          <text x="180" y="80" font-size="10" fill="#facc15" text-anchor="middle" font-family="monospace" font-weight="bold">Insulated Jumper Wire</text>
+          <text x="180" y="96" font-size="9" fill="#cbd5e1" text-anchor="middle" font-family="monospace">Pin 6 (SCK) ➔ Pin 2 (GND)</text>
+          <text x="180" y="112" font-size="9" fill="#94a3b8" text-anchor="middle" font-family="monospace">(or solder SCK directly</text>
+          <text x="180" y="125" font-size="9" fill="#94a3b8" text-anchor="middle" font-family="monospace">to logic GND rail)</text>
+        </g>
+
+        <!-- Option B: Backside SMD Solder Pads -->
+        <g transform="translate(320, 20)">
+          <rect x="0" y="0" width="300" height="170" rx="6" fill="#1e293b" stroke="#eab308" stroke-width="1.5"/>
+          <text x="150" y="24" font-size="12" fill="#facc15" text-anchor="middle" font-family="monospace" font-weight="bold">METHOD B: UNDERSIDE SOLDER PADS</text>
+          
+          <!-- Backside solder jumper pairs -->
+          <g transform="translate(20, 45)">
+            <text x="0" y="16" font-size="9" fill="#cbd5e1" font-family="monospace">Jumper 1 (FLT):</text>
+            <rect x="130" y="6" width="16" height="12" rx="2" fill="#d97706"/>
+            <rect x="152" y="6" width="16" height="12" rx="2" fill="#0284c7"/>
+            <ellipse cx="149" cy="12" rx="10" ry="7" fill="#e2e8f0" stroke="#94a3b8"/>
+            <text x="180" y="16" font-size="9" fill="#4ade80" font-family="monospace">Bridged (GND)</text>
+
+            <text x="0" y="42" font-size="9" fill="#cbd5e1" font-family="monospace">Jumper 2 (DMP):</text>
+            <rect x="130" y="32" width="16" height="12" rx="2" fill="#d97706"/>
+            <rect x="152" y="32" width="16" height="12" rx="2" fill="#0284c7"/>
+            <ellipse cx="149" cy="38" rx="10" ry="7" fill="#e2e8f0" stroke="#94a3b8"/>
+            <text x="180" y="42" font-size="9" fill="#4ade80" font-family="monospace">Bridged (GND)</text>
+
+            <text x="0" y="68" font-size="9" fill="#cbd5e1" font-family="monospace">Jumper 3 (FMT):</text>
+            <rect x="130" y="58" width="16" height="12" rx="2" fill="#d97706"/>
+            <rect x="152" y="58" width="16" height="12" rx="2" fill="#0284c7"/>
+            <ellipse cx="149" cy="64" rx="10" ry="7" fill="#e2e8f0" stroke="#94a3b8"/>
+            <text x="180" y="68" font-size="9" fill="#4ade80" font-family="monospace">Bridged (I2S)</text>
+
+            <text x="0" y="94" font-size="9" fill="#cbd5e1" font-family="monospace">Jumper 4 (XMT):</text>
+            <rect x="130" y="84" width="16" height="12" rx="2" fill="#d97706"/>
+            <rect x="152" y="84" width="16" height="12" rx="2" fill="#dc2626"/>
+            <ellipse cx="149" cy="90" rx="10" ry="7" fill="#e2e8f0" stroke="#94a3b8"/>
+            <text x="180" y="94" font-size="9" fill="#4ade80" font-family="monospace">Pulled HIGH (VCC)</text>
+          </g>
+          <text x="150" y="158" font-size="9" fill="#94a3b8" text-anchor="middle" font-family="monospace">Pairs on bottom PCB side ARE adjacent!</text>
+        </g>
+
+        <!-- Summary & Recommendation -->
+        <g transform="translate(640, 20)">
+          <rect x="0" y="0" width="260" height="170" rx="6" fill="#1e293b" stroke="#10b981" stroke-width="1.5"/>
+          <text x="130" y="24" font-size="12" fill="#34d399" text-anchor="middle" font-family="monospace" font-weight="bold">RECOMMENDED FOR DIY BUILD</text>
+          
+          <rect x="15" y="42" width="230" height="42" rx="4" fill="#052e16" stroke="#10b981"/>
+          <text x="130" y="58" font-size="10" fill="#6ee7b7" text-anchor="middle" font-family="monospace" font-weight="bold">EASIEST SCK METHOD:</text>
+          <text x="130" y="74" font-size="9" fill="#cbd5e1" text-anchor="middle" font-family="monospace">Solder SCK directly to GND bus</text>
+
+          <text x="20" y="110" font-size="9" fill="#cbd5e1" font-family="monospace">• No PCB track slicing needed</text>
+          <text x="20" y="126" font-size="9" fill="#cbd5e1" font-family="monospace">• Connect Pin 6 wire to common GND</text>
+          <text x="20" y="142" font-size="9" fill="#cbd5e1" font-family="monospace">• DAC internal PLL locks immediately</text>
+        </g>
+
+      </svg>
+    </div>
+  </div>
+
+  <div style="margin-top:12px; padding:10px; border-top:1px solid #334155; font-size:11px; color:#94a3b8; display:flex; justify-content:space-between;">
+    <span>PCM5102A DAC HW-280 Annotated Pinout • DIY 5.1 Copper Chimney V2</span>
+    <span>DWG: CCV2-E-DAC-01 • REV 1.0</span>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       SECTION 2: CONNECTION DIAGRAM — DAC LOUT/AGND/ROUT → AMP PADS
+  ═══════════════════════════════════════════════════════════════ -->
+  <div style="margin-top:32px; border-top:2px solid #10b981; padding-top:20px;">
+    <div style="color:#34d399; font-weight:800; font-size:16px; margin-bottom:4px;">
+      <i class="fa fa-long-arrow-right"></i> Connection: PCM5102A DAC → XH-M562 TPA3116D2 Amp
+    </div>
+    <p style="color:#94a3b8; font-size:12px; margin-bottom:16px;">
+      Three wires run from the DAC's analog output pads (left side of board) to the amp's input pads (left edge of amp board). Use shielded cable — L and R as inner conductors, AGND as the outer braid/shield.
+    </p>
+
+    <!-- ── SIDE-BY-SIDE CONNECTION SVG ── -->
+    <div style="overflow-x:auto;">
+      <svg viewBox="0 0 1000 340" style="width:100%; min-width:700px; max-width:1000px; display:block; margin:0 auto; background:#0a0e17; border-radius:8px; border:1.5px solid #1f2937;">
+        <defs>
+          <marker id="ca-g" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#10b981"/></marker>
+          <marker id="ca-b" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#38bdf8"/></marker>
+        </defs>
+
+        <!-- ── DAC BOARD BLOCK ── -->
+        <rect x="20" y="20" width="260" height="300" rx="8" fill="#1a0533" stroke="#10b981" stroke-width="2"/>
+        <text x="150" y="44" font-size="13" fill="#4ade80" text-anchor="middle" font-family="monospace" font-weight="bold">PCM5102A DAC</text>
+        <text x="150" y="58" font-size="10" fill="#6d28d9" text-anchor="middle" font-family="monospace">HW-280 • Analog Output Side</text>
+
+        <!-- DAC board mini image placeholder with label -->
+        <rect x="40" y="70" width="220" height="120" rx="4" fill="#0d1117" stroke="#374151"/>
+        <text x="150" y="122" font-size="10" fill="#475569" text-anchor="middle" font-family="monospace">[ DAC Board ]</text>
+        <text x="150" y="138" font-size="9" fill="#374151" text-anchor="middle" font-family="monospace">Left edge pads</text>
+
+        <!-- DAC output pads (right side of block) -->
+        <!-- LOUT -->
+        <rect x="220" y="210" width="60" height="24" rx="4" fill="#052e16" stroke="#10b981" stroke-width="1.5"/>
+        <circle cx="282" cy="222" r="6" fill="#10b981"/>
+        <text x="248" y="226" font-size="10" fill="#10b981" text-anchor="middle" font-family="monospace" font-weight="bold">LOUT</text>
+
+        <!-- AGND -->
+        <rect x="220" y="244" width="60" height="24" rx="4" fill="#0c1a3a" stroke="#38bdf8" stroke-width="1.5"/>
+        <circle cx="282" cy="256" r="6" fill="#1d4ed8"/>
+        <text x="248" y="260" font-size="10" fill="#38bdf8" text-anchor="middle" font-family="monospace" font-weight="bold">AGND</text>
+
+        <!-- ROUT -->
+        <rect x="220" y="278" width="60" height="24" rx="4" fill="#052e16" stroke="#10b981" stroke-width="1.5"/>
+        <circle cx="282" cy="290" r="6" fill="#10b981"/>
+        <text x="248" y="294" font-size="10" fill="#10b981" text-anchor="middle" font-family="monospace" font-weight="bold">ROUT</text>
+
+        <!-- Left side inputs labels for reference -->
+        <text x="40" y="215" font-size="9" fill="#6d28d9" font-family="monospace">← (I2S from ESP32)</text>
+        <text x="40" y="228" font-size="9" fill="#374151" font-family="monospace">BCK · LCK · DIN · VIN · GND</text>
+
+        <!-- ── SHIELDED CABLE in the middle ── -->
+        <!-- Outer shield (braid) -->
+        <rect x="310" y="202" width="340" height="96" rx="10" fill="none" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6 4"/>
+        <text x="480" y="196" font-size="10" fill="#94a3b8" text-anchor="middle" font-family="monospace">Shielded Cable (3-wire)</text>
+
+        <!-- LOUT wire -->
+        <line x1="288" y1="222" x2="660" y2="222" stroke="#10b981" stroke-width="3" marker-end="url(#ca-g)"/>
+        <text x="480" y="217" font-size="9" fill="#10b981" text-anchor="middle" font-family="monospace">Left Audio (inner conductor)</text>
+
+        <!-- AGND wire (dashed = shield) -->
+        <line x1="288" y1="256" x2="660" y2="256" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="8 4" marker-end="url(#ca-b)"/>
+        <text x="480" y="251" font-size="9" fill="#38bdf8" text-anchor="middle" font-family="monospace">AGND (outer shield / braid)</text>
+
+        <!-- ROUT wire -->
+        <line x1="288" y1="290" x2="660" y2="290" stroke="#10b981" stroke-width="3" marker-end="url(#ca-g)"/>
+        <text x="480" y="285" font-size="9" fill="#10b981" text-anchor="middle" font-family="monospace">Right Audio (inner conductor)</text>
+
+        <!-- Shield grounded ONE end callout -->
+        <line x1="650" y1="256" x2="650" y2="313" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3 3"/>
+        <rect x="590" y="313" width="180" height="20" rx="3" fill="#0c1a3a" stroke="#1d4ed8"/>
+        <text x="680" y="327" font-size="9" fill="#38bdf8" text-anchor="middle" font-family="monospace">⚠ Ground shield HERE only</text>
+
+        <!-- NOT grounded at DAC end -->
+        <line x1="310" y1="256" x2="310" y2="313" stroke="#374151" stroke-width="1.5" stroke-dasharray="3 3"/>
+        <rect x="230" y="313" width="162" height="20" rx="3" fill="#1f2937" stroke="#374151"/>
+        <text x="311" y="327" font-size="9" fill="#6b7280" text-anchor="middle" font-family="monospace">NOT grounded at DAC end</text>
+
+        <!-- ── AMP BOARD BLOCK ── -->
+        <rect x="660" y="20" width="320" height="300" rx="8" fill="#0a1628" stroke="#0ea5e9" stroke-width="2"/>
+        <text x="820" y="44" font-size="13" fill="#38bdf8" text-anchor="middle" font-family="monospace" font-weight="bold">XH-M562 TPA3116D2</text>
+        <text x="820" y="58" font-size="10" fill="#0369a1" text-anchor="middle" font-family="monospace">Class-D Amplifier Board</text>
+
+        <!-- Amp board mini visual -->
+        <rect x="680" y="70" width="280" height="120" rx="4" fill="#0d1117" stroke="#374151"/>
+        <text x="820" y="122" font-size="10" fill="#475569" text-anchor="middle" font-family="monospace">[ Amp Board ]</text>
+        <text x="820" y="138" font-size="9" fill="#374151" text-anchor="middle" font-family="monospace">Left edge — input solder pads</text>
+
+        <!-- AMP input pads (left of block) -->
+        <!-- Pad 1 INL -->
+        <circle cx="668" cy="222" r="8" fill="#10b981"/>
+        <rect x="668" y="210" width="90" height="24" rx="4" fill="#052e16" stroke="#10b981" stroke-width="1.5"/>
+        <text x="718" y="226" font-size="10" fill="#10b981" text-anchor="middle" font-family="monospace" font-weight="bold">Pad 1: INL</text>
+
+        <!-- Pad 2 AGND -->
+        <circle cx="668" cy="256" r="8" fill="#1d4ed8"/>
+        <rect x="668" y="244" width="90" height="24" rx="4" fill="#0c1a3a" stroke="#38bdf8" stroke-width="1.5"/>
+        <text x="718" y="260" font-size="10" fill="#38bdf8" text-anchor="middle" font-family="monospace" font-weight="bold">Pad 2: AGND</text>
+
+        <!-- Pad 3 INR -->
+        <circle cx="668" cy="290" r="8" fill="#10b981"/>
+        <rect x="668" y="278" width="90" height="24" rx="4" fill="#052e16" stroke="#10b981" stroke-width="1.5"/>
+        <text x="718" y="294" font-size="10" fill="#10b981" text-anchor="middle" font-family="monospace" font-weight="bold">Pad 3: INR</text>
+
+        <!-- Other amp pads listed -->
+        <text x="775" y="215" font-size="9" fill="#374151" font-family="monospace">Pad 4: SPL−</text>
+        <text x="775" y="228" font-size="9" fill="#ef4444" font-family="monospace">Pad 5: SPL+  ─→ Speaker L+</text>
+        <text x="775" y="241" font-size="9" fill="#6b7280" font-family="monospace">Pad 4: SPL−  ─→ Speaker L−</text>
+        <text x="775" y="257" font-size="9" fill="#ef4444" font-family="monospace">Pad 6: SPR+  ─→ Speaker R+</text>
+        <text x="775" y="270" font-size="9" fill="#6b7280" font-family="monospace">Pad 7: SPR−  ─→ Speaker R−</text>
+        <text x="775" y="286" font-size="9" fill="#f97316" font-family="monospace">Pad 8: VCC   ─→ 24V PSU</text>
+        <text x="775" y="299" font-size="9" fill="#38bdf8" font-family="monospace">Pad 9: GND   ─→ PSU −</text>
+        <text x="775" y="312" font-size="9" fill="#fbbf24" font-family="monospace">Pad 10: CS   ─→ Float (always ON)</text>
+
+        <!-- 1uF AC coupling note on amp input -->
+        <rect x="668" y="160" width="200" height="38" rx="4" fill="#1e293b" stroke="#334155"/>
+        <text x="768" y="176" font-size="9" fill="#94a3b8" text-anchor="middle" font-family="monospace">XH-M562 has 1µF AC coupling</text>
+        <text x="768" y="190" font-size="9" fill="#94a3b8" text-anchor="middle" font-family="monospace">caps on board — DC blocked ✔</text>
+
+        <!-- BTL warning -->
+        <rect x="668" y="30" width="296" height="34" rx="4" fill="#450a0a" stroke="#dc2626"/>
+        <text x="816" y="46" font-size="10" fill="#fca5a5" text-anchor="middle" font-family="monospace" font-weight="bold">⚠ BTL OUTPUT</text>
+        <text x="816" y="59" font-size="9" fill="#f87171" text-anchor="middle" font-family="monospace">Speaker pads NEVER connect to GND</text>
+      </svg>
+    </div>
+
+    <!-- ── STEP-BY-STEP SOLDERING GUIDE ── -->
+    <div style="margin-top:20px; display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+
+      <div style="background:#0f172a; border:1px solid #10b981; border-radius:8px; padding:14px;">
+        <div style="color:#34d399; font-weight:800; font-size:13px; margin-bottom:10px;">🔧 How to Wire the 3-Pin Input (Step by Step)</div>
+        <ol style="color:#cbd5e1; font-size:12px; line-height:2.0; padding-left:18px; margin:0;">
+          <li>Cut a piece of <strong style="color:#f8fafc;">shielded audio cable</strong> (3-conductor or 2-conductor shielded). ~15–20 cm is enough inside the chassis.</li>
+          <li>Strip the outer jacket ~20 mm. You'll see the <strong style="color:#94a3b8;">braid/foil shield</strong> and the inner wires.</li>
+          <li>Twist the shield braid into a single wire — this becomes your <strong style="color:#38bdf8;">AGND</strong>.</li>
+          <li>Solder the <strong style="color:#10b981;">Left inner wire</strong> to <strong>DAC LOUT</strong> pad → run to <strong>Amp Pad 1 (INL)</strong>.</li>
+          <li>Solder the <strong style="color:#38bdf8;">shield wire</strong> to <strong>DAC AGND</strong> pad (DAC end). At the <strong>amp end</strong> solder to <strong>Amp Pad 2 (AGND / GND)</strong> only.</li>
+          <li>Solder the <strong style="color:#10b981;">Right inner wire</strong> to <strong>DAC ROUT</strong> pad → run to <strong>Amp Pad 3 (INR)</strong>.</li>
+          <li>⚠ Do NOT solder the shield at both ends. Only the <strong>amp side</strong> grounds the shield.</li>
+        </ol>
+      </div>
+
+      <div style="background:#0f172a; border:1px solid #334155; border-radius:8px; padding:14px;">
+        <div style="color:#fbbf24; font-weight:800; font-size:13px; margin-bottom:10px;">📋 Quick Reference Table</div>
+        <table style="width:100%; border-collapse:collapse; font-size:12px;">
+          <tr style="background:#1e293b;">
+            <th style="padding:5px 8px; text-align:left; color:#94a3b8; border:1px solid #334155;">DAC Pad</th>
+            <th style="padding:5px 8px; text-align:center; color:#94a3b8; border:1px solid #334155;">Wire</th>
+            <th style="padding:5px 8px; text-align:left; color:#94a3b8; border:1px solid #334155;">Amp Pad</th>
+          </tr>
+          <tr>
+            <td style="padding:5px 8px; border:1px solid #334155; color:#10b981; font-family:monospace; font-weight:bold;">LOUT (L)</td>
+            <td style="padding:5px 8px; border:1px solid #334155; text-align:center;">
+              <span style="display:inline-block; width:50px; height:3px; background:#10b981; vertical-align:middle; border-radius:2px;"></span>
+            </td>
+            <td style="padding:5px 8px; border:1px solid #334155; color:#10b981; font-family:monospace; font-weight:bold;">Pad 1: INL</td>
+          </tr>
+          <tr style="background:#0f172a;">
+            <td style="padding:5px 8px; border:1px solid #334155; color:#38bdf8; font-family:monospace; font-weight:bold;">AGND (G)</td>
+            <td style="padding:5px 8px; border:1px solid #334155; text-align:center;">
+              <span style="display:inline-block; width:50px; height:2px; background:repeating-linear-gradient(90deg,#38bdf8 0,#38bdf8 6px,transparent 6px,transparent 10px); vertical-align:middle;"></span>
+            </td>
+            <td style="padding:5px 8px; border:1px solid #334155; color:#38bdf8; font-family:monospace; font-weight:bold;">Pad 2: AGND ⚠ amp-end only</td>
+          </tr>
+          <tr>
+            <td style="padding:5px 8px; border:1px solid #334155; color:#10b981; font-family:monospace; font-weight:bold;">ROUT (R)</td>
+            <td style="padding:5px 8px; border:1px solid #334155; text-align:center;">
+              <span style="display:inline-block; width:50px; height:3px; background:#10b981; vertical-align:middle; border-radius:2px;"></span>
+            </td>
+            <td style="padding:5px 8px; border:1px solid #334155; color:#10b981; font-family:monospace; font-weight:bold;">Pad 3: INR</td>
+          </tr>
+        </table>
+
+        <div style="margin-top:12px; background:#022c22; border-radius:4px; padding:8px; font-size:11px; color:#6ee7b7;">
+          <strong>✔ The XH-M562 amp board already has 1µF AC coupling capacitors</strong> on the INL/INR pads — so the DAC's DC offset is blocked automatically. No external caps needed.
+        </div>
+        <div style="margin-top:8px; background:#1c1917; border-radius:4px; padding:8px; font-size:11px; color:#a8a29e;">
+          <strong style="color:#fbbf24;">Signal level:</strong> PCM5102A outputs ~1 Vrms (line level). The TPA3116D2 input is designed for this — no attenuator needed. The ESP32 software volume control (83.6% limit) keeps headroom.
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end section 2 -->
+
+  <!-- ── ANNOTATED AMP BOARD PHOTO ── -->
+  <div style="margin-top:28px;">
+    <div style="color:#38bdf8; font-weight:800; font-size:14px; margin-bottom:8px;">
+      📌 XH-M562 TPA3116D2 Amp — Annotated Input Pads
+    </div>
+    <p style="color:#94a3b8; font-size:12px; margin-bottom:12px;">
+      The three input pads (INL, GND, INR) are on the <strong>left edge</strong> of the amp board. The DAC's LOUT/AGND/ROUT connect directly to these.
+    </p>
+
+    <div class="board-wrap" style="max-width:860px;">
+      <img src="./image/xhm562_amp.png" alt="XH-M562 TPA3116D2 Amp Board">
+
+      <svg class="overlay" viewBox="0 0 762 618" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="am-g" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#10b981"/></marker>
+          <marker id="am-b" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#38bdf8"/></marker>
+          <marker id="am-o" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#f97316"/></marker>
+          <marker id="am-r" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#ef4444"/></marker>
+          <marker id="am-y" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#eab308"/></marker>
+          <marker id="am-s" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#6b7280"/></marker>
+        </defs>
+
+        <!-- ── LEFT EDGE PADS (input + power row, top-left of board) ── -->
+
+        <!-- INL — Pad 1 -->
+        <circle cx="98" cy="295" r="9" fill="#10b981" opacity="0.95"/>
+        <line x1="98" y1="295" x2="20" y2="200" stroke="#10b981" stroke-width="2.5" marker-end="url(#am-g)"/>
+        <rect x="20" y="156" width="150" height="40" rx="4" fill="#0d1117" opacity="0.92"/>
+        <text x="95" y="174" font-size="14" fill="#10b981" text-anchor="middle" font-family="monospace" font-weight="bold">Pad 1: INL</text>
+        <text x="95" y="188" font-size="10" fill="#94a3b8" text-anchor="middle" font-family="monospace">← LOUT from DAC</text>
+
+        <!-- GND — Pad 2 -->
+        <circle cx="118" cy="323" r="9" fill="#38bdf8" opacity="0.95"/>
+        <line x1="118" y1="323" x2="20" y2="260" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="6 3" marker-end="url(#am-b)"/>
+        <rect x="8" y="218" width="168" height="40" rx="4" fill="#0d1117" opacity="0.92"/>
+        <text x="92" y="236" font-size="14" fill="#38bdf8" text-anchor="middle" font-family="monospace" font-weight="bold">Pad 2: GND/AGND</text>
+        <text x="92" y="250" font-size="10" fill="#94a3b8" text-anchor="middle" font-family="monospace">← AGND shield (amp end)</text>
+
+        <!-- INR — Pad 3 -->
+        <circle cx="136" cy="352" r="9" fill="#10b981" opacity="0.95"/>
+        <line x1="136" y1="352" x2="20" y2="318" stroke="#10b981" stroke-width="2.5" marker-end="url(#am-g)"/>
+        <rect x="8" y="278" width="150" height="40" rx="4" fill="#0d1117" opacity="0.92"/>
+        <text x="83" y="296" font-size="14" fill="#10b981" text-anchor="middle" font-family="monospace" font-weight="bold">Pad 3: INR</text>
+        <text x="83" y="310" font-size="10" fill="#94a3b8" text-anchor="middle" font-family="monospace">← ROUT from DAC</text>
+
+        <!-- SPL− — Pad 4 -->
+        <circle cx="152" cy="381" r="9" fill="#6b7280" opacity="0.95"/>
+        <line x1="152" y1="381" x2="20" y2="380" stroke="#6b7280" stroke-width="2" marker-end="url(#am-s)"/>
+        <rect x="8" y="358" width="150" height="40" rx="4" fill="#0d1117" opacity="0.92"/>
+        <text x="83" y="376" font-size="13" fill="#6b7280" text-anchor="middle" font-family="monospace" font-weight="bold">Pad 4: SPL−</text>
+        <text x="83" y="390" font-size="10" fill="#94a3b8" text-anchor="middle" font-family="monospace">Speaker L − (BTL float)</text>
+
+        <!-- SPL+ — Pad 5 -->
+        <circle cx="168" cy="409" r="9" fill="#ef4444" opacity="0.95"/>
+        <line x1="168" y1="409" x2="20" y2="440" stroke="#ef4444" stroke-width="2.5" marker-end="url(#am-r)"/>
+        <rect x="8" y="418" width="140" height="40" rx="4" fill="#0d1117" opacity="0.92"/>
+        <text x="78" y="436" font-size="13" fill="#ef4444" text-anchor="middle" font-family="monospace" font-weight="bold">Pad 5: SPL+</text>
+        <text x="78" y="450" font-size="10" fill="#94a3b8" text-anchor="middle" font-family="monospace">Speaker L + (BTL float)</text>
+
+        <!-- SPR− — Pad 6/7 area -->
+        <circle cx="184" cy="435" r="9" fill="#ef4444" opacity="0.95"/>
+        <line x1="184" y1="435" x2="40" y2="490" stroke="#ef4444" stroke-width="2.5" marker-end="url(#am-r)"/>
+        <rect x="8" y="468" width="140" height="40" rx="4" fill="#0d1117" opacity="0.92"/>
+        <text x="78" y="486" font-size="13" fill="#ef4444" text-anchor="middle" font-family="monospace" font-weight="bold">Pad 6: SPR+</text>
+        <text x="78" y="500" font-size="10" fill="#94a3b8" text-anchor="middle" font-family="monospace">Speaker R + (BTL float)</text>
+
+        <!-- SPR+ -->
+        <circle cx="200" cy="461" r="9" fill="#6b7280" opacity="0.95"/>
+        <line x1="200" y1="461" x2="60" y2="528" stroke="#6b7280" stroke-width="2" marker-end="url(#am-s)"/>
+        <rect x="8" y="516" width="140" height="38" rx="4" fill="#0d1117" opacity="0.92"/>
+        <text x="78" y="534" font-size="13" fill="#6b7280" text-anchor="middle" font-family="monospace" font-weight="bold">Pad 7: SPR−</text>
+        <text x="78" y="548" font-size="10" fill="#94a3b8" text-anchor="middle" font-family="monospace">Speaker R − (BTL float)</text>
+
+        <!-- VCC — Pad 8 -->
+        <circle cx="218" cy="488" r="9" fill="#f97316" opacity="0.95"/>
+        <line x1="218" y1="488" x2="600" y2="560" stroke="#f97316" stroke-width="2.5" marker-end="url(#am-o)"/>
+        <rect x="508" y="556" width="168" height="38" rx="4" fill="#0d1117" opacity="0.92"/>
+        <text x="592" y="574" font-size="13" fill="#f97316" text-anchor="middle" font-family="monospace" font-weight="bold">Pad 8: VCC (+24V)</text>
+
+        <!-- GND — Pad 9 -->
+        <circle cx="235" cy="514" r="9" fill="#38bdf8" opacity="0.95"/>
+        <line x1="235" y1="514" x2="680" y2="560" stroke="#38bdf8" stroke-width="2.5" marker-end="url(#am-b)"/>
+        <rect x="596" y="556" width="168" height="38" rx="4" fill="#0d1117" opacity="0.92"/>
+        <text x="680" y="574" font-size="13" fill="#38bdf8" text-anchor="middle" font-family="monospace" font-weight="bold">Pad 9: GND (PSU −)</text>
+
+        <!-- CS — Pad 10 -->
+        <circle cx="254" cy="539" r="9" fill="#eab308" opacity="0.9"/>
+        <line x1="254" y1="539" x2="470" y2="570" stroke="#eab308" stroke-width="2" stroke-dasharray="5 3" marker-end="url(#am-y)"/>
+        <rect x="380" y="556" width="176" height="38" rx="4" fill="#0d1117" opacity="0.92"/>
+        <text x="468" y="572" font-size="12" fill="#eab308" text-anchor="middle" font-family="monospace" font-weight="bold">Pad 10: CS — FLOAT</text>
+        <text x="468" y="585" font-size="10" fill="#94a3b8" text-anchor="middle" font-family="monospace">Leave unsoldered = always ON</text>
+
+        <!-- TPA3116D2 chip label -->
+        <circle cx="410" cy="295" r="11" fill="#0369a1" opacity="0.9"/>
+        <line x1="410" y1="295" x2="560" y2="200" stroke="#38bdf8" stroke-width="2"/>
+        <rect x="490" y="156" width="220" height="42" rx="4" fill="#0d1117" opacity="0.92"/>
+        <text x="600" y="174" font-size="13" fill="#38bdf8" text-anchor="middle" font-family="monospace" font-weight="bold">TPA3116D2 IC</text>
+        <text x="600" y="188" font-size="10" fill="#94a3b8" text-anchor="middle" font-family="monospace">Class-D PWM • 400 kHz switching</text>
+
+        <!-- BTL warning box top-right -->
+        <rect x="490" y="30" width="280" height="50" rx="6" fill="#450a0a" stroke="#dc2626" stroke-width="1.5"/>
+        <text x="630" y="50" font-size="12" fill="#fca5a5" text-anchor="middle" font-family="monospace" font-weight="bold">⚠ BTL OUTPUT</text>
+        <text x="630" y="68" font-size="10" fill="#f87171" text-anchor="middle" font-family="monospace">SPL±  SPR± both FLOAT — never to GND</text>
+
+        <!-- Input group bracket -->
+        <rect x="84" y="284" width="8" height="80" rx="2" fill="none" stroke="#10b981" stroke-width="2"/>
+        <line x1="84" y1="324" x2="68" y2="324" stroke="#10b981" stroke-width="1.5"/>
+        <text x="62" y="320" font-size="9" fill="#10b981" text-anchor="end" font-family="monospace">From</text>
+        <text x="62" y="332" font-size="9" fill="#10b981" text-anchor="end" font-family="monospace">DAC</text>
+      </svg>
+    </div>
+  </div><!-- end amp photo section -->
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       SECTION 3: BENCH TEST DUMMY BOX & MDF MOUNTING PLAN
+  ═══════════════════════════════════════════════════════════════ -->
+  <div style="margin-top:32px; border-top:2px solid #38bdf8; padding-top:20px;">
+    <div style="color:#38bdf8; font-weight:800; font-size:16px; margin-bottom:4px;">
+      📦 Bench Test Mockup: 200×200×100 mm Box &amp; 130×200 mm MDF Mounting Tray
+    </div>
+    <p style="color:#cbd5e1; font-size:12px; line-height:1.6; margin-bottom:14px;">
+      Using your cardboard box (200 mm width × 200 mm depth × 100 mm height) and the 130 mm × 200 mm MDF board as a slide-in component tray is an <strong>ideal prototyping strategy</strong>. It lets you test audio, verify grounds, check temperature, and tune software before cutting metal.
+    </p>
+
+    <!-- Side by Side Photos & Tray Layout -->
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:16px;">
+      
+      <!-- User Box Photo Card -->
+      <div style="background:#0f172a; border:1px solid #334155; border-radius:8px; padding:12px;">
+        <div style="color:#facc15; font-weight:bold; font-size:12px; margin-bottom:8px;">
+          📦 Dummy Enclosure Box (200 × 200 × 100 mm)
+        </div>
+        <img src="./image/dummy_cardboard_box.jpg" alt="Dummy Box 200x200x100mm" style="width:100%; border-radius:6px; border:1px solid #1e293b; max-height:240px; object-fit:cover;">
+        <div style="font-size:11px; color:#94a3b8; margin-top:8px; line-height:1.5;">
+          • <strong>Volume:</strong> 4 Liters total interior.<br>
+          • <strong>Cutouts:</strong> Easily cut rear speaker binding post holes &amp; front volume pot / 3.5mm AUX jack with a craft knife for mockup testing.
+        </div>
+      </div>
+
+      <!-- User MDF Board Photo Card -->
+      <div style="background:#0f172a; border:1px solid #334155; border-radius:8px; padding:12px;">
+        <div style="color:#34d399; font-weight:bold; font-size:12px; margin-bottom:8px;">
+          🪵 Component Sled: 130 × 200 mm MDF Board
+        </div>
+        <img src="./image/dummy_mdf_board.jpg" alt="MDF Board 130x200mm" style="width:100%; border-radius:6px; border:1px solid #1e293b; max-height:240px; object-fit:cover;">
+        <div style="font-size:11px; color:#94a3b8; margin-top:8px; line-height:1.5;">
+          • <strong>Width:</strong> 130 mm fits comfortably inside the 200 mm box with <strong>70 mm clearance</strong> for side cabling / power supply.<br>
+          • <strong>Length:</strong> Exactly 200 mm — slides straight in as an equipment baseplate.
+        </div>
+      </div>
+
+    </div>
+
+    <!-- MDF Layout Blueprint SVG -->
+    <div style="background:#0f172a; border:1.5px solid #10b981; border-radius:8px; padding:14px; margin-top:16px;">
+      <div style="color:#4ade80; font-weight:bold; font-size:13px; margin-bottom:8px;">
+        📐 Recommended Component Placement on your 130 × 200 mm MDF Board
+      </div>
+      <div style="overflow-x:auto;">
+        <svg viewBox="0 0 780 340" style="width:100%; min-width:650px; background:#0a0e17; border-radius:6px; border:1px solid #334155;">
+          
+          <!-- Outer Box boundary reference (200x200 dashed) -->
+          <rect x="20" y="20" width="740" height="300" rx="8" fill="none" stroke="#475569" stroke-width="2" stroke-dasharray="6 4"/>
+          <text x="35" y="42" font-size="11" fill="#94a3b8" font-family="monospace">CARDBOARD BOX INNER ENVELOPE: 200 mm × 200 mm (Depth × Width)</text>
+
+          <!-- MDF Board Tray (130 mm wide x 200 mm deep representation) -->
+          <!-- Scaled: 200 mm depth -> 520px, 130 mm width -> 250px -->
+          <rect x="180" y="55" width="560" height="250" rx="4" fill="#2d2218" stroke="#d97706" stroke-width="2.5"/>
+          <text x="460" y="76" font-size="12" fill="#fbbf24" font-family="monospace" text-anchor="middle" font-weight="bold">MDF BASE TRAY (130 mm × 200 mm)</text>
+
+          <!-- 3x XH-M562 Amps Row (Left side / Heatsink airflow zone) -->
+          <g transform="translate(205, 95)">
+            <!-- Amp 1 -->
+            <rect x="0" y="0" width="85" height="60" rx="3" fill="#0c1a28" stroke="#0ea5e9" stroke-width="1.5"/>
+            <text x="42" y="28" font-size="9" fill="#38bdf8" text-anchor="middle" font-family="monospace" font-weight="bold">AMP #1</text>
+            <text x="42" y="42" font-size="8" fill="#94a3b8" text-anchor="middle" font-family="monospace">Front L/R</text>
+
+            <!-- Amp 2 -->
+            <rect x="0" y="70" width="85" height="60" rx="3" fill="#0c1a28" stroke="#0ea5e9" stroke-width="1.5"/>
+            <text x="42" y="98" font-size="9" fill="#38bdf8" text-anchor="middle" font-family="monospace" font-weight="bold">AMP #2</text>
+            <text x="42" y="112" font-size="8" fill="#94a3b8" text-anchor="middle" font-family="monospace">Surround</text>
+
+            <!-- Amp 3 -->
+            <rect x="0" y="140" width="85" height="60" rx="3" fill="#0c1a28" stroke="#0ea5e9" stroke-width="1.5"/>
+            <text x="42" y="168" font-size="9" fill="#38bdf8" text-anchor="middle" font-family="monospace" font-weight="bold">AMP #3</text>
+            <text x="42" y="182" font-size="8" fill="#94a3b8" text-anchor="middle" font-family="monospace">Center/Sub</text>
+          </g>
+
+          <!-- 3x PCM5102A DACs Row (Middle zone) -->
+          <g transform="translate(325, 95)">
+            <!-- DAC 1 -->
+            <rect x="0" y="5" width="105" height="50" rx="3" fill="#2e1065" stroke="#a855f7" stroke-width="1.5"/>
+            <text x="52" y="26" font-size="9" fill="#c084fc" text-anchor="middle" font-family="monospace" font-weight="bold">DAC #1</text>
+            <text x="52" y="40" font-size="7.5" fill="#facc15" text-anchor="middle" font-family="monospace">SCK➔GND jumper</text>
+
+            <!-- DAC 2 -->
+            <rect x="0" y="75" width="105" height="50" rx="3" fill="#2e1065" stroke="#a855f7" stroke-width="1.5"/>
+            <text x="52" y="96" font-size="9" fill="#c084fc" text-anchor="middle" font-family="monospace" font-weight="bold">DAC #2</text>
+            <text x="52" y="110" font-size="7.5" fill="#facc15" text-anchor="middle" font-family="monospace">SCK➔GND jumper</text>
+
+            <!-- DAC 3 -->
+            <rect x="0" y="145" width="105" height="50" rx="3" fill="#2e1065" stroke="#a855f7" stroke-width="1.5"/>
+            <text x="52" y="166" font-size="9" fill="#c084fc" text-anchor="middle" font-family="monospace" font-weight="bold">DAC #3</text>
+            <text x="52" y="180" font-size="7.5" fill="#facc15" text-anchor="middle" font-family="monospace">SCK➔GND jumper</text>
+          </g>
+
+          <!-- ESP32-S3 Processor & Power (Right side) -->
+          <g transform="translate(465, 95)">
+            <!-- ESP32-S3 -->
+            <rect x="0" y="10" width="125" height="85" rx="4" fill="#0f172a" stroke="#10b981" stroke-width="2"/>
+            <text x="62" y="38" font-size="10" fill="#4ade80" text-anchor="middle" font-family="monospace" font-weight="bold">ESP32-S3</text>
+            <text x="62" y="52" font-size="8" fill="#cbd5e1" text-anchor="middle" font-family="monospace">Touch / MCU</text>
+            <text x="62" y="68" font-size="7.5" fill="#38bdf8" text-anchor="middle" font-family="monospace">I2S Audio Stream</text>
+
+            <!-- XL4015 5V Buck Regulator -->
+            <rect x="0" y="115" width="125" height="80" rx="4" fill="#0f172a" stroke="#f97316" stroke-width="1.5"/>
+            <text x="62" y="142" font-size="9.5" fill="#f97316" text-anchor="middle" font-family="monospace" font-weight="bold">XL4015 BUCK</text>
+            <text x="62" y="156" font-size="8" fill="#cbd5e1" text-anchor="middle" font-family="monospace">24V IN ➔ 5V OUT</text>
+            <text x="62" y="172" font-size="7.5" fill="#38bdf8" text-anchor="middle" font-family="monospace">Star Ground Block</text>
+          </g>
+
+          <!-- 4700uF Main DC Cap & PSU side connection -->
+          <g transform="translate(615, 110)">
+            <circle cx="45" cy="50" r="32" fill="#0a0e17" stroke="#eab308" stroke-width="2"/>
+            <text x="45" y="48" font-size="9" fill="#eab308" text-anchor="middle" font-family="monospace" font-weight="bold">4700µF</text>
+            <text x="45" y="62" font-size="8" fill="#cbd5e1" text-anchor="middle" font-family="monospace">50V Cap</text>
+          </g>
+
+          <!-- 70mm Free Side Space Callout (left of MDF tray) -->
+          <rect x="35" y="80" width="130" height="200" rx="4" fill="#0f172a" stroke="#334155" stroke-dasharray="3 3"/>
+          <text x="100" y="130" font-size="10" fill="#38bdf8" text-anchor="middle" font-family="monospace" font-weight="bold">70 mm FREE</text>
+          <text x="100" y="146" font-size="10" fill="#38bdf8" text-anchor="middle" font-family="monospace" font-weight="bold">SPACE</text>
+          <text x="100" y="166" font-size="8" fill="#94a3b8" text-anchor="middle" font-family="monospace">Use for WAGO nuts,</text>
+          <text x="100" y="178" font-size="8" fill="#94a3b8" text-anchor="middle" font-family="monospace">24V DC inlet wires,</text>
+          <text x="100" y="190" font-size="8" fill="#94a3b8" text-anchor="middle" font-family="monospace">&amp; terminal blocks</text>
+
+        </svg>
+      </div>
+      <div style="margin-top:10px; font-size:11px; color:#cbd5e1; line-height:1.6;">
+        <strong style="color:#4ade80;">💡 Builder's Tip for Cardboard + MDF Mockup:</strong><br>
+        1. Screw the 3 Amps, 3 DACs, ESP32, and Buck regulator onto the MDF board using small 6mm wood screws or brass standoffs.<br>
+        2. Wire and test all I2S lines and audio outputs on your desk with the MDF sled completely exposed.<br>
+        3. Once audio plays clearly from all 6 channels, slide the entire loaded MDF sled into the cardboard box to check cable routing, clearances, and connector positions.
+      </div>
+    </div>
+
+  </div><!-- end section 3 -->
+
+</div>
+</body>
+</html>
+

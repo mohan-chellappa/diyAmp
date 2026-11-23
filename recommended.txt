@@ -1,0 +1,12 @@
+Yes — the ESP32-C3 Super Mini (HW-466A) will work as your dedicated 2-channel Surround L/R DSP, and its tiny size (~22 × 18 mm) with pre-soldered headers actually fits your 10×10 cm perfboard much easier than the 38-pin board.
+
+How It Runs Surround L/R (PCM5102A #3)
+ESP32-C3 has 1 hardware I2S0 controller, which supports full-duplex mode (1 DIN + 1 DOUT sharing the same BCK and LRCK).
+Wire it as an I2S Slave on safe GPIOs (GPIO 4, 5, 6, 7 — avoiding strapping pins 2, 8, 9):
+BCK & LRCK: Tapped from ESP32-S3-Pico
+DIN: Tapped from PCM1808 DOUT (parallel with ESP32-S3-Pico)
+DOUT: Drives PCM5102A #3 (Surround L/R)
+Control: Receives separate Surround EQ / delay / volume sliders from the 4.3B screen over ESP-NOW.
+2 Honest Trade-Offs vs. ESP32-WROOM-32 (₹449)
+Single-Core 160 MHz RISC-V: Has a hardware FPU and plenty of power for 2-channel EQ/delay/volume, just keep a 256-sample I2S DMA buffer so ESP-NOW slider updates don't cause audio clicks.
+No Bluetooth Classic (BLE 5.0 only): Fine for your build since you already ordered the VHM-314 + B0505S for Bluetooth audio into PCM1808.

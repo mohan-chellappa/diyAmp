@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DIY 5.1 / 8-Output Amplifier — Master Engineering Hub &amp; Navigator</title>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --sidebar-bg: #0f172a;
+      --card-bg: #161f30;
+      --border-slate: #334155;
+      --cyan: #38bdf8;
+      --copper: #f59e0b;
+      --green: #10b981;
+      --purple: #a855f7;
+      --red: #ef4444;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 13px;
+      overflow-x: hidden;
+    }
+
+    /* Layout Shell */
+    .app-shell {
+      display: flex;
+      min-height: 100vh;
+      width: 100%;
+    }
+
+    /* Expandable Left Sidebar */
+    .side-nav {
+      width: 330px;
+      min-width: 330px;
+      background: var(--sidebar-bg);
+      border-right: 2px solid var(--border-slate);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      transition: width 0.2s ease, min-width 0.2s ease;
+    }
+
+    .side-nav.collapsed {
+      width: 0;
+      min-width: 0;
+      overflow: hidden;
+      border-right: none;
+    }
+
+    .brand-header {
+      padding: 14px 16px;
+      background: #0b1120;
+      border-bottom: 1px solid var(--border-slate);
+    }
+
+    .brand-title {
+      font-size: 15px;
+      font-weight: 900;
+      color: var(--copper);
+      letter-spacing: 0.6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    .sidebar-controls {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border-slate);
+      background: #111827;
+    }
+
+    .search-box {
+      width: 100%;
+      background: #1e293b;
+      color: var(--text-main);
+      border: 1px solid #475569;
+      border-radius: 5px;
+      padding: 7px 10px;
+      font-size: 12px;
+      outline: none;
+    }
+
+    .search-box:focus {
+      border-color: var(--cyan);
+    }
+
+    .ctrl-btn-row {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .mini-btn {
+      flex: 1;
+      background: #1e293b;
+      color: #cbd5e1;
+      border: 1px solid #475569;
+      border-radius: 4px;
+      padding: 5px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .mini-btn:hover {
+      background: #334155;
+      color: #fff;
+    }
+
+    .mini-btn-primary {
+      background: #0284c7;
+      border-color: var(--cyan);
+      color: #fff;
+    }
+
+    /* Accordion Tree inside Sidebar */
+    .menu-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+    }
+
+    .menu-group {
+      margin-bottom: 8px;
+      border: 1px solid #1e293b;
+      border-radius: 6px;
+      overflow: hidden;
+      background: #0b1120;
+    }
+
+    .group-header {
+      width: 100%;
+      background: #161f30;
+      color: var(--text-main);
+      border: none;
+      padding: 9px 12px;
+      text-align: left;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      letter-spacing: 0.4px;
+    }
+
+    .group-header:hover {
+      background: #1e293b;
+    }
+
+    .group-items {
+      display: block;
+      padding: 4px;
+    }
+
+    .group-items.hidden {
+      display: none;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 10px;
+      margin: 2px 0;
+      border-radius: 4px;
+      color: #cbd5e1;
+      text-decoration: none;
+      cursor: pointer;
+      font-size: 12px;
+      border-left: 3px solid transparent;
+    }
+
+    .menu-item:hover {
+      background: rgba(56, 189, 248, 0.12);
+      color: #fff;
+    }
+
+    .menu-item.active {
+      background: rgba(245, 158, 11, 0.16);
+      color: #fbbf24;
+      border-left-color: var(--copper);
+      font-weight: 700;
+    }
+
+    .item-type-tag {
+      font-size: 9.5px;
+      font-family: monospace;
+      padding: 1px 5px;
+      border-radius: 3px;
+      background: #1e293b;
+      color: var(--cyan);
+      border: 1px solid #334155;
+      margin-left: 6px;
+      white-space: nowrap;
+    }
+
+    /* Main Content Area */
+    .main-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .top-bar {
+      background: #0f172a;
+      border-bottom: 2px solid var(--cyan);
+      padding: 10px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 900;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .top-btn {
+      background: #1e293b;
+      color: #f8fafc;
+      border: 1px solid #475569;
+      padding: 6px 12px;
+      border-radius: 5px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .top-btn:hover {
+      background: #334155;
+    }
+
+    .top-btn-copper {
+      background: #b45309;
+      border-color: var(--copper);
+      color: #fff;
+    }
+
+    .dashboard-container {
+      padding: 18px;
+      max-width: 1480px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .panel-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-slate);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 18px;
+    }
+
+    .section-heading {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      border-bottom: 1px solid var(--border-slate);
+      padding-bottom: 8px;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .page-tile {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 7px;
+      padding: 14px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+
+    .page-tile:hover {
+      border-color: var(--cyan);
+      transform: translateY(-2px);
+    }
+
+    .img-card {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 7px;
+      overflow: hidden;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .img-thumb-wrap {
+      width: 100%;
+      height: 185px;
+      background: #050811;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border-bottom: 1px solid #1e293b;
+      cursor: pointer;
+    }
+
+    .img-thumb-wrap img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    /* Live Preview Frame Container */
+    .preview-pane {
+      display: none;
+      flex: 1;
+      flex-direction: column;
+      height: calc(100vh - 54px);
+      background: #050811;
+    }
+
+    .preview-pane.active {
+      display: flex;
+    }
+
+    .preview-Subbar {
+      background: #161f30;
+      padding: 8px 16px;
+      border-bottom: 1px solid var(--border-slate);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .preview-iframe {
+      flex: 1;
+      width: 100%;
+      border: none;
+      background: #0b0f19;
+    }
+
+    .preview-img-stage {
+      flex: 1;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow: auto;
+      background: #050811;
+    }
+
+    .preview-img-stage img {
+      max-width: 96%;
+      max-height: 84vh;
+      border: 2px solid var(--border-slate);
+      border-radius: 8px;
+    }
+
+    .dir-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .dir-table th {
+      background: #0f172a;
+      color: var(--cyan);
+      padding: 8px 10px;
+      text-align: left;
+      border: 1px solid var(--border-slate);
+    }
+
+    .dir-table td {
+      padding: 7px 10px;
+      border: 1px solid var(--border-slate);
+      color: #e2e8f0;
+    }
+
+    .dir-table tr:nth-child(even) {
+      background: rgba(15, 23, 42, 0.55);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="app-shell">
+
+    <!-- ================================================================= -->
+    <!-- EXPANDABLE LEFT SIDEBAR MENU                                      -->
+    <!-- ================================================================= -->
+    <aside class="side-nav" id="sideNav">
+      <div class="brand-header">
+        <div class="brand-title">
+          <i class="fa fa-sliders"></i>
+          <span>DIY 5.1 / 8-CH AMP HUB</span>
+        </div>
+        <div class="brand-sub">Triple Copper Chimney &bull; Dual-ESP32-S3</div>
+      </div>
+
+      <div class="sidebar-controls">
+        <input type="text" id="menuSearchInput" class="search-box" placeholder="Search pages, CAD, circuits, images...">
+        <div class="ctrl-btn-row">
+          <button id="btnDashboardHome" class="mini-btn mini-btn-primary">
+            <i class="fa fa-th-large"></i> Home Grid
+          </button>
+          <button id="btnExpandAll" class="mini-btn">
+            <i class="fa fa-plus-square-o"></i> Expand All
+          </button>
+          <button id="btnCollapseAll" class="mini-btn">
+            <i class="fa fa-minus-square-o"></i> Collapse
+          </button>
+        </div>
+      </div>
+
+      <div class="menu-scroll" id="sidebarAccordionContainer">
+        <!-- Populated dynamically from 2D array by Vanilla JS -->
+      </div>
+    </aside>
+
+    <!-- ================================================================= -->
+    <!-- MAIN WORKSPACE AREA                                               -->
+    <!-- ================================================================= -->
+    <div class="main-area">
+
+      <!-- Sticky Top Bar -->
+      <header class="top-bar">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <button id="btnToggleSidebar" class="top-btn" title="Toggle Side Menu">
+            <i class="fa fa-bars"></i> Menu
+          </button>
+          <span id="activeViewTitle" style="font-size: 15px; font-weight: 800; color: #38bdf8;">
+            MASTER PROJECT DASHBOARD &amp; COMPLETE FILE NAVIGATOR
+          </span>
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <a href="AMP_DESIGN_DRAWING.html" class="top-btn top-btn-copper">
+            <i class="fa fa-compass"></i> CAD Blueprint &amp; BOM
+          </a>
+          <a href="CIRCUIT_DIAGRAM.html" class="top-btn">
+            <i class="fa fa-microchip"></i> Circuit Schematic
+          </a>
+          <a href="WIRING_DIAGRAM.html" class="top-btn">
+            <i class="fa fa-sitemap"></i> Wiring Diagram
+          </a>
+          <a href="PROJECT.html" class="top-btn">
+            <i class="fa fa-book"></i> Master Spec
+          </a>
+        </div>
+      </header>
+
+      <!-- =============================================================== -->
+      <!-- VIEW MODE 1: HOME DASHBOARD GRID                                -->
+      <!-- =============================================================== -->
+      <div class="dashboard-container" id="homeDashboardView">
+
+        <!-- KPI Summary Strip -->
+        <div class="w3-row-padding" style="margin: 0 -8px 14px -8px;">
+          <div class="w3-col l3 m6 s12" style="padding: 8px;">
+            <div class="panel-card" style="margin: 0; border-left: 4px solid #f59e0b;">
+              <div style="font-size: 11px; color: #94a3b8; text-transform: uppercase;">Locked Thermal Architecture</div>
+              <div style="font-size: 18px; font-weight: 800; color: #fbbf24;">3&times; &Oslash;22mm Copper Pipes</div>
+              <div style="font-size: 11px; color: #cbd5e1;">Horizontal Boards + Side Saddle L-Bridges</div>
+            </div>
+          </div>
+          <div class="w3-col l3 m6 s12" style="padding: 8px;">
+            <div class="panel-card" style="margin: 0; border-left: 4px solid #38bdf8;">
+              <div style="font-size: 11px; color: #94a3b8; text-transform: uppercase;">Dual-MCU Split Brain</div>
+              <div style="font-size: 18px; font-weight: 800; color: #38bdf8;">ESP32-S3-Pico + 4.3B Touch</div>
+              <div style="font-size: 11px; color: #cbd5e1;">SKU 1552780 (6-Ch I2S) + Wireless Sofa Remote</div>
+            </div>
+          </div>
+          <div class="w3-col l3 m6 s12" style="padding: 8px;">
+            <div class="panel-card" style="margin: 0; border-left: 4px solid #10b981;">
+              <div style="font-size: 11px; color: #94a3b8; text-transform: uppercase;">Amp Board Soldering</div>
+              <div style="font-size: 18px; font-weight: 800; color: #10b981;">3&times; XH-M562 Ready</div>
+              <div style="font-size: 11px; color: #cbd5e1;">Pins 1&ndash;3 Audio Plug Above &bull; Pins 4&ndash;9 18AWG
+                Below</div>
+            </div>
+          </div>
+          <div class="w3-col l3 m6 s12" style="padding: 8px;">
+            <div class="panel-card" style="margin: 0; border-left: 4px solid #a855f7;">
+              <div style="font-size: 11px; color: #94a3b8; text-transform: uppercase;">Indexed Project Assets</div>
+              <div style="font-size: 18px; font-weight: 800; color: #c084fc;" id="kpiAssetCount">45+ Linked Files</div>
+              <div style="font-size: 11px; color: #cbd5e1;">12 HTML Apps &bull; 16 Renders/Photos &bull; 17 Specs/TSVs
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 1: Interactive HTML Engineering Pages -->
+        <div class="panel-card">
+          <div class="section-heading">
+            <span><i class="fa fa-desktop"></i> 1. Interactive HTML Engineering Pages, CAD Blueprints &amp;
+              Schematics</span>
+            <span style="font-size: 11px; color: #94a3b8; font-weight: normal;">Click "Preview Here" or "Open
+              Page"</span>
+          </div>
+          <div class="w3-row-padding" id="htmlPagesGrid" style="margin: 0 -8px;"></div>
+        </div>
+
+        <!-- Section 2: CAD Renders, Thermal Bridge Cutaways & Hardware Photos -->
+        <div class="panel-card">
+          <div class="section-heading">
+            <span><i class="fa fa-picture-o"></i> 2. CAD Renders, Copper Chimney Cutaways &amp; Actual Board
+              Photos</span>
+            <span style="font-size: 11px; color: #94a3b8; font-weight: normal;">Click any image to inspect
+              full-screen</span>
+          </div>
+          <div class="w3-row-padding" id="imagesGalleryGrid" style="margin: 0 -8px;"></div>
+        </div>
+
+        <!-- Section 3: Complete Searchable Master File Index (TSVs, Markdown Specs, PDFs, SQL) -->
+        <div class="panel-card">
+          <div class="section-heading">
+            <span><i class="fa fa-database"></i> 3. Complete Project File Directory (BOM TSVs, FMEA, Datasheets &amp;
+              Markdown Specs)</span>
+          </div>
+          <div class="w3-responsive">
+            <table class="dir-table">
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Title / Component</th>
+                  <th>File Path</th>
+                  <th>Type</th>
+                  <th>Summary / Purpose</th>
+                  <th style="text-align: center;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="masterDirectoryTbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- =============================================================== -->
+      <!-- VIEW MODE 2: EMBEDDED LIVE PREVIEWER (HTML / IMAGE / DOCS)      -->
+      <!-- =============================================================== -->
+      <div class="preview-pane" id="livePreviewPane">
+        <div class="preview-Subbar">
+          <div>
+            <span id="previewBadge" class="item-type-tag" style="margin-left: 0; margin-right: 8px;">HTML</span>
+            <strong id="previewItemTitle" style="color: #fbbf24; font-size: 13px;">Loading...</strong>
+            <span id="previewItemDesc" style="color: #94a3b8; font-size: 11.5px; margin-left: 10px;"></span>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <a id="previewOpenDirectLink" href="#" target="_blank" class="mini-btn mini-btn-primary"
+              style="text-decoration: none; padding: 5px 12px;">
+              <i class="fa fa-external-link"></i> Open in Full Tab
+            </a>
+            <button id="btnClosePreview" class="mini-btn" style="padding: 5px 12px;">
+              <i class="fa fa-times"></i> Back to Home Grid
+            </button>
+          </div>
+        </div>
+        <iframe id="previewIframe" class="preview-iframe" title="Live Page Preview"></iframe>
+        <div id="previewImageStage" class="preview-img-stage">
+          <img id="previewImageEl" src="" alt="Full Resolution Preview">
+        </div>
+        <div id="previewTextStage" style="display: none; flex: 1; overflow: auto; padding: 18px; background: #090d16;">
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    (function () {
+      // =========================================================================
+      // MASTER 2D DATASET OF ALL LINKED PAGES, CIRCUITS, CAD DRAWINGS & IMAGES
+      // Columns: [0:Group, 1:Title, 2:FilePath, 3:TypeTag, 4:IconClass, 5:Summary]
+      // Zero HTML strings in JS per architecture rules.
+      // =========================================================================
+      const PROJECT_ASSETS_2D = [
+        // GROUP 1: CAD & Mechanical Blueprints
+        ["1. CAD & Mechanical Blueprints", "Master Amp CAD Blueprint & Fastener BOM", "AMP_DESIGN_DRAWING.html", "CAD HTML", "fa-compass", "5-View 1:1 Metric SVG Blueprint + View 5 Finned Wall & Central Chimney Detail + 26-Item Standard BOM (M-01 to M-26)"],
+        ["1. CAD & Mechanical Blueprints", "Mechanical BOM Dataset (M-01 to M-26)", "AMP_MECHANICAL_BOM.tsv", "TSV DATA", "fa-table", "Machine-readable 26-item standard off-the-shelf fastener & hardware schedule (Rs 2,998)"],
+        ["1. CAD & Mechanical Blueprints", "Mechanical Design Specification", "AMP_DESIGN_DRAWING.md", "MARKDOWN", "fa-file-text-o", "Markdown dimensional specification and drilling coordinates for the 160x160x95mm enclosure"],
+        ["1. CAD & Mechanical Blueprints", "Interactive 360° Chassis Concept Viewer", "CHASSIS_360_VIEWER.html", "3D HTML", "fa-cube", "Interactive multi-angle enclosure viewer and visual inspection tool"],
+        ["1. CAD & Mechanical Blueprints", "Earlier Chassis CAD Drawings Archive", "CHASSIS_CAD_DRAWINGS.html", "CAD HTML", "fa-building-o", "Reference archive of earlier single-chimney orthographic views"],
+
+        // GROUP 2: Circuit & Wiring Schematics
+        ["2. Circuit & Wiring Schematics", "Interactive Electronic Circuit Schematic", "CIRCUIT_DIAGRAM.html", "CIRCUIT", "fa-microchip", "Complete circuit schematic: Dual-ESP32-S3, 3x PCM5102A DACs, 1x PCM1808 ADC, 3x XH-M562 Amps, XL4015 Buck & SMPS"],
+        ["2. Circuit & Wiring Schematics", "Master Point-to-Point Wiring Diagram", "WIRING_DIAGRAM.html", "WIRING", "fa-sitemap", "Interactive color-coded wiring harness map, WAGO busbars, and GPIO pin tables"],
+        ["2. Circuit & Wiring Schematics", "Printable Workbench Wiring Sheet", "PRINTABLE_WIRING_DIAGRAM.html", "PRINT HTML", "fa-print", "High-contrast print-ready wiring diagram for workbench assembly"],
+        ["2. Circuit & Wiring Schematics", "PCM5102A DAC Pinout & Jumper Guide", "DAC_PINOUT_ANNOTATED.html", "PINOUT", "fa-Sliders", "Annotated solder jumper guide (H1L-H4L, SCK to GND) and L/G/R line-out header mapping"],
+        ["2. Circuit & Wiring Schematics", "PCM1808 24-Bit ADC Soldering Guide", "PCM1808_SOLDERING_GUIDE.html", "PINOUT", "fa-wrench", "Annotated guide for PCM1808 stereo AUX line-in ADC + GPIO 0 MCLK wiring"],
+        ["2. Circuit & Wiring Schematics", "Printable Wiring Diagram PDF", "Wiring Diagram print.pdf", "PDF", "fa-file-pdf-o", "Saved PDF print version of the system wiring diagram"],
+        ["2. Circuit & Wiring Schematics", "Wiring Specification & Pin Tables", "WIRING_DIAGRAM.md", "MARKDOWN", "fa-file-text-o", "Complete markdown pin-to-pin wiring reference and cable gauge specification"],
+
+        // GROUP 3: Project Specs, Assembly & Quality (FMEA)
+        ["3. Master Spec, Assembly & QA", "Master Project Specification Dashboard", "PROJECT.html", "SPEC HTML", "fa-book", "Complete 8-Output Home Theater Amplifier specification, speaker power caps, and BOM overview"],
+        ["3. Master Spec, Assembly & QA", "Interactive Step-by-Step Assembly Manual", "ASSEMBLY_MANUAL.html", "MANUAL", "fa-check-square-o", "Guided bench assembly sequence, multimeter continuity checks, and first power-up protocol"],
+        ["3. Master Spec, Assembly & QA", "Quality Management: DFMEA, PFMEA & Control Plan", "QUALITY_MANAGEMENT_FMEA_CP.html", "QA HTML", "fa-shield", "Interactive failure mode & effects analysis dashboard (DFM-01 to DFM-14) and quality control plan"],
+        ["3. Master Spec, Assembly & QA", "Technical & Acoustic Engineering Evaluation", "TECHNICAL_EVALUATION.html", "EVAL HTML", "fa-line-chart", "Thermal dissipation math, BTL speaker power headroom, and acoustic crossover evaluation"],
+        ["3. Master Spec, Assembly & QA", "CAD & Circuit Subagent Definition", ".agents/agents/cad-circuit-engineer.md", "AGENT", "fa-cogs", "Workspace definition file for the dedicated cad-circuit-engineer subagent"],
+
+        // GROUP 4: CAD Renders & Thermal Bridge Visuals
+        ["4. CAD Renders & Thermal Cutaways", "HERITAGE COWBOY EDITION: Saddle Leather + Suede + Smoked Polycarbonate", "image/cowboy_leather_suede_smoked_amp.jpg", "IMAGE", "fa-picture-o", "Zero-stitch cut-and-paste brown leather right cheek + tan suede front lip/dock + smoked polycarbonate + wall PSU"],
+        ["4. CAD Renders & Thermal Cutaways", "FINAL INTERNAL CUTAWAY: Copper Busbar + SKU 872064 + Standalone Chimney", "image/final_busbar_finned_wall_cutaway.jpg", "IMAGE", "fa-picture-o", "1x continuous 135x20x3mm copper busbar over 3x XH-M562 -> SKU 872064 wall + separate Ø35mm copper chimney"],
+        ["4. CAD Renders & Thermal Cutaways", "FINAL TARGET: 3-Side Smoked Polycarbonate + Wall Steel-Mesh Mean Well", "image/smoked_polycarbonate_wall_psu_setup.jpg", "IMAGE", "fa-picture-o", "58mm curved dark smoked polycarbonate (Top/Front, Right, Rear) + Left black fins + wall-mounted Mean Well in steel mesh cage"],
+        ["4. CAD Renders & Thermal Cutaways", "Curved Matte Black Copper Chimney Console (Waterfall Curve)", "image/curved_matte_black_amp_console.jpg", "IMAGE", "fa-picture-o", "Sculptural curved matte-black chassis with rounded corners, flush copper chimney, 4.3B screen, brass V-wheel & curved wood stand"],
+        ["4. CAD Renders & Thermal Cutaways", "Brushed Silver + Copper + Golden Brass PSU Console (58mm)", "image/brushed_silver_golden_brass_psu_console.jpg", "IMAGE", "fa-picture-o", "Raw brushed silver aluminum 35° slanted console with copper chimney & golden brass spray-painted Mean Well PSU"],
+        ["4. CAD Renders & Thermal Cutaways", "Slanted-Front Low-Profile Console (58mm Tall, 35° Tilt)", "image/slanted_console_amp_concept.jpg", "IMAGE", "fa-picture-o", "58mm low-profile wedge console with 35° click-in touch dock, Left fins, flush Ø35mm chimney & wood stand"],
+        ["4. CAD Renders & Thermal Cutaways", "LOCKED: Blue XH-M562 + Continuous Copper Pipe + Saddle Bridge", "image/proper_xh_m562_copper_through_pipe.jpg", "IMAGE", "fa-picture-o", "100% accurate assembly: Left External Finned Wall + L-Bridge + Central Ø35mm Copper Chimney"],
+        ["4. CAD Renders & Thermal Cutaways", "Triple Copper Through-Pipe Enclosure (Corrected 3-Pipe Cutaway)", "image/triple_copper_pipe_amp_layout.jpg", "IMAGE", "fa-picture-o", "Corrected 3-pipe cutaway: 3x continuous Ø22mm copper through-pipes standing BESIDE the 3x blue XH-M562 amps with side saddle L-bridges"],
+        ["4. CAD Renders & Thermal Cutaways", "Solution 1: Inward PCB with L-Angle Chip Bridge", "image/xh_m562_l_angle_chip_bridge_solution1.jpg", "IMAGE", "fa-picture-o", "Close-up macro showing M3 brass standoff clearance for bottom solder tips and top chip thermal contact"],
+        ["4. CAD Renders & Thermal Cutaways", "Flush Chimney & Sideways 15mm V-Wheel Concept", "image/flush_chimney_subtle_v_wheel_concept.jpg", "IMAGE", "fa-picture-o", "Exterior industrial design showing flush copper chimney collar and sideways knurled V-line volume wheel"],
+        ["4. CAD Renders & Thermal Cutaways", "Front Click-In 4.3B Touch Screen Dock Concept", "image/modular_clickin_thimble_amp_concept.jpg", "IMAGE", "fa-picture-o", "Shows Waveshare 4.3B Touch screen clicking into front U-channel rails with magnetic USB-C charging"],
+        ["4. CAD Renders & Thermal Cutaways", "Copper Chimney V2 — Rear 16-Post I/O View", "image/copper_chimney_v2_back_view.jpg", "IMAGE", "fa-picture-o", "Rear polycarbonate panel with 16x insulated binding posts (8 outputs), GX16 4-pin power, AUX, and USB-C"],
+        ["4. CAD Renders & Thermal Cutaways", "Copper Chimney V2 — Hero Isometric View", "image/copper_chimney_v2_hero.jpg", "IMAGE", "fa-picture-o", "Isometric render of the compact cube with copper corner pillars"],
+        ["4. CAD Renders & Thermal Cutaways", "Copper Chimney V2 — Top Deck View", "image/copper_chimney_v2_top_view.jpg", "IMAGE", "fa-picture-o", "Top deck orthographic view showing internal board arrangement"],
+
+        // GROUP 5: Actual Hardware & Component Photos
+        ["5. Actual Hardware & Board Photos", "VHM-314 Blackboard Bluetooth 5.0 Audio Receiver", "image/PROJECT/vhm314_bluetooth_5_decoder.jpg", "PHOTO", "fa-camera", "BT 5.0 Decoder: 3.5mm Stereo Audio Out Jack + L/G/R solder pads + Micro-USB 5V / BAT (-/+) pads"],
+        ["5. Actual Hardware & Board Photos", "Blue XH-M562 Official 10-Pin Wiring & Pinout Diagram", "image/PROJECT/xh_m562_official_pinout.jpg", "PINOUT", "fa-camera", "Official XH-M562 pinout: CS (Mute), GND, VCC, SPR+, SPR-, SPL+, SPL-, INR, GND (Public), INL"],
+        ["5. Actual Hardware & Board Photos", "Blue XH-M562 TPA3116D2 Amp Board (Actual Chip Side)", "image/PROJECT/1791126239021.png", "PHOTO", "fa-camera", "Actual Robu SKU 815901 (37.2x25.6mm): 10-pin row (INL, GND, INR, SPL-, SPL+, SPR-, SPR+, VCC, GND, CS) on left, TPA3116D2 in center"],
+        ["5. Actual Hardware & Board Photos", "Waveshare ESP32-S3-Pico with Pre-Soldered Headers (SKU: 1552780)", "image/PROJECT/waveshare_esp32_s3_pico_1552780.jpg", "PHOTO", "fa-camera", "Ordered dedicated 6-channel I2S Audio DSP Engine with factory-soldered yellow male pin headers"],
+        ["5. Actual Hardware & Board Photos", "Purple PCM5102A (GY-PCM5102) I2S DAC Module", "image/PROJECT/1791126150194.png", "PHOTO", "fa-camera", "Shows 6-pin I2S header (VIN, GND, LCK, DIN, BCK, SCK) on right and 4-pin Line-Out (L, G, R, G) on bottom-left"],
+        ["5. Actual Hardware & Board Photos", "Waveshare ESP32-S3 4.3B Touch LCD (Model 28141)", "image/PROJECT/1791222659512.png", "PHOTO", "fa-camera", "800x480 IPS capacitive touch screen with enclosure (operates as Wireless ESP-NOW Sofa Remote + Docked HMI)"],
+        ["5. Actual Hardware & Board Photos", "PCM1808 24-Bit Stereo Analog-to-Digital (ADC) Board", "image/PROJECT/1791122464907.png", "PHOTO", "fa-camera", "Digitizes rear 3.5mm Stereo AUX line input into the ESP32-S3 I2S bus"],
+        ["5. Actual Hardware & Board Photos", "Mean Well LRS-350-24 (24V 14.6A 350W SMPS)", "image/PROJECT/1790954969013.png", "PHOTO", "fa-camera", "Primary 24V DC power supply (mounts on lower open-sided tier of 18mm wooden stand)"],
+        ["5. Actual Hardware & Board Photos", "WAGO 221-415 (5-Way Lever Splicing Connector)", "image/PROJECT/1790955632766.png", "PHOTO", "fa-camera", "Used for +24V, +5V, and Star Ground power distribution busbars"],
+        ["5. Actual Hardware & Board Photos", "4700µF 50V Low-ESR Electrolytic Bulk Capacitor", "image/PROJECT/1790956992684.png", "PHOTO", "fa-camera", "Bridged across +24V and GND WAGO rails to feed instantaneous sub-bass current transients"],
+
+        // GROUP 6: TSV Datasets, Component Specs & Datasheets
+        ["6. TSV Data, Specs & Datasheets", "Master Electronic & Hardware BOM", "BOM.tsv", "TSV DATA", "fa-table", "Complete project Bill of Materials with quantities, rates, vendors, and stock status"],
+        ["6. TSV Data, Specs & Datasheets", "Design FMEA (DFM-01 to DFM-14)", "DFMEA.tsv", "TSV DATA", "fa-table", "Updated Design Failure Mode & Effects Analysis including Top-Pad IC bridge & header pin clearance"],
+        ["6. TSV Data, Specs & Datasheets", "Process FMEA (PFMEA)", "PFMEA.tsv", "TSV DATA", "fa-table", "Soldering, wiring, and assembly process failure mode analysis"],
+        ["6. TSV Data, Specs & Datasheets", "Manufacturing & Test Control Plan", "CONTROL_PLAN.tsv", "TSV DATA", "fa-table", "Step-by-step quality verification checks before power-on"],
+        ["6. TSV Data, Specs & Datasheets", "BT Receiver + PCM1808 Integration Spec", "BT_RECEIVER_PCM1808.md", "SPEC MD", "fa-file-code-o", "10-point BT audio input datasheet (XY-WRBT / MH-M18 / ESP32-WROOM-32 I2S) & PCM1808 rules"],
+        ["6. TSV Data, Specs & Datasheets", "ESP32-S3-Pico (SKU: 1552780) Full Pinout & Spec", "esp32.md", "SPEC MD", "fa-file-code-o", "Full hardware specs and silkscreen GPIO mapping for Waveshare ESP32-S3-Pico"],
+        ["6. TSV Data, Specs & Datasheets", "XH-M562 TPA3116D2 Mini Amplifier Spec", "XH-M562 TPA3116D2.md", "SPEC MD", "fa-file-code-o", "Specifications for the 37.2x25.6mm 50W+50W stereo Class-D board"],
+        ["6. TSV Data, Specs & Datasheets", "PCM5102A I2S DAC Spec Sheet", "PCM5102 12S Spec.md", "SPEC MD", "fa-file-code-o", "32-bit I2S DAC module specifications and jumper settings"],
+        ["6. TSV Data, Specs & Datasheets", "Mean Well LRS-350 Official Datasheet (PDF)", "Mean Well LRS-350.pdf", "PDF", "fa-file-pdf-o", "Full manufacturer datasheet for LRS-350-24 power supply"],
+        ["6. TSV Data, Specs & Datasheets", "TPA3116D2 2x50W Amplifier Manual (PDF)", "TPA3116D2 DC 12V-24V 2x50W Dual Channel Mini Digital Amplifier D Class 50W+50W manual.pdf", "PDF", "fa-file-pdf-o", "Reference manual and application notes for TPA3116D2"]
+      ];
+
+      const sidebarContainer = document.getElementById("sidebarAccordionContainer");
+      const htmlPagesGrid = document.getElementById("htmlPagesGrid");
+      const imagesGalleryGrid = document.getElementById("imagesGalleryGrid");
+      const masterDirectoryTbody = document.getElementById("masterDirectoryTbody");
+      const menuSearchInput = document.getElementById("menuSearchInput");
+
+      const homeDashboardView = document.getElementById("homeDashboardView");
+      const livePreviewPane = document.getElementById("livePreviewPane");
+      const previewIframe = document.getElementById("previewIframe");
+      const previewImageStage = document.getElementById("previewImageStage");
+      const previewImageEl = document.getElementById("previewImageEl");
+      const previewTextStage = document.getElementById("previewTextStage");
+      const previewItemTitle = document.getElementById("previewItemTitle");
+      const previewItemDesc = document.getElementById("previewItemDesc");
+      const previewBadge = document.getElementById("previewBadge");
+      const previewOpenDirectLink = document.getElementById("previewOpenDirectLink");
+      const activeViewTitle = document.getElementById("activeViewTitle");
+
+      let currentActiveMenuEl = null;
+
+      const TSV_HTML_TWINS = {
+        "AMP_MECHANICAL_BOM.tsv": "AMP_DESIGN_DRAWING.html",
+        "BOM.tsv": "PROJECT.html",
+        "DFMEA.tsv": "QUALITY_MANAGEMENT_FMEA_CP.html",
+        "PFMEA.tsv": "QUALITY_MANAGEMENT_FMEA_CP.html",
+        "CONTROL_PLAN.tsv": "QUALITY_MANAGEMENT_FMEA_CP.html",
+        "ASSEMBLY_STEPS.tsv": "ASSEMBLY_MANUAL.html"
+      };
+
+      function isImageFile(path) {
+        const lower = path.toLowerCase();
+        return lower.endsWith(".jpg") || lower.endsWith(".jpeg") || lower.endsWith(".png") || lower.endsWith(".webp") || lower.endsWith(".avif");
+      }
+
+      function isTextOrTsvFile(path) {
+        const lower = path.toLowerCase();
+        return lower.endsWith(".tsv") || lower.endsWith(".md") || lower.endsWith(".sql");
+      }
+
+      function renderTsvTableInStage(tsvText, path) {
+        while (previewTextStage.firstChild) previewTextStage.removeChild(previewTextStage.firstChild);
+
+        const lines = tsvText.split(/\r?\n/).filter(function (l) { return l.trim().length > 0; });
+        const wrap = document.createElement("div");
+        wrap.className = "w3-responsive";
+
+        const table = document.createElement("table");
+        table.className = "dir-table";
+
+        if (lines.length > 0) {
+          const thead = document.createElement("thead");
+          const hRow = document.createElement("tr");
+          const hCols = lines[0].split("\t");
+          for (let c = 0; c < hCols.length; c++) {
+            const th = document.createElement("th");
+            th.textContent = hCols[c];
+            hRow.appendChild(th);
+          }
+          thead.appendChild(hRow);
+          table.appendChild(thead);
+
+          const tbody = document.createElement("tbody");
+          for (let r = 1; r < lines.length; r++) {
+            const tr = document.createElement("tr");
+            const cols = lines[r].split("\t");
+            for (let c = 0; c < hCols.length; c++) {
+              const td = document.createElement("td");
+              td.textContent = cols[c] || "";
+              tr.appendChild(td);
+            }
+            tbody.appendChild(tr);
+          }
+          table.appendChild(tbody);
+        }
+
+        wrap.appendChild(table);
+        previewTextStage.appendChild(wrap);
+      }
+
+      function openInPreviewPane(row, menuEl) {
+        if (currentActiveMenuEl) {
+          currentActiveMenuEl.classList.remove("active");
+        }
+        if (menuEl) {
+          menuEl.classList.add("active");
+          currentActiveMenuEl = menuEl;
+        }
+
+        const title = row[1];
+        const path = row[2];
+        const typeTag = row[3];
+        const desc = row[5];
+
+        homeDashboardView.style.display = "none";
+        livePreviewPane.classList.add("active");
+
+        activeViewTitle.textContent = title.toUpperCase();
+        previewBadge.textContent = typeTag;
+        previewItemTitle.textContent = title;
+        previewItemDesc.textContent = desc;
+        previewOpenDirectLink.href = path;
+
+        if (isImageFile(path)) {
+          previewIframe.style.display = "none";
+          previewIframe.src = "about:blank";
+          previewTextStage.style.display = "none";
+          previewImageStage.style.display = "flex";
+          previewImageEl.src = path;
+          previewImageEl.alt = title;
+        } else if (isTextOrTsvFile(path)) {
+          previewIframe.style.display = "none";
+          previewIframe.src = "about:blank";
+          previewImageStage.style.display = "none";
+          previewImageEl.src = "";
+          previewTextStage.style.display = "block";
+          while (previewTextStage.firstChild) previewTextStage.removeChild(previewTextStage.firstChild);
+
+          const loadingMsg = document.createElement("div");
+          loadingMsg.style.color = "#38bdf8";
+          loadingMsg.textContent = "Loading " + path + "...";
+          previewTextStage.appendChild(loadingMsg);
+
+          fetch(path)
+            .then(function (res) {
+              if (!res.ok) throw new Error("HTTP " + res.status);
+              return res.text();
+            })
+            .then(function (txt) {
+              if (path.toLowerCase().endsWith(".tsv")) {
+                renderTsvTableInStage(txt, path);
+              } else {
+                while (previewTextStage.firstChild) previewTextStage.removeChild(previewTextStage.firstChild);
+                const pre = document.createElement("pre");
+                pre.style.whiteSpace = "pre-wrap";
+                pre.style.color = "#e2e8f0";
+                pre.style.background = "#0f172a";
+                pre.style.padding = "16px";
+                pre.style.borderRadius = "6px";
+                pre.style.border = "1px solid #334155";
+                pre.textContent = txt;
+                previewTextStage.appendChild(pre);
+              }
+            })
+            .catch(function () {
+              while (previewTextStage.firstChild) previewTextStage.removeChild(previewTextStage.firstChild);
+              const box = document.createElement("div");
+              box.className = "panel-card";
+              box.style.maxWidth = "680px";
+              box.style.margin = "30px auto";
+
+              const h = document.createElement("div");
+              h.style.fontWeight = "800";
+              h.style.color = "#fbbf24";
+              h.style.fontSize = "15px";
+              h.style.marginBottom = "8px";
+              h.textContent = "Local file:// Preview Blocked by Browser Security (" + path + ")";
+
+              const p = document.createElement("div");
+              p.style.color = "#cbd5e1";
+              p.style.marginBottom = "14px";
+              p.textContent = "When hosted on GitHub Pages or an HTTP server, this .tsv/.md file renders as a live formatted table right here. On local file://, use the formatted HTML view below:";
+
+              box.appendChild(h);
+              box.appendChild(p);
+
+              const twin = TSV_HTML_TWINS[path];
+              if (twin) {
+                const btn = document.createElement("a");
+                btn.href = twin;
+                btn.className = "top-btn top-btn-copper";
+                btn.textContent = "Open Formatted HTML Table (" + twin + ") →";
+                box.appendChild(btn);
+              }
+              previewTextStage.appendChild(box);
+            });
+        } else {
+          previewImageStage.style.display = "none";
+          previewImageEl.src = "";
+          previewTextStage.style.display = "none";
+          previewIframe.style.display = "block";
+          previewIframe.src = path;
+        }
+      }
+
+      function showHomeDashboard() {
+        livePreviewPane.classList.remove("active");
+        previewIframe.src = "about:blank";
+        homeDashboardView.style.display = "block";
+        activeViewTitle.textContent = "MASTER PROJECT DASHBOARD & COMPLETE FILE NAVIGATOR";
+        if (currentActiveMenuEl) {
+          currentActiveMenuEl.classList.remove("active");
+          currentActiveMenuEl = null;
+        }
+      }
+
+      // Build Expandable Sidebar Accordion Menu
+      function renderSidebarMenu(filterText) {
+        while (sidebarContainer.firstChild) {
+          sidebarContainer.removeChild(sidebarContainer.firstChild);
+        }
+
+        const q = (filterText || "").trim().toLowerCase();
+        const groupsMap = [];
+        const groupIndexByName = {};
+
+        for (let i = 0; i < PROJECT_ASSETS_2D.length; i++) {
+          const row = PROJECT_ASSETS_2D[i];
+          const hay = (row[0] + " " + row[1] + " " + row[2] + " " + row[3] + " " + row[5]).toLowerCase();
+          if (q && hay.indexOf(q) === -1) {
+            continue;
+          }
+
+          const gName = row[0];
+          if (groupIndexByName[gName] === undefined) {
+            groupIndexByName[gName] = groupsMap.length;
+            groupsMap.push({ name: gName, items: [] });
+          }
+          groupsMap[groupIndexByName[gName]].items.push(row);
+        }
+
+        for (let g = 0; g < groupsMap.length; g++) {
+          const grp = groupsMap[g];
+          const grpWrap = document.createElement("div");
+          grpWrap.className = "menu-group";
+
+          const headerBtn = document.createElement("button");
+          headerBtn.className = "group-header";
+
+          const titleSpan = document.createElement("span");
+          titleSpan.textContent = grp.name + " (" + grp.items.length + ")";
+          headerBtn.appendChild(titleSpan);
+
+          const caretIcon = document.createElement("i");
+          caretIcon.className = "fa fa-chevron-down";
+          headerBtn.appendChild(caretIcon);
+
+          const itemsDiv = document.createElement("div");
+          itemsDiv.className = "group-items";
+
+          headerBtn.addEventListener("click", function () {
+            const isHidden = itemsDiv.classList.toggle("hidden");
+            caretIcon.className = isHidden ? "fa fa-chevron-right" : "fa fa-chevron-down";
+          });
+
+          for (let j = 0; j < grp.items.length; j++) {
+            const itemRow = grp.items[j];
+            const itemLink = document.createElement("div");
+            itemLink.className = "menu-item";
+            itemLink.title = itemRow[5];
+
+            const leftPart = document.createElement("div");
+            leftPart.style.display = "flex";
+            leftPart.style.alignItems = "center";
+            leftPart.style.gap = "7px";
+            leftPart.style.overflow = "hidden";
+
+            const ic = document.createElement("i");
+            ic.className = "fa " + itemRow[4];
+            ic.style.color = "#38bdf8";
+            leftPart.appendChild(ic);
+
+            const lbl = document.createElement("span");
+            lbl.style.whiteSpace = "nowrap";
+            lbl.style.overflow = "hidden";
+            lbl.style.textOverflow = "ellipsis";
+            lbl.textContent = itemRow[1];
+            leftPart.appendChild(lbl);
+
+            const badge = document.createElement("span");
+            badge.className = "item-type-tag";
+            badge.textContent = itemRow[3];
+
+            itemLink.appendChild(leftPart);
+            itemLink.appendChild(badge);
+
+            itemLink.addEventListener("click", function () {
+              openInPreviewPane(itemRow, itemLink);
+            });
+
+            itemsDiv.appendChild(itemLink);
+          }
+
+          grpWrap.appendChild(headerBtn);
+          grpWrap.appendChild(itemsDiv);
+          sidebarContainer.appendChild(grpWrap);
+        }
+      }
+
+      // Build Dashboard Grids & Directory Table
+      function renderDashboardGrids() {
+        while (htmlPagesGrid.firstChild) htmlPagesGrid.removeChild(htmlPagesGrid.firstChild);
+        while (imagesGalleryGrid.firstChild) imagesGalleryGrid.removeChild(imagesGalleryGrid.firstChild);
+        while (masterDirectoryTbody.firstChild) masterDirectoryTbody.removeChild(masterDirectoryTbody.firstChild);
+
+        const kpiEl = document.getElementById("kpiAssetCount");
+        if (kpiEl) {
+          kpiEl.textContent = PROJECT_ASSETS_2D.length + " Linked Files";
+        }
+
+        for (let i = 0; i < PROJECT_ASSETS_2D.length; i++) {
+          const row = PROJECT_ASSETS_2D[i];
+          const path = row[2];
+
+          // 1. If HTML page -> add to Section 1 Grid
+          if (path.toLowerCase().endsWith(".html")) {
+            const col = document.createElement("div");
+            col.className = "w3-col l4 m6 s12";
+            col.style.padding = "8px";
+
+            const tile = document.createElement("div");
+            tile.className = "page-tile";
+
+            const topDiv = document.createElement("div");
+
+            const headRow = document.createElement("div");
+            headRow.style.display = "flex";
+            headRow.style.justifyContent = "space-between";
+            headRow.style.alignItems = "center";
+            headRow.style.marginBottom = "8px";
+
+            const titleEl = document.createElement("div");
+            titleEl.style.fontWeight = "800";
+            titleEl.style.fontSize = "13.5px";
+            titleEl.style.color = "#f8fafc";
+            titleEl.textContent = row[1];
+
+            const tagEl = document.createElement("span");
+            tagEl.className = "item-type-tag";
+            tagEl.textContent = row[3];
+
+            headRow.appendChild(titleEl);
+            headRow.appendChild(tagEl);
+
+            const descEl = document.createElement("div");
+            descEl.style.color = "#94a3b8";
+            descEl.style.fontSize = "12px";
+            descEl.style.lineHeight = "1.45";
+            descEl.style.marginBottom = "12px";
+            descEl.textContent = row[5];
+
+            topDiv.appendChild(headRow);
+            topDiv.appendChild(descEl);
+
+            const btnRow = document.createElement("div");
+            btnRow.style.display = "flex";
+            btnRow.style.gap = "8px";
+
+            const btnPreview = document.createElement("button");
+            btnPreview.className = "mini-btn mini-btn-primary";
+            btnPreview.textContent = "Preview Here";
+            btnPreview.addEventListener("click", function () {
+              openInPreviewPane(row, null);
+            });
+
+            const linkOpen = document.createElement("a");
+            linkOpen.className = "mini-btn";
+            linkOpen.style.textDecoration = "none";
+            linkOpen.href = path;
+            linkOpen.textContent = "Open Page →";
+
+            btnRow.appendChild(btnPreview);
+            btnRow.appendChild(linkOpen);
+
+            tile.appendChild(topDiv);
+            tile.appendChild(btnRow);
+            col.appendChild(tile);
+            htmlPagesGrid.appendChild(col);
+          }
+
+          // 2. If Image/Photo -> add to Section 2 Visual Gallery Grid
+          if (isImageFile(path)) {
+            const col = document.createElement("div");
+            col.className = "w3-col l3 m6 s12";
+            col.style.padding = "8px";
+
+            const card = document.createElement("div");
+            card.className = "img-card";
+
+            const thumbWrap = document.createElement("div");
+            thumbWrap.className = "img-thumb-wrap";
+            const img = document.createElement("img");
+            img.src = path;
+            img.alt = row[1];
+            img.loading = "lazy";
+            thumbWrap.appendChild(img);
+            thumbWrap.addEventListener("click", function () {
+              openInPreviewPane(row, null);
+            });
+
+            const body = document.createElement("div");
+            body.style.padding = "10px 12px";
+            body.style.flex = "1";
+            body.style.display = "flex";
+            body.style.flexDirection = "column";
+            body.style.justifyContent = "space-between";
+
+            const tEl = document.createElement("div");
+            tEl.style.fontWeight = "700";
+            tEl.style.fontSize = "12px";
+            tEl.style.color = "#fbbf24";
+            tEl.style.marginBottom = "4px";
+            tEl.textContent = row[1];
+
+            const dEl = document.createElement("div");
+            dEl.style.fontSize = "11px";
+            dEl.style.color = "#94a3b8";
+            dEl.style.marginBottom = "8px";
+            dEl.textContent = row[5];
+
+            const inspectBtn = document.createElement("button");
+            inspectBtn.className = "mini-btn";
+            inspectBtn.textContent = "Inspect Full Size";
+            inspectBtn.addEventListener("click", function () {
+              openInPreviewPane(row, null);
+            });
+
+            body.appendChild(tEl);
+            body.appendChild(dEl);
+            body.appendChild(inspectBtn);
+
+            card.appendChild(thumbWrap);
+            card.appendChild(body);
+            col.appendChild(card);
+            imagesGalleryGrid.appendChild(col);
+          }
+
+          // 3. Add every asset to Master Directory Table
+          const tr = document.createElement("tr");
+
+          const tdCat = document.createElement("td");
+          tdCat.style.color = "#38bdf8";
+          tdCat.style.fontWeight = "600";
+          tdCat.textContent = row[0];
+          tr.appendChild(tdCat);
+
+          const tdTitle = document.createElement("td");
+          tdTitle.style.fontWeight = "700";
+          tdTitle.textContent = row[1];
+          tr.appendChild(tdTitle);
+
+          const tdPath = document.createElement("td");
+          tdPath.style.fontFamily = "monospace";
+          tdPath.style.color = "#fde047";
+          tdPath.textContent = row[2];
+          tr.appendChild(tdPath);
+
+          const tdType = document.createElement("td");
+          const badge = document.createElement("span");
+          badge.className = "item-type-tag";
+          badge.textContent = row[3];
+          tdType.appendChild(badge);
+          tr.appendChild(tdType);
+
+          const tdDesc = document.createElement("td");
+          tdDesc.style.color = "#cbd5e1";
+          tdDesc.textContent = row[5];
+          tr.appendChild(tdDesc);
+
+          const tdAct = document.createElement("td");
+          tdAct.style.textAlign = "center";
+          tdAct.style.whiteSpace = "nowrap";
+
+          const btnPrev = document.createElement("button");
+          btnPrev.className = "mini-btn mini-btn-primary";
+          btnPrev.style.marginRight = "4px";
+          btnPrev.textContent = "Preview";
+          btnPrev.addEventListener("click", function () {
+            openInPreviewPane(row, null);
+          });
+
+          const aOpen = document.createElement("a");
+          aOpen.className = "mini-btn";
+          aOpen.style.textDecoration = "none";
+          aOpen.href = path;
+          aOpen.target = "_blank";
+          aOpen.textContent = "Open";
+
+          tdAct.appendChild(btnPrev);
+          tdAct.appendChild(aOpen);
+          tr.appendChild(tdAct);
+
+          masterDirectoryTbody.appendChild(tr);
+        }
+      }
+
+      // Wire up controls
+      renderSidebarMenu("");
+      renderDashboardGrids();
+
+      if (menuSearchInput) {
+        menuSearchInput.addEventListener("input", function (e) {
+          renderSidebarMenu(e.target.value);
+        });
+      }
+
+      document.getElementById("btnDashboardHome").addEventListener("click", showHomeDashboard);
+      document.getElementById("btnClosePreview").addEventListener("click", showHomeDashboard);
+
+      document.getElementById("btnExpandAll").addEventListener("click", function () {
+        const groups = sidebarContainer.querySelectorAll(".group-items");
+        for (let i = 0; i < groups.length; i++) {
+          groups[i].classList.remove("hidden");
+        }
+      });
+
+      document.getElementById("btnCollapseAll").addEventListener("click", function () {
+        const groups = sidebarContainer.querySelectorAll(".group-items");
+        for (let i = 0; i < groups.length; i++) {
+          groups[i].classList.add("hidden");
+        }
+      });
+
+      document.getElementById("btnToggleSidebar").addEventListener("click", function () {
+        document.getElementById("sideNav").classList.toggle("collapsed");
+      });
+    })();
+  </script>
+</body>
+
+</html>

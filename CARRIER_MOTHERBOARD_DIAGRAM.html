@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Master System Schematic & Parts Audit — DIY 5.1 Hybrid Amp</title>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <style>
+    body { background: #060a12; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; margin: 0; padding: 0; }
+    .page-wrap { max-width: 1560px; margin: 0 auto; padding: 16px; }
+    .motherboard-card {
+      background: #0d1522;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      position: relative;
+    }
+    #pcb-svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 6px;
+      background: #07170c;
+    }
+    .w3-table td, .w3-table th { color: #cbd5e1; font-size: 12.5px; vertical-align: middle; }
+    .w3-table th { background: #131d2e; color: #f1f5f9; }
+    .info-badge { display: inline-block; padding: 5px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-right: 6px; }
+    .note-box { background: #0b1320; border-left: 4px solid #10b981; padding: 14px 18px; border-radius: 0 4px 4px 0; font-size: 13px; line-height: 1.6; }
+    .legend-item { display: inline-flex; align-items: center; margin-right: 18px; margin-bottom: 8px; font-size: 12px; }
+    .legend-line { width: 22px; height: 3px; display: inline-block; margin-right: 6px; border-radius: 1px; }
+
+    /* Interactive Filter Tabs */
+    .filter-btn {
+      background: #1e293b;
+      color: #94a3b8;
+      border: 1px solid #334155;
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-right: 6px;
+      transition: all 0.2s ease;
+    }
+    .filter-btn:hover { background: #334155; color: #f8fafc; }
+    .filter-btn.active-all { background: #0284c7; color: #fff; border-color: #38bdf8; }
+    .filter-btn.active-missing { background: #b91c1c; color: #fff; border-color: #f87171; }
+    .filter-btn.active-ordered { background: #0369a1; color: #fff; border-color: #38bdf8; }
+    .filter-btn.active-inhand { background: #15803d; color: #fff; border-color: #4ade80; }
+
+    /* Pulse animation for missing items */
+    @keyframes pulseMissing {
+      0% { opacity: 0.85; stroke-width: 2; }
+      50% { opacity: 1; stroke-width: 3.5; stroke: #ef4444; }
+      100% { opacity: 0.85; stroke-width: 2; }
+    }
+    .flag-missing {
+      animation: pulseMissing 1.8s infinite ease-in-out;
+    }
+    .dimmed-part {
+      opacity: 0.15 !important;
+      transition: opacity 0.3s ease;
+    }
+    .highlighted-part {
+      opacity: 1 !important;
+      transition: opacity 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrap">
+    
+    <!-- Top Header & Live Status Summary -->
+    <div class="w3-row w3-margin-bottom" style="align-items: center;">
+      <div class="w3-col l7 m12">
+        <h2 style="margin: 0; font-size: 24px; font-weight: 400; letter-spacing: 0.5px; color: #38bdf8;">
+          Master System Schematic &amp; Hardware Status Audit
+        </h2>
+        <div style="font-size: 13px; color: #94a3b8; margin-top: 4px;">
+          Complete 5.1 Copper Chimney V2 Circuit &bull; All 32 Components with Live Status Tracking &amp; Missing Flags
+        </div>
+      </div>
+      <div class="w3-col l5 m12 w3-right-align" style="margin-top: 8px;">
+        <span class="info-badge w3-green" id="count-inhand">✔ In Hand: 18</span>
+        <span class="info-badge w3-blue" id="count-ordered">✈ In Transit: 9</span>
+        <span class="info-badge w3-red" id="count-missing">⚠ Missing / To Buy: 5</span>
+      </div>
+    </div>
+
+    <!-- Filter Buttons Bar -->
+    <div class="w3-margin-bottom" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px;">
+      <div>
+        <span style="font-size: 12px; font-weight: bold; color: #94a3b8; margin-right: 8px;">FILTER VIEW:</span>
+        <button id="btn-flt-all" class="filter-btn active-all" onclick="setAuditFilter('all')">Show Complete Circuit</button>
+        <button id="btn-flt-missing" class="filter-btn" onclick="setAuditFilter('missing')">⚠ Highlight Missing Only (5)</button>
+        <button id="btn-flt-ordered" class="filter-btn" onclick="setAuditFilter('ordered')">✈ Highlight In-Transit (9)</button>
+        <button id="btn-flt-inhand" class="filter-btn" onclick="setAuditFilter('inhand')">✔ Highlight In Hand (18)</button>
+      </div>
+      <div style="font-size: 12px; color: #cbd5e1;">
+        <span style="color: #ef4444; font-weight: bold;">● RED BOXES</span> = Missing &bull;
+        <span style="color: #38bdf8; font-weight: bold;">● BLUE BOXES</span> = Ordered &bull;
+        <span style="color: #22c55e; font-weight: bold;">● GREEN BOXES</span> = Available
+      </div>
+    </div>
+
+    <!-- SVG Master Schematic Canvas -->
+    <div class="motherboard-card">
+      <svg id="pcb-svg" viewBox="0 0 1480 920" role="img" aria-label="Master System Schematic with Parts Audit"></svg>
+    </div>
+
+    <!-- Legend Bar -->
+    <div class="motherboard-card w3-margin-top" style="padding: 10px 16px;">
+      <div style="font-weight: bold; font-size: 12px; margin-bottom: 8px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">
+        Signal &amp; Power Bus Legend
+      </div>
+      <div id="legend-container"></div>
+    </div>
+
+    <!-- Parts Audit Table -->
+    <div class="w3-margin-top">
+      <h3 style="font-size: 16px; font-weight: bold; color: #e2e8f0; margin-bottom: 8px;">
+        Complete Bill of Materials (BOM) &amp; Status Breakdown
+      </h3>
+      <div class="w3-responsive motherboard-card" style="padding: 0;">
+        <table class="w3-table w3-bordered w3-hoverable" id="spec-table"></table>
+      </div>
+    </div>
+
+    <!-- Action Plan Box -->
+    <div class="note-box w3-margin-top" id="notes-content"></div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // 2D ARRAY DATASETS (Zero HTML in JS)
+    // =========================================================================
+
+    // Bus Legend
+    var LEGEND_DATA = [
+      ["230V AC Mains & 24V Heavy DC Bus", "#ef4444", "solid"],
+      ["5V Clean Regulated Logic Bus", "#f97316", "solid"],
+      ["3.3V Isolated / LDO Rail", "#eab308", "solid"],
+      ["BCK + LRCK Clock Bus (with Damping)", "#00d2ff", "solid"],
+      ["MCLK (12.288 MHz Master Clock)", "#ff8c00", "solid"],
+      ["I2S Digital Audio Data", "#a855f7", "solid"],
+      ["Shielded Analog Audio to Amps", "#22c55e", "solid"],
+      ["Passive Crossover Speaker Outs", "#f43f5e", "solid"],
+      ["Ground & Shield Net (0V Return)", "#38bdf8", "dashed"]
+    ];
+
+    // Hardware Status Dataset: [Category, Part Name, Spec, Status, Status Key, Role / Connection, Action]
+    var PARTS_STATUS_DATA = [
+      ["Power", "Mean Well LRS-350-24", "24V 14.6A 350.4W SMPS", "Available (In Hand)", "inhand", "Mains to 24V conversion", "Mount in bottom chassis / external tray"],
+      ["Power", "Power Rocker Switch", "SPST/DPST 250V 10A/15A", "Missing (To Buy)", "missing", "Master AC/DC ON/OFF isolation", "Select Rocker, ON-OFF, 10A/15A, 250V on Robu"],
+      ["Power", "GX16 4-Pin Aviation Socket", "4-Pin Metal Screw Lock", "Available (In Hand)", "inhand", "24V umbilical disconnect (2P || per rail)", "Solder 16 AWG leads (Pins 1+2 = +24V, 3+4 = GND)"],
+      ["Power", "Inline 10A DC Fuse", "5x20mm Glass Slow-Blow", "Available (In Hand)", "inhand", "Overcurrent safeguard on 24V rail", "Mount inline on +24V wire before WAGO"],
+      ["Power", "WAGO 221-415 (2 pcs)", "5-Port Lever Connector", "Available (In Hand)", "inhand", "+24V and GND central distribution", "Splits 24V to 3x Amps + XL4015 buck"],
+      ["Power", "4700µF 50V Caps (2 pcs)", "Low-ESR Radial Electrolytic", "Available (In Hand)", "inhand", "24V ripple reservoir for bass hits", "Plugged directly across WAGO Port 1"],
+      ["Power", "XL4015 5A Buck Converter", "24V -> 5.00V DC-DC Step-Down", "Available (In Hand)", "inhand", "Powers ESP32, DACs, ADC, and Touch", "Trim pot counter-clockwise to exactly 5.00V"],
+      ["Power", "Logic Decoupling Caps", "2x 100µF + 4x 0.1µF Ceramic", "Missing (To Buy)", "missing", "Filter buck switching hash on 5V/3.3V", "Buy 100uF 25V + 0.1uF disc caps locally (~Rs 15)"],
+      ["Power", "AMS1117-3.3V LDO Module", "3.3V Linear Step-Down", "Available (In Hand)", "inhand", "Clean 3.3V logic for PCM1808 VDD", "Solder 3-pin header to 5V bus"],
+      ["Analog In", "CentIoT PJ392A-1 3.5mm Jack", "Panel-Mount Gold TRS Jack", "Available (In Hand)", "inhand", "Analog stereo line input from TV/Phone", "Solder shielded cable to Tip (L), Ring (R), Sleeve (G)"],
+      ["Analog In", "B0505S-1WR3 Isolated 5V", "1W 1:1 Isolated DC-DC", "In Transit (Ordered)", "ordered", "Breaks digital ground loop for Bluetooth", "Arriving from Robu (SKU: R175199)"],
+      ["Analog In", "VHM-314 Bluetooth 5.0", "Stereo BT Receiver Board", "In Transit (Ordered)", "ordered", "Receives wireless audio from phone/laptop", "Arriving from Robu (SKU: 1794208)"],
+      ["Analog In", "DPDT Audio Toggle Switch", "Mini 6-Pin ON-ON Switch", "Missing (To Buy)", "missing", "Toggles ADC input: AUX vs Bluetooth", "Select DPDT, ON-ON, 3A/6A on Robu (~Rs 25)"],
+      ["Analog In", "PCM1808 Stereo ADC", "24-bit 96kHz I2S Modulator", "Available (In Hand)", "inhand", "Digitizes switched analog audio to I2S", "Configured in Slave Mode (MD0=0, MD1=0)"],
+      ["Digital", "Waveshare ESP32-S3-Pico", "Master Audio & Clock DSP", "In Transit (Ordered)", "ordered", "Generates master clocks, matrix 5.1 decode", "Arriving from Robu (SKU: 1552780) with yellow headers"],
+      ["Digital", "Clock Resistors (10-Pack)", "10x 33Ω–47Ω 1/4W Metal Film", "Missing (To Buy)", "missing", "Star-branch damping on BCK, LRCK, MCLK", "Buy 10-pack of 33R or 47R locally/online (~Rs 10)"],
+      ["Digital", "ESP32-WROOM-32 (Slave)", "30-Pin NodeMCU Dev Board", "In Transit (Ordered)", "ordered", "I2S Slave surround & cymbal shimmer DSP", "Arriving from Robu. Clocks from Pico; drives DAC #2"],
+      ["HMI", "Waveshare 4.3B Touch LCD", "800x480 Capacitive Touch IPS", "Available (In Hand)", "inhand", "Touch UI (Volume, Boost, Delay, Presets)", "Operates untethered over ESP-NOW (<2ms latency)"],
+      ["DACs", "PCM5102A DAC #1", "32-bit I2S Stereo DAC (HW-280)", "Available (In Hand)", "inhand", "Front Left & Front Right channels", "SCK to GND (PLL ON), FMT to GND (I2S)"],
+      ["DACs", "PCM5102A DAC #2", "32-bit I2S Stereo DAC (HW-280)", "Available (In Hand)", "inhand", "Surround Left & Surround Right", "Driven by Slave ESP32-WROOM-32 D27"],
+      ["DACs", "PCM5102A DAC #3", "32-bit I2S Stereo DAC (HW-280)", "Available (In Hand)", "inhand", "Center Voice & Subwoofer channels", "Driven by Master ESP32-S3-Pico DOUT2 (GPIO 6)"],
+      ["Wiring", "Shielded 2-Core Audio Wire", "3 meters low-noise audio cable", "Missing (To Buy)", "missing", "Transfers DAC line-out to Amp inputs", "Buy 3 meters locally from audio shop (~Rs 120)"],
+      ["Amps", "Amp #1 (XH-M562 TPA3116D2)", "2x50W Class-D Stereo Board", "Available (In Hand)", "inhand", "Drives Front Left & Front Right walls", "Clamped to AL6061 finned heatsink with Arctic MX-4"],
+      ["Amps", "Amp #2 (XH-M562 TPA3116D2)", "2x50W Class-D Stereo Board", "Available (In Hand)", "inhand", "Drives Center Voice & Subwoofer", "Clamped to AL6061 finned heatsink with Arctic MX-4"],
+      ["Amps", "Amp #3 (XH-M562 TPA3116D2)", "2x50W Class-D Stereo Board", "Available (In Hand)", "inhand", "Drives Surround Domes & Piezo Sparkles", "Clamped to AL6061 finned heatsink with Arctic MX-4"],
+      ["Crossover", "JIMSON 10µF 250V Film Cap (2x)", "CBB20 MEA Axial Film Audio Cap", "Available (In Hand)", "inhand", "Center Voice high-pass (1 kHz – 2 kHz)", "In hand! Wire inline on Center Voice (+) terminal"],
+      ["Crossover", "JIMSON 4.7µF 250V Film Cap (2x)", "CBB20 MEA Axial Film Audio Cap", "Available (In Hand)", "inhand", "Surround Dome high-pass (4.2 kHz @ 8Ω)", "In hand! Protects Silver Dome tweeters"],
+      ["Crossover", "JIMSON 2.2µF 250V Film Cap (2x)", "CBB20 MEA Axial Film Audio Cap", "Available (In Hand)", "inhand", "Piezo Super-Tweeter high-pass (9 kHz)", "In hand! Pure crystal shimmer, zero bass loading"],
+      ["Mechanical", "JS-910B Binding Posts (16 pcs)", "4mm Gold Speaker Terminals", "12 In Hand + 4 Ordered", "ordered", "Rear panel discrete speaker connections", "Mounted in non-conductive Polycarbonate rear plate"],
+      ["Mechanical", "M3x10mm Standoffs (30 pcs)", "Nylon Hex Spacer w/ Brass Thread", "In Transit (Ordered)", "ordered", "Elevates carrier board 10mm off floor", "Arriving from Robu (SKU: 806698)"],
+      ["Mechanical", "HY510 Thermal Paste (30g)", "Non-conductive thermal grease", "In Transit (Ordered)", "ordered", "Thermal coupling between chips & L-bridges", "Arriving from Hubtronics.in (SKU: 07555)"],
+      ["Carrier", "10x10 cm Perfboard (Zero-PCB)", "FR4 Universal 2.54mm Grid", "In Transit (Ordered)", "ordered", "Motherboard carrier for dual-MCUs & DACs", "Arriving from Robu (SKU: 1031002)"]
+    ];
+
+    var ACTION_NOTES = [
+      "SWITCH SELECTION ON ROBU.IN: For the DPDT Audio Selector Switch, check 'DPDT' under Switch Type and 'ON-ON' under Switching Mode. For the Power Rocker Switch, check 'Rocker switch' or 'SPST', 'ON-OFF' switching mode, and rated current '10' or '15' Amps.",
+      "CLOCK DAMPING RESISTORS: Place the 10x 33Ω–47Ω resistors directly at each star branch stub: 2 for DAC 1 (BCK/LRCK), 2 for DAC 3, 2 for Slave WROOM, 2 for PCM1808 ADC, 1 for MCLK, and 1 spare. This completely prevents edge reflection jitter.",
+      "JIMSON FILM CAPACITORS (IN HAND): The 2.2µF, 4.7µF, and 10µF 250V CBB20 capacitors in your possession eliminate the need for any other crossover caps. They provide audiophile-grade high-pass filtering with 250V safety headroom.",
+      "FLOATING BTL SPEAKER RULE: Never connect any speaker negative lead to chassis ground or power ground. All 8 outputs float freely on the TPA3116D2 H-bridges."
+    ];
+
+    // =========================================================================
+    // SVG RENDERING ENGINE
+    // =========================================================================
+    var currentFilter = "all";
+
+    document.addEventListener("DOMContentLoaded", function() {
+      drawMasterSchematic();
+      renderLegend();
+      renderSpecTable();
+      renderNotes();
+    });
+
+    function createSvgElem(tag, attrs) {
+      var elem = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      for (var key in attrs) elem.setAttribute(key, attrs[key]);
+      return elem;
+    }
+
+    function drawMasterSchematic() {
+      var svg = document.getElementById("pcb-svg");
+      while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+      var defs = createSvgElem("defs", {});
+      
+      // Board Gradients
+      var bgGrad = createSvgElem("linearGradient", { id: "bgGrad", x1: "0%", y1: "0%", x2: "100%", y2: "100%" });
+      bgGrad.appendChild(createSvgElem("stop", { offset: "0%", "stop-color": "#07120a" }));
+      bgGrad.appendChild(createSvgElem("stop", { offset: "100%", "stop-color": "#040a06" }));
+      defs.appendChild(bgGrad);
+
+      var copperGrad = createSvgElem("linearGradient", { id: "copperGrad", x1: "0%", y1: "0%", x2: "100%", y2: "0%" });
+      copperGrad.appendChild(createSvgElem("stop", { offset: "0%", "stop-color": "#14532d" }));
+      copperGrad.appendChild(createSvgElem("stop", { offset: "100%", "stop-color": "#166534" }));
+      defs.appendChild(copperGrad);
+
+      svg.appendChild(defs);
+
+      // Main Outer Carrier Board Boundary
+      svg.appendChild(createSvgElem("rect", { x: "15", y: "15", width: "1450", height: "890", rx: "16", fill: "url(#bgGrad)", stroke: "#1e3a24", "stroke-width": "3" }));
+      svg.appendChild(createSvgElem("rect", { x: "25", y: "25", width: "1430", height: "870", rx: "12", fill: "none", stroke: "#e2e8f0", "stroke-width": "1.2", "stroke-dasharray": "6 4", opacity: "0.3" }));
+
+      // Corner Mounting Standoffs
+      [[40,40], [1440,40], [40,880], [1440,880]].forEach(function(pt) {
+        svg.appendChild(createSvgElem("circle", { cx: pt[0], cy: pt[1], r: "10", fill: "#d97706" }));
+        svg.appendChild(createSvgElem("circle", { cx: pt[0], cy: pt[1], r: "5", fill: "#040a06" }));
+      });
+
+      // =======================================================================
+      // ZONE 1: AC MAINS, DC POWER, WAGO & BUCK (TOP-LEFT)
+      // =======================================================================
+      drawSectionBox(svg, 40, 50, 380, 240, "ZONE 1: POWER DELIVERY & 24V/5V BUS", "#ef4444");
+
+      // 1. Mean Well LRS-350-24
+      drawComponentCard(svg, 55, 80, 160, 85, "MEAN WELL LRS-350-24", "24V 14.6A (350W SMPS)", "inhand", "✔ IN HAND");
+
+      // 2. Power Rocker Switch [MISSING]
+      drawComponentCard(svg, 235, 80, 165, 85, "POWER SWITCH", "Rocker 250V 10A/15A", "missing", "⚠ MISSING (TO BUY)");
+
+      // 3. GX16 4-Pin Disconnect
+      drawComponentCard(svg, 55, 185, 105, 85, "GX16 4-PIN", "24V Umbilical (2P ||)", "inhand", "✔ IN HAND");
+
+      // 4. Inline 10A DC Fuse
+      drawComponentCard(svg, 175, 185, 105, 85, "10A DC FUSE", "5x20mm Slow-Blow", "inhand", "✔ IN HAND");
+
+      // 5. WAGO 221-415 Rails & 4700uF Caps
+      drawComponentCard(svg, 295, 185, 110, 85, "WAGO 221-415", "+24V & GND Rails + 2x 4700µF", "inhand", "✔ IN HAND");
+
+      // =======================================================================
+      // ZONE 2: LOGIC POWER REGULATION & DECOUPLING
+      // =======================================================================
+      drawSectionBox(svg, 40, 310, 380, 160, "ZONE 2: 5V & 3.3V CLEAN LOGIC RAILS", "#f97316");
+
+      // XL4015 Buck Converter
+      drawComponentCard(svg, 55, 340, 160, 110, "XL4015 BUCK REGULATOR", "24V -> 5.00V @ 3A Clean Logic", "inhand", "✔ IN HAND");
+
+      // Logic Decoupling Capacitors [MISSING]
+      drawComponentCard(svg, 235, 340, 165, 52, "DECOUPLING CAPS", "2x 100µF + 4x 0.1µF", "missing", "⚠ MISSING (TO BUY)");
+
+      // AMS1117-3.3V LDO
+      drawComponentCard(svg, 235, 400, 165, 50, "AMS1117-3.3V LDO", "Clean 3.3V ADC Logic VDD", "inhand", "✔ IN HAND");
+
+      // =======================================================================
+      // ZONE 3: ANALOG AUDIO PRE-AMP & ADC (LEFT BOTTOM)
+      // =======================================================================
+      drawSectionBox(svg, 40, 490, 380, 390, "ZONE 3: ANALOG INPUTS & PCM1808 ADC", "#eab308");
+
+      // CentIoT 3.5mm AUX Jack
+      drawComponentCard(svg, 55, 520, 160, 75, "3.5mm STEREO AUX", "CentIoT PJ392A-1 Gold Jack", "inhand", "✔ IN HAND");
+
+      // B0505S-1WR3 Isolated 5V
+      drawComponentCard(svg, 235, 520, 165, 75, "B0505S-1WR3", "1kV 5V Isolated DC-DC", "ordered", "✈ IN TRANSIT");
+
+      // VHM-314 Bluetooth 5.0
+      drawComponentCard(svg, 235, 610, 165, 80, "VHM-314 BT 5.0", "Wireless SBC/AAC Decoder", "ordered", "✈ IN TRANSIT");
+
+      // DPDT Audio Source Selector Switch [MISSING]
+      drawComponentCard(svg, 55, 610, 160, 80, "DPDT AUDIO SWITCH", "Toggle: 3.5mm AUX ↔ BT", "missing", "⚠ MISSING (TO BUY)");
+
+      // PCM1808 Stereo ADC
+      drawComponentCard(svg, 55, 710, 345, 150, "PCM1808 STEREO 24-BIT ADC", "Slave Mode (MD0=0, MD1=0) • 24-bit 96kHz I2S Output", "inhand", "✔ IN HAND");
+
+      // =======================================================================
+      // ZONE 4: DUAL-MCU DIGITAL BRAINS & CLOCK DAMPING (CENTER)
+      // =======================================================================
+      drawSectionBox(svg, 450, 50, 470, 830, "ZONE 4: DUAL-MCU AUDIO ENGINE & CLOCK BUS", "#8b5cf6");
+
+      // Waveshare 4.3B Touch HMI
+      drawComponentCard(svg, 470, 80, 430, 95, "WAVESHARE 4.3B TOUCH LCD (HMI)", "800x480 Capacitive Touch &bull; ESP-NOW Wireless Remote Link (<2ms)", "inhand", "✔ IN HAND");
+
+      // Master MCU: Waveshare ESP32-S3-Pico
+      drawComponentCard(svg, 470, 195, 205, 330, "ESP32-S3-PICO (MASTER)", "SKU: 1552780 (Yellow Headers)\nMaster Clock & Active 5.1 Matrix\n• GPIO 15: BCK Master\n• GPIO 16: LRCK Master\n• GPIO 2:  MCLK to ADC\n• GPIO 7:  DOUT 1 (Front)\n• GPIO 6:  DOUT 2 (Ctr/Sub)\n• GPIO 4:  DIN from ADC", "ordered", "✈ IN TRANSIT");
+
+      // 10x Clock Damping Resistors [MISSING]
+      drawComponentCard(svg, 695, 195, 205, 330, "CLOCK RESISTORS (10x)", "10-Pack 33Ω–47Ω 1/4W\nIndividual Star Termination:\n• R1: BCK to DAC 1\n• R2: LRCK to DAC 1\n• R3: BCK to DAC 3\n• R4: LRCK to DAC 3\n• R5: BCK to Slave MCU\n• R6: LRCK to Slave MCU\n• R7: BCK to ADC\n• R8: LRCK to ADC\n• R9: MCLK to ADC\n• R10: Spare / DOUT", "missing", "⚠ MISSING (TO BUY)");
+
+      // Slave MCU: ESP32-WROOM-32
+      drawComponentCard(svg, 470, 545, 430, 175, "ESP32-WROOM-32 (SLAVE SURROUND)", "30-Pin NodeMCU Dev Board &bull; Dedicated Haas Delay & Cymbal Synth\n• D26: BCK in (from Pico) &bull; D25: LRCK in (from Pico) &bull; D35: DIN in (from ADC)\n• D27: DOUT to DAC #2 (Surround L/R)", "ordered", "✈ IN TRANSIT");
+
+      // Shielded Audio Cable [MISSING]
+      drawComponentCard(svg, 470, 740, 430, 120, "SHIELDED 2-CORE AUDIO CABLE", "3 Meters Flexible Shielded Cable &bull; Eliminates 50Hz hum & PWM interference between DACs and Amps", "missing", "⚠ MISSING (TO BUY)");
+
+      // =======================================================================
+      // ZONE 5: D/A CONVERSION & AMPLIFICATION (RIGHT)
+      // =======================================================================
+      drawSectionBox(svg, 950, 50, 500, 830, "ZONE 5: 3x PCM5102A DACS, 3x AMPS & 8-CH CROSSOVER", "#10b981");
+
+      // 3x PCM5102A DAC Modules
+      drawComponentCard(svg, 970, 80, 150, 160, "DAC #1 (FRONT L/R)", "PCM5102A (HW-280)\nDIN from Pico DOUT1\nSCK->GND (PLL ON)", "inhand", "✔ IN HAND");
+      drawComponentCard(svg, 1130, 80, 150, 160, "DAC #3 (CTR / SUB)", "PCM5102A (HW-280)\nDIN from Pico DOUT2\nSCK->GND (PLL ON)", "inhand", "✔ IN HAND");
+      drawComponentCard(svg, 1290, 80, 140, 160, "DAC #2 (SURROUND)", "PCM5102A (HW-280)\nDIN from Slave D27\nSCK->GND (PLL ON)", "inhand", "✔ IN HAND");
+
+      // 3x XH-M562 TPA3116D2 Amplifier Boards
+      drawComponentCard(svg, 970, 260, 150, 200, "AMP #1: FRONT L/R", "XH-M562 (2x50W BTL)\nCh 1: Front Left (30W)\nCh 2: Front Right (30W)\nPad 8: 24V | Pad 9: GND", "inhand", "✔ IN HAND");
+      drawComponentCard(svg, 1130, 260, 150, 200, "AMP #2: CTR / SUB", "XH-M562 (2x50W BTL)\nCh 3: Subwoofer (30W)\nCh 4: Center Voice + Mid\nPad 8: 24V | Pad 9: GND", "inhand", "✔ IN HAND");
+      drawComponentCard(svg, 1290, 260, 140, 200, "AMP #3: SURROUNDS", "XH-M562 (2x50W BTL)\nCh 5: Surround Domes\nCh 6: Piezo Sparkle\nPad 8: 24V | Pad 9: GND", "inhand", "✔ IN HAND");
+
+      // JIMSON Audio Film Capacitors (IN HAND)
+      drawComponentCard(svg, 970, 480, 460, 120, "JIMSON 250V CBB20 AXIAL AUDIO FILM CAPACITORS (IN HAND)", "• 2x 10µF 250V Film Cap: High-pass inline filter for Output #5 Center Voice (1–2 kHz)\n• 2x 4.7µF 250V Film Cap: High-pass protection for Output #3 & #4 Surround Silver Domes (4.2 kHz)\n• 2x 2.2µF 250V Film Cap: High-pass shimmer filter for Output #8 Piezo Sparkles (9.0 kHz)", "inhand", "✔ IN HAND (6 CAPS)");
+
+      // Discrete Speaker Outputs & 16x Binding Posts
+      drawComponentCard(svg, 970, 620, 460, 240, "REAR PANEL 8-OUTPUT ARRAY (16x JS-910B BINDING POSTS)", "• Out 1: Front Left (30W) &bull; Out 2: Front Right (30W) [Direct Full-Range BTL]\n• Out 3 & 4: Surround Left & Right Domes [Via JIMSON 4.7µF Film Caps]\n• Out 5: Center Voice 4\" Driver [Via JIMSON 10µF Film Cap]\n• Out 6: Sub-Bass Woofer [Summed Mono <100Hz Active Filter]\n• Out 7: Full-Range Mid Driver [Direct 20W Power]\n• Out 8: Piezo Super-Tweeters [Via JIMSON 2.2µF Film Caps]\n(12 Binding Posts In Hand + 4 In Transit from Robu)", "inhand", "✔ 12 IN HAND + ✈ 4 ORDERED");
+
+      // Draw Signal Connection Wires
+      drawWirePaths(svg);
+    }
+
+    // Helper: Section Box
+    function drawSectionBox(svg, x, y, w, h, title, strokeCol) {
+      svg.appendChild(createSvgElem("rect", { x: x, y: y, width: w, height: h, rx: 10, fill: "rgba(11,20,32,0.65)", stroke: strokeCol, "stroke-width": "1.5", "stroke-dasharray": "6 4", opacity: "0.85" }));
+      var t = createSvgElem("text", { x: x + 16, y: y + 20, fill: strokeCol, "font-size": "11", "font-weight": "bold", "letter-spacing": "1" });
+      t.textContent = title;
+      svg.appendChild(t);
+    }
+
+    // Helper: Component Card with Status Badge
+    function drawComponentCard(svg, x, y, w, h, title, desc, statusKey, badgeText) {
+      var g = createSvgElem("g", { class: "part-node part-" + statusKey });
+
+      var fillCol = "#0d1829";
+      var strokeCol = "#334155";
+      var badgeFill = "#15803d";
+      var badgeTxtCol = "#86efac";
+
+      if (statusKey === "missing") {
+        strokeCol = "#ef4444";
+        badgeFill = "#b91c1c";
+        badgeTxtCol = "#fecaca";
+      } else if (statusKey === "ordered") {
+        strokeCol = "#0284c7";
+        badgeFill = "#0369a1";
+        badgeTxtCol = "#bae6fd";
+      } else if (statusKey === "inhand") {
+        strokeCol = "#22c55e";
+        badgeFill = "#166534";
+        badgeTxtCol = "#bbf7d0";
+      }
+
+      // Outer Card Box
+      var rectAttrs = { x: x, y: y, width: w, height: h, rx: 6, fill: fillCol, stroke: strokeCol, "stroke-width": (statusKey === "missing" ? "2.5" : "1.5") };
+      if (statusKey === "missing") rectAttrs.class = "flag-missing";
+      g.appendChild(createSvgElem("rect", rectAttrs));
+
+      // Status Badge Tag at Top Right of Card
+      var badgeW = 95;
+      var badgeH = 18;
+      if (w > 200) badgeW = 125;
+      g.appendChild(createSvgElem("rect", { x: x + w - badgeW - 6, y: y + 6, width: badgeW, height: badgeH, rx: 3, fill: badgeFill }));
+      var bTxt = createSvgElem("text", { x: x + w - badgeW/2 - 6, y: y + 18, fill: badgeTxtCol, "font-size": "9", "font-weight": "bold", "text-anchor": "middle" });
+      bTxt.textContent = badgeText;
+      g.appendChild(bTxt);
+
+      // Card Title
+      var titleElem = createSvgElem("text", { x: x + 10, y: y + 20, fill: "#f8fafc", "font-size": "10.5", "font-weight": "bold" });
+      titleElem.textContent = title;
+      g.appendChild(titleElem);
+
+      // Card Multiline Description
+      var lines = desc.split("\n");
+      lines.forEach(function(line, idx) {
+        var dTxt = createSvgElem("text", { x: x + 10, y: y + 36 + (idx * 14), fill: "#94a3b8", "font-size": "8.5" });
+        dTxt.textContent = line;
+        g.appendChild(dTxt);
+      });
+
+      svg.appendChild(g);
+    }
+
+    // Helper: Draw Interconnecting Wires
+    function drawWirePaths(svg) {
+      // 24V Heavy Copper Bus
+      var pwrBus = createSvgElem("path", {
+        d: "M 215 125 L 235 125 M 310 125 L 420 125 L 420 225 L 450 225 M 350 270 L 350 340 M 405 225 L 970 290",
+        fill: "none", stroke: "#ef4444", "stroke-width": "2.5"
+      });
+      svg.appendChild(pwrBus);
+
+      // 5V Clean Logic Bus
+      var logicBus = createSvgElem("path", {
+        d: "M 215 390 L 450 390 L 450 320 L 470 320 M 400 390 L 400 550 L 235 550 M 450 390 L 970 120",
+        fill: "none", stroke: "#f97316", "stroke-width": "2"
+      });
+      svg.appendChild(logicBus);
+
+      // Clock Bus with Star Damping Resistors
+      var clkBus = createSvgElem("path", {
+        d: "M 675 250 L 695 250 M 900 250 L 970 150 M 900 270 L 1130 150 M 900 290 L 1290 150 M 675 320 L 900 320 L 900 580 L 470 580 M 675 420 L 400 420 L 400 760",
+        fill: "none", stroke: "#00d2ff", "stroke-width": "1.8", "stroke-dasharray": "4 2"
+      });
+      svg.appendChild(clkBus);
+    }
+
+    // Filter Controller
+    function setAuditFilter(filter) {
+      currentFilter = filter;
+      document.querySelectorAll(".filter-btn").forEach(function(b) {
+        b.className = "filter-btn";
+      });
+
+      var activeBtnId = "btn-flt-all";
+      if (filter === "missing") activeBtnId = "btn-flt-missing";
+      else if (filter === "ordered") activeBtnId = "btn-flt-ordered";
+      else if (filter === "inhand") activeBtnId = "btn-flt-inhand";
+      
+      var btn = document.getElementById(activeBtnId);
+      if (btn) {
+        if (filter === "all") btn.className = "filter-btn active-all";
+        else if (filter === "missing") btn.className = "filter-btn active-missing";
+        else if (filter === "ordered") btn.className = "filter-btn active-ordered";
+        else if (filter === "inhand") btn.className = "filter-btn active-inhand";
+      }
+
+      var partNodes = document.querySelectorAll(".part-node");
+      partNodes.forEach(function(node) {
+        if (filter === "all") {
+          node.setAttribute("class", "part-node highlighted-part");
+        } else {
+          if (node.classList.contains("part-" + filter)) {
+            node.setAttribute("class", "part-node highlighted-part");
+          } else {
+            node.setAttribute("class", "part-node dimmed-part");
+          }
+        }
+      });
+    }
+
+    // Legend
+    function renderLegend() {
+      var container = document.getElementById("legend-container");
+      while (container.firstChild) container.removeChild(container.firstChild);
+
+      LEGEND_DATA.forEach(function(item) {
+        var wrap = document.createElement("div");
+        wrap.className = "legend-item";
+
+        var line = document.createElement("span");
+        line.className = "legend-line";
+        line.style.backgroundColor = item[1];
+        if (item[2] === "dashed") {
+          line.style.borderTop = "2px dashed " + item[1];
+          line.style.backgroundColor = "transparent";
+        }
+        wrap.appendChild(line);
+
+        var lbl = document.createElement("span");
+        lbl.textContent = item[0];
+        wrap.appendChild(lbl);
+
+        container.appendChild(wrap);
+      });
+    }
+
+    // Table
+    function renderSpecTable() {
+      var table = document.getElementById("spec-table");
+      while (table.firstChild) table.removeChild(table.firstChild);
+
+      var thead = document.createElement("thead");
+      var hRow = document.createElement("tr");
+      ["Sub-System", "Part Name", "Hardware Spec", "Current Status", "Circuit Function", "Next Action / Procurement"].forEach(function(h) {
+        var th = document.createElement("th");
+        th.textContent = h;
+        hRow.appendChild(th);
+      });
+      thead.appendChild(hRow);
+      table.appendChild(thead);
+
+      var tbody = document.createElement("tbody");
+      PARTS_STATUS_DATA.forEach(function(row) {
+        var tr = document.createElement("tr");
+
+        // Styling based on status
+        var statusColor = "#4ade80";
+        var statusBg = "rgba(34, 197, 94, 0.1)";
+        if (row[4] === "missing") {
+          statusColor = "#f87171";
+          statusBg = "rgba(239, 68, 68, 0.15)";
+        } else if (row[4] === "ordered") {
+          statusColor = "#38bdf8";
+          statusBg = "rgba(56, 189, 248, 0.1)";
+        }
+
+        row.forEach(function(cell, idx) {
+          if (idx === 4) return; // skip status key
+          var td = document.createElement("td");
+          td.textContent = cell;
+
+          if (idx === 1) td.style.fontWeight = "bold";
+          if (idx === 3) {
+            td.style.color = statusColor;
+            td.style.fontWeight = "bold";
+            td.style.background = statusBg;
+          }
+          if (idx === 6 && row[4] === "missing") {
+            td.style.color = "#fca5a5";
+            td.style.fontWeight = "600";
+          }
+          tr.appendChild(td);
+        });
+
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+    }
+
+    // Notes
+    function renderNotes() {
+      var box = document.getElementById("notes-content");
+      while (box.firstChild) box.removeChild(box.firstChild);
+
+      var title = document.createElement("div");
+      title.style.fontWeight = "bold";
+      title.style.fontSize = "14px";
+      title.style.color = "#38bdf8";
+      title.style.marginBottom = "8px";
+      title.textContent = "Immediate Action Plan & Component Verification Notes:";
+      box.appendChild(title);
+
+      var ul = document.createElement("ul");
+      ul.style.margin = "0";
+      ul.style.paddingLeft = "20px";
+      ACTION_NOTES.forEach(function(note) {
+        var li = document.createElement("li");
+        li.textContent = note;
+        li.style.marginBottom = "6px";
+        ul.appendChild(li);
+      });
+      box.appendChild(ul);
+    }
+  </script>
+</body>
+</html>

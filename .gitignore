@@ -1,0 +1,11 @@
+# Ignore unrelated local files
+Recommendation-Letter-Shital-Auti.pdf
+ledger_after_autocorrect.png
+factory_ptn_grn_pipeline.png
+factory_ptn_grn_pipeline_v2.png
+simulation_drawer_preview.png
+tab1_factory_autocorrect.png
+tab1_factory_autocorrect_completed.png
+toolbar_autocorrect_btn.png
+.DS_Store
+Thumbs.db

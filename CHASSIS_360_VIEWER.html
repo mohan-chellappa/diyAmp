@@ -1,0 +1,1659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Copper Chimney V2 — 360° 3D Turntable & GIF Studio</title>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --card-bg: rgba(15, 23, 42, 0.88);
+      --copper: #d97706;
+      --copper-glow: #f59e0b;
+      --alu: #94a3b8;
+      --accent: #38bdf8;
+    }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: radial-gradient(circle at center, #1e293b 0%, #090d16 100%);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: #f8fafc;
+      user-select: none;
+      -webkit-user-select: none;
+      transition: background 0.4s ease;
+    }
+    #canvas-container {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+      touch-action: none;
+    }
+    .glass-panel {
+      background: var(--card-bg);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55);
+    }
+
+    /* Top HUD Header */
+    .hud-header {
+      position: absolute;
+      top: env(safe-area-inset-top, 16px);
+      left: 16px;
+      right: 16px;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      pointer-events: none;
+    }
+    .hud-header-left {
+      pointer-events: auto;
+    }
+    .hud-title {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      color: #f1f5f9;
+      text-transform: uppercase;
+      margin: 0;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .hud-subtitle {
+      font-size: 11px;
+      color: var(--copper-glow);
+      margin-top: 3px;
+      letter-spacing: 0.4px;
+    }
+    .hud-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(217, 119, 6, 0.22);
+      border: 1px solid rgba(217, 119, 6, 0.5);
+      color: #fcd34d;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 10px;
+      margin-top: 4px;
+    }
+    .hud-header-right {
+      pointer-events: auto;
+      display: flex;
+      gap: 8px;
+    }
+    .top-action-btn {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      color: #cbd5e1;
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+      transition: all 0.2s;
+    }
+    .top-action-btn:active {
+      transform: scale(0.96);
+      background: #334155;
+    }
+
+    /* Desktop View Presets Panel (Right Side) */
+    .hud-views {
+      position: absolute;
+      right: 16px;
+      top: 75px;
+      z-index: 10;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-width: 170px;
+    }
+    .hud-views-title {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #94a3b8;
+      margin-bottom: 2px;
+      text-align: center;
+    }
+    .view-btn {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #cbd5e1;
+      padding: 7px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .view-btn:active, .view-btn:hover {
+      background: #334155;
+      color: #fff;
+      border-color: #64748b;
+    }
+
+    /* Quick Info Box (Desktop Left) */
+    .hud-info-box {
+      position: absolute;
+      bottom: 85px;
+      left: 16px;
+      z-index: 10;
+      padding: 12px 14px;
+      max-width: 300px;
+      font-size: 11px;
+      line-height: 1.45;
+      color: #94a3b8;
+    }
+    .hud-info-box strong {
+      color: #e2e8f0;
+    }
+
+    /* Bottom Control Bar / Dock */
+    .hud-controls-dock {
+      position: absolute;
+      bottom: env(safe-area-inset-bottom, 16px);
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: nowrap;
+      justify-content: center;
+      max-width: 96vw;
+    }
+    .hud-btn {
+      background: #1e293b;
+      color: #cbd5e1;
+      border: 1px solid #334155;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      white-space: nowrap;
+      min-height: 40px;
+    }
+    .hud-btn:active {
+      transform: scale(0.95);
+    }
+    .hud-btn.active {
+      background: #b45309;
+      color: #fff;
+      border-color: #f59e0b;
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+    }
+    .hud-btn.primary {
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      border-color: #38bdf8;
+      color: #ffffff;
+    }
+    .hud-btn.gif-btn {
+      background: linear-gradient(135deg, #d97706, #b45309);
+      border-color: #fbbf24;
+      color: #ffffff;
+    }
+
+    /* Speed Slider Popover / Capsule */
+    .speed-capsule {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      color: #cbd5e1;
+      min-height: 40px;
+    }
+    .speed-capsule input[type="range"] {
+      width: 65px;
+      accent-color: #f59e0b;
+      cursor: pointer;
+    }
+
+    /* Bottom Sheets / Drawers (Mobile Optimized) */
+    .mobile-drawer-backdrop {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.65);
+      z-index: 50;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+    .mobile-drawer {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      max-height: 80vh;
+      background: #0f172a;
+      border-top: 1px solid #334155;
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+      z-index: 60;
+      padding: 18px 20px 30px 20px;
+      overflow-y: auto;
+      box-shadow: 0 -8px 32px rgba(0,0,0,0.8);
+      animation: slideUp 0.25s ease-out;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    .drawer-handle {
+      width: 40px;
+      height: 4px;
+      background: #475569;
+      border-radius: 2px;
+      margin: 0 auto 16px auto;
+    }
+    .drawer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .drawer-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #f59e0b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 0;
+    }
+    .drawer-close {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #94a3b8;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .drawer-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    /* Modal for GIF Recording / Display */
+    .gif-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.88);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+    }
+    .gif-modal-content {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 20px;
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.85);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .gif-preview-container {
+      width: 100%;
+      height: 240px;
+      background: #020617;
+      border-radius: 8px;
+      border: 1px solid #1e293b;
+      margin: 14px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .gif-preview-container img {
+      max-width: 100%;
+      max-height: 100%;
+      border-radius: 6px;
+      object-fit: contain;
+    }
+    .recording-spinner {
+      border: 4px solid #1e293b;
+      border-top: 4px solid #f59e0b;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 0.8s linear infinite;
+      margin: 16px auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Mobile Responsive Overrides */
+    @media (max-width: 768px) {
+      .hud-title {
+        font-size: 15px;
+      }
+      .hud-subtitle {
+        font-size: 10px;
+      }
+      .hud-badge {
+        display: none;
+      }
+      .hud-views {
+        display: none;
+      }
+      .hud-info-box {
+        display: none;
+      }
+      .desktop-only-btn {
+        display: none !important;
+      }
+      .hud-controls-dock {
+        width: 96%;
+        padding: 6px 8px;
+        gap: 5px;
+        overflow-x: auto;
+        justify-content: space-around;
+        border-radius: 30px;
+      }
+      .hud-btn {
+        padding: 6px 9px;
+        font-size: 11px;
+        min-height: 38px;
+      }
+      .hud-btn span.btn-text {
+        display: none;
+      }
+      .speed-capsule {
+        padding: 4px 6px;
+        font-size: 10px;
+        min-height: 38px;
+      }
+      .speed-capsule input[type="range"] {
+        width: 44px;
+      }
+    }
+
+    @media (min-width: 769px) {
+      .mobile-only-btn {
+        display: none !important;
+      }
+    }
+  </style>
+
+  <!-- Three.js + OrbitControls from reliable CDNs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+
+  <!-- 3D Canvas Target -->
+  <div id="canvas-container"></div>
+
+  <!-- Header Overlay -->
+  <div class="hud-header">
+    <div class="hud-header-left">
+      <h1 class="hud-title"><i class="fa fa-cube w3-text-amber"></i> Copper Chimney V2</h1>
+      <div class="hud-subtitle">360° Studio Showcase &bull; Amber Polycarbonate + External SMPS</div>
+      <div class="hud-badge"><i class="fa fa-wifi"></i> 360° RF-Transparent Panels</div>
+    </div>
+
+    <!-- Top Right Action Buttons -->
+    <div class="hud-header-right">
+      <a href="CHASSIS_CAD_DRAWINGS.html" class="top-action-btn desktop-only-btn" target="_blank" title="2D CAD Blueprint & DXF Laser/CNC Cutting Suite" style="text-decoration: none; border-color: rgba(245, 158, 11, 0.4);">
+        <i class="fa fa-pencil-square-o w3-text-amber"></i> CAD / DXF
+      </a>
+      <a href="TECHNICAL_EVALUATION.html" class="top-action-btn desktop-only-btn" target="_blank" title="Comprehensive Technical Evaluation Dossier" style="text-decoration: none;">
+        <i class="fa fa-shield w3-text-amber"></i> Tech Eval
+      </a>
+      <a href="PROJECT.html" class="top-action-btn desktop-only-btn" target="_blank" title="Project Specification Document" style="text-decoration: none;">
+        <i class="fa fa-book w3-text-cyan"></i> Spec
+      </a>
+      <a href="WIRING_DIAGRAM.html" class="top-action-btn desktop-only-btn" target="_blank" title="Pictorial Wiring Blueprint" style="text-decoration: none;">
+        <i class="fa fa-sitemap w3-text-green"></i> Wiring
+      </a>
+      <button class="top-action-btn mobile-only-btn" onclick="openViewsDrawer()">
+        <i class="fa fa-eye w3-text-amber"></i> Views
+      </button>
+      <button class="top-action-btn" onclick="cycleTheme()" title="Switch Studio Background Theme">
+        <i class="fa fa-paint-brush w3-text-cyan"></i> <span id="top-theme-label">Theme</span>
+      </button>
+      <button class="top-action-btn" onclick="openSpecsDrawer()">
+        <i class="fa fa-info-circle w3-text-amber"></i> Specs
+      </button>
+    </div>
+  </div>
+
+  <!-- Desktop Perspective Preset Views (Right Side) -->
+  <div class="hud-views glass-panel">
+    <div class="hud-views-title"><i class="fa fa-eye"></i> Preset Views</div>
+    <button class="view-btn" onclick="setView('iso')"><i class="fa fa-compass w3-text-amber"></i> Isometric</button>
+    <button class="view-btn" onclick="setView('front')"><i class="fa fa-tv w3-text-cyan"></i> Front LCD</button>
+    <button class="view-btn" onclick="setView('top')"><i class="fa fa-arrow-down w3-text-amber"></i> Top Chimney</button>
+    <button class="view-btn" onclick="setView('back')"><i class="fa fa-plug w3-text-red"></i> Rear I/O</button>
+    <button class="view-btn" onclick="setView('left')"><i class="fa fa-th w3-text-blue"></i> Side Fins</button>
+    <button class="view-btn" onclick="setView('wall_smps')"><i class="fa fa-bolt w3-text-green"></i> Wall SMPS</button>
+    
+    <div class="hud-views-title" style="margin-top: 6px;"><i class="fa fa-paint-brush"></i> Background</div>
+    <button class="view-btn" onclick="cycleTheme()"><i class="fa fa-magic w3-text-cyan"></i> <span id="view-theme-label">Cycle Theme</span></button>
+  </div>
+
+  <!-- Desktop Quick Info Box (Bottom Left) -->
+  <div class="hud-info-box glass-panel">
+    <div style="font-weight: 700; color: #f59e0b; margin-bottom: 4px; text-transform: uppercase;">Chassis Architecture</div>
+    <div><strong>Amber Polycarbonate (Default):</strong> High-contrast warm glow, 100% RF-transparent &amp; insulated I/O.</div>
+    <div><strong>AL6061 Aluminum (Left/Right):</strong> 10 fins/side primary heatsinks.</div>
+    <div><strong>Convection Core:</strong> 35mm OD central copper chimney + 4 corner tubes.</div>
+    <div><strong>Power:</strong> External Mean Well LRS-350 via GX16 4-Pin umbilical (parallel rails).</div>
+  </div>
+
+  <!-- Floating Mobile/Desktop Bottom Controls Dock -->
+  <div class="hud-controls-dock glass-panel">
+    <button id="btn-turntable" class="hud-btn active" onclick="toggleTurntable()" title="Toggle Auto-Rotation">
+      <i class="fa fa-repeat"></i> <span class="btn-text" id="turntable-label">Rotating</span>
+    </button>
+    
+    <div class="speed-capsule" title="Rotation Speed">
+      <i class="fa fa-tachometer w3-text-amber"></i>
+      <input type="range" id="speed-slider" min="1" max="25" value="5" oninput="updateSpeed(this.value)">
+    </div>
+
+    <!-- Default view: Amber -->
+    <button id="btn-poly" class="hud-btn active" onclick="togglePolycarbonateStyle()" title="Cycle Polycarbonate Finish">
+      <i class="fa fa-adjust w3-text-amber"></i> <span class="btn-text" id="poly-label">Amber</span>
+    </button>
+
+    <!-- Studio Theme Switcher Button -->
+    <button id="btn-theme" class="hud-btn" onclick="cycleTheme()" title="Switch Studio Background Theme">
+      <i class="fa fa-paint-brush w3-text-cyan"></i> <span class="btn-text" id="theme-label">Slate Studio</span>
+    </button>
+
+    <button class="hud-btn primary" onclick="resetCamera()" title="Reset Camera Angle">
+      <i class="fa fa-refresh"></i> <span class="btn-text">Reset</span>
+    </button>
+
+    <button class="hud-btn gif-btn" onclick="startGifCapture()" title="Generate Animated GIF">
+      <i class="fa fa-film"></i> <span class="btn-text">GIF</span>
+    </button>
+  </div>
+
+  <!-- Mobile Drawer Backdrop -->
+  <div id="drawer-backdrop" class="mobile-drawer-backdrop" onclick="closeAllDrawers()"></div>
+
+  <!-- Mobile Views Drawer -->
+  <div id="views-drawer" class="mobile-drawer">
+    <div class="drawer-handle"></div>
+    <div class="drawer-header">
+      <h3 class="drawer-title"><i class="fa fa-eye"></i> Camera Presets</h3>
+      <div class="drawer-close" onclick="closeAllDrawers()"><i class="fa fa-times"></i></div>
+    </div>
+    <div class="drawer-grid">
+      <button class="view-btn" onclick="setViewAndClose('iso')"><i class="fa fa-compass w3-text-amber"></i> Isometric Hero</button>
+      <button class="view-btn" onclick="setViewAndClose('front')"><i class="fa fa-tv w3-text-cyan"></i> Front LCD Display</button>
+      <button class="view-btn" onclick="setViewAndClose('top')"><i class="fa fa-arrow-down w3-text-amber"></i> Top Convection</button>
+      <button class="view-btn" onclick="setViewAndClose('back')"><i class="fa fa-plug w3-text-red"></i> Rear I/O &amp; GX16 4-Pin</button>
+      <button class="view-btn" onclick="setViewAndClose('left')"><i class="fa fa-th w3-text-blue"></i> Side Cooling Fins</button>
+      <button class="view-btn" onclick="setViewAndClose('wall_smps')"><i class="fa fa-bolt w3-text-green"></i> Wall-Mounted SMPS</button>
+    </div>
+
+    <div style="margin-top: 18px; margin-bottom: 8px; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">
+      <i class="fa fa-paint-brush"></i> Studio Backgrounds
+    </div>
+    <div class="drawer-grid">
+      <button class="view-btn" onclick="setThemeAndClose(0)"><i class="fa fa-circle" style="color: #38bdf8;"></i> Dark Slate</button>
+      <button class="view-btn" onclick="setThemeAndClose(1)"><i class="fa fa-circle" style="color: #f59e0b;"></i> Warm Walnut</button>
+      <button class="view-btn" onclick="setThemeAndClose(2)"><i class="fa fa-circle" style="color: #94a3b8;"></i> OLED Black</button>
+      <button class="view-btn" onclick="setThemeAndClose(3)"><i class="fa fa-circle" style="color: #60a5fa;"></i> Blueprint Navy</button>
+      <button class="view-btn" onclick="setThemeAndClose(4)"><i class="fa fa-circle" style="color: #f1f5f9;"></i> Daylight Studio</button>
+    </div>
+  </div>
+
+  <!-- Specs & Materials Drawer / Modal (Mobile & Desktop) -->
+  <div id="specs-drawer" class="mobile-drawer">
+    <div class="drawer-handle"></div>
+    <div class="drawer-header">
+      <h3 class="drawer-title"><i class="fa fa-info-circle"></i> Chassis Specifications</h3>
+      <div class="drawer-close" onclick="closeAllDrawers()"><i class="fa fa-times"></i></div>
+    </div>
+    <div style="font-size: 13px; color: #cbd5e1; line-height: 1.6;">
+      <div class="w3-padding-small w3-margin-bottom" style="background: rgba(30,41,59,0.7); border-radius: 8px; border-left: 3px solid #f59e0b;">
+        <strong class="w3-text-amber">Amber Polycarbonate (Default View):</strong><br>
+        Warm frosted amber panels provide high contrast against the dark studio background, softly diffusing the internal polished copper chimney and corner pillars while ensuring 100% RF transparency for Wi-Fi and Bluetooth.
+      </div>
+      <div class="w3-padding-small w3-margin-bottom" style="background: rgba(30,41,59,0.7); border-radius: 8px; border-left: 3px solid #38bdf8;">
+        <strong class="w3-text-cyan">2× AL6061 Aluminum Finned Flanks (Left &amp; Right):</strong><br>
+        5mm thick walls with 10 deep extruded cooling fins per side, acting as primary thermal conduction heatsinks for the three TPA3116D2 boards.
+      </div>
+      <div class="w3-padding-small w3-margin-bottom" style="background: rgba(30,41,59,0.7); border-radius: 8px; border-left: 3px solid #f97316;">
+        <strong class="w3-text-orange">Vertical Convective Thermosiphon:</strong><br>
+        Central 35mm OD polished copper chimney + 4× 15mm corner tubes open through-and-through, creating 5 natural draft flues. Electronics chamber is dust-sealed around tubes.
+      </div>
+      <div class="w3-padding-small" style="background: rgba(30,41,59,0.7); border-radius: 8px; border-left: 3px solid #22c55e;">
+        <strong class="w3-text-green">External Wall-Mounted SMPS:</strong><br>
+        Mean Well LRS-350-24 hanging on the wall delivers 24V 14.6A DC via braided umbilical cable with heavy-duty GX16 4-pin aviation connector.
+      </div>
+
+      <div style="margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap;">
+        <a href="CHASSIS_CAD_DRAWINGS.html" target="_blank" class="hud-btn dxf-btn" style="flex: 1; text-decoration: none; font-size: 11px;">
+          <i class="fa fa-pencil-square-o"></i> CAD / DXF
+        </a>
+        <a href="TECHNICAL_EVALUATION.html" target="_blank" class="hud-btn primary" style="flex: 1; text-decoration: none; font-size: 11px;">
+          <i class="fa fa-shield"></i> Tech Eval
+        </a>
+        <a href="PROJECT.html" target="_blank" class="hud-btn" style="flex: 1; text-decoration: none; font-size: 11px;">
+          <i class="fa fa-book"></i> Spec
+        </a>
+        <a href="WIRING_DIAGRAM.html" target="_blank" class="hud-btn" style="flex: 1; text-decoration: none; font-size: 11px;">
+          <i class="fa fa-sitemap"></i> Wiring
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- GIF Recording & Preview Modal -->
+  <div id="gif-modal" class="gif-modal">
+    <div class="gif-modal-content">
+      <h3 id="modal-title" style="margin: 0; color: #f59e0b; font-size: 16px; font-weight: 700;">
+        <i class="fa fa-circle-o-notch fa-spin"></i> Rendering 360° Slow Moving GIF...
+      </h3>
+      <p id="modal-desc" style="font-size: 12px; color: #94a3b8; margin: 8px 0;">
+        Capturing 36 rotation frames around the amplifier chassis...
+      </p>
+
+      <div class="gif-preview-container">
+        <div id="modal-loading-indicator">
+          <div class="recording-spinner"></div>
+          <div id="render-progress" style="font-size: 12px; color: #fcd34d; font-weight: 600;">0% Captured</div>
+        </div>
+        <img id="gif-result-img" style="display: none;" alt="360 Turntable GIF">
+      </div>
+
+      <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+        <a id="download-gif-link" class="hud-btn gif-btn" style="display: none; text-decoration: none;" download="Copper_Chimney_V2_Amber_360.gif">
+          <i class="fa fa-download"></i> Save GIF to Device
+        </a>
+        <button class="hud-btn" onclick="closeGifModal()"><i class="fa fa-times"></i> Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 3D SCENE SCRIPT WITH THREE.JS              -->
+  <!-- ========================================== -->
+  <script>
+    let scene, camera, renderer, controls;
+    let ampGroup, smpsGroup, umbilicalMesh;
+    let deskMesh, wallMesh, deskMat, wallMat;
+    let ambientLight, keyLight, rimLight, internalCopperLight;
+    let isRotating = true;
+    let rotationSpeed = 0.005;
+
+    // Polycarbonate finishes: 0 = Amber (Default), 1 = Smoked, 2 = Clear
+    let polyMaterial, polyStyleIndex = 0; 
+    let vuCanvas, vuCtx, vuTexture;
+
+    // Studio Background Themes
+    const studioThemes = [
+      {
+        name: 'Dark Slate',
+        bodyBg: 'radial-gradient(circle at center, #1e293b 0%, #090d16 100%)',
+        fogColor: 0x090d16,
+        fogDensity: 0.0018,
+        deskColor: 0x27272a,
+        wallColor: 0x0f172a,
+        ambientColor: 0xffffff,
+        ambientIntensity: 0.8,
+        keyColor: 0xfff7ed
+      },
+      {
+        name: 'Warm Walnut',
+        bodyBg: 'radial-gradient(circle at center, #451a03 0%, #1c0a00 60%, #0c0400 100%)',
+        fogColor: 0x1c0a00,
+        fogDensity: 0.002,
+        deskColor: 0x3d1a08,
+        wallColor: 0x230e04,
+        ambientColor: 0xfef3c7,
+        ambientIntensity: 0.85,
+        keyColor: 0xfbbf24
+      },
+      {
+        name: 'OLED Black',
+        bodyBg: '#000000',
+        fogColor: 0x000000,
+        fogDensity: 0.0015,
+        deskColor: 0x141414,
+        wallColor: 0x050505,
+        ambientColor: 0xffffff,
+        ambientIntensity: 0.65,
+        keyColor: 0xffffff
+      },
+      {
+        name: 'Blueprint Navy',
+        bodyBg: 'radial-gradient(circle at center, #1e3a8a 0%, #0f172a 70%, #020617 100%)',
+        fogColor: 0x020617,
+        fogDensity: 0.0018,
+        deskColor: 0x1e293b,
+        wallColor: 0x0b132b,
+        ambientColor: 0xe0f2fe,
+        ambientIntensity: 0.85,
+        keyColor: 0x38bdf8
+      },
+      {
+        name: 'Daylight Studio',
+        bodyBg: 'radial-gradient(circle at center, #f8fafc 0%, #e2e8f0 70%, #cbd5e1 100%)',
+        fogColor: 0xe2e8f0,
+        fogDensity: 0.0016,
+        deskColor: 0xd1d5db,
+        wallColor: 0xf1f5f9,
+        ambientColor: 0xffffff,
+        ambientIntensity: 1.15,
+        keyColor: 0xffffff
+      }
+    ];
+    let currentThemeIndex = 0;
+
+    // 1. Initialize Animated Dual Analog VU Meter Canvas Texture
+    function initVuTexture() {
+      vuCanvas = document.createElement('canvas');
+      vuCanvas.width = 512;
+      vuCanvas.height = 320;
+      vuCtx = vuCanvas.getContext('2d');
+      vuTexture = new THREE.CanvasTexture(vuCanvas);
+      updateVuMeter(0.4, 0.45);
+    }
+
+    function updateVuMeter(lVal, rVal) {
+      const ctx = vuCtx;
+      const w = vuCanvas.width;
+      const h = vuCanvas.height;
+
+      // Dark Vintage Background
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, 0, w, h);
+
+      // Amber/Gold glowing meter dial backgrounds
+      ctx.fillStyle = '#1c1917';
+      ctx.strokeStyle = '#d97706';
+      ctx.lineWidth = 3;
+
+      // Left Dial
+      ctx.strokeRect(16, 16, 230, 220);
+      ctx.fillStyle = '#fef3c7';
+      ctx.fillRect(18, 18, 226, 216);
+
+      // Right Dial
+      ctx.strokeRect(266, 16, 230, 220);
+      ctx.fillStyle = '#fef3c7';
+      ctx.fillRect(268, 18, 226, 216);
+
+      // Scales & Arc Markings (Left)
+      drawDialMarks(ctx, 133, 200, 140, 'FRONT LEFT (FL)');
+      drawNeedle(ctx, 133, 200, 140, lVal);
+
+      // Scales & Arc Markings (Right)
+      drawDialMarks(ctx, 383, 200, 140, 'FRONT RIGHT (FR)');
+      drawNeedle(ctx, 383, 200, 140, rVal);
+
+      // Bottom Status Strip
+      ctx.fillStyle = '#020617';
+      ctx.fillRect(0, 246, w, 74);
+      ctx.fillStyle = '#f59e0b';
+      ctx.font = 'bold 16px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('COPPER CHIMNEY V2 • 5.1 ANALOG AMP', w / 2, 272);
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = '12px sans-serif';
+      ctx.fillText('FL: 24.2V | FR: 24.2V | C: OK | SL/SR: OK | SUB: 80Hz', w / 2, 296);
+
+      if (vuTexture) vuTexture.needsUpdate = true;
+    }
+
+    function drawDialMarks(ctx, cx, cy, radius, label) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, -Math.PI * 0.85, -Math.PI * 0.15);
+      ctx.strokeStyle = '#78350f';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, -Math.PI * 0.35, -Math.PI * 0.15);
+      ctx.strokeStyle = '#dc2626';
+      ctx.lineWidth = 4;
+      ctx.stroke();
+
+      ctx.fillStyle = '#451a03';
+      ctx.font = 'bold 12px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(label, cx, cy - 40);
+      ctx.font = 'bold 10px monospace';
+      ctx.fillText('VU / dB', cx, cy - 25);
+      ctx.restore();
+    }
+
+    function drawNeedle(ctx, cx, cy, radius, value) {
+      ctx.save();
+      const minAngle = -Math.PI * 0.82;
+      const maxAngle = -Math.PI * 0.18;
+      const angle = minAngle + (maxAngle - minAngle) * Math.min(Math.max(value, 0), 1);
+
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx + Math.cos(angle) * (radius - 12), cy + Math.sin(angle) * (radius - 12));
+      ctx.strokeStyle = '#b91c1c';
+      ctx.lineWidth = 2.5;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+      ctx.fillStyle = '#1c1917';
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // 2. Initialize Three.js Scene
+    function init() {
+      const container = document.getElementById('canvas-container');
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const aspect = w / h;
+
+      scene = new THREE.Scene();
+      scene.fog = new THREE.FogExp2(studioThemes[0].fogColor, studioThemes[0].fogDensity);
+
+      const initialFov = aspect < 0.85 ? 54 : 40;
+      camera = new THREE.PerspectiveCamera(initialFov, aspect, 1, 3000);
+
+      if (aspect < 0.85) {
+        camera.position.set(340, 260, 470);
+      } else {
+        camera.position.set(280, 220, 360);
+      }
+
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+      renderer.setSize(w, h);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      container.appendChild(renderer.domElement);
+
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.06;
+      controls.rotateSpeed = 0.75;
+      controls.zoomSpeed = 0.85;
+      controls.maxPolarAngle = Math.PI / 2 + 0.08;
+      controls.minDistance = 140;
+      controls.maxDistance = 1100;
+      controls.target.set(0, 0, 0);
+
+      initVuTexture();
+      setupLighting();
+      buildEnvironment();
+      buildAmplifier();
+      buildWallMountedSmps();
+
+      window.addEventListener('resize', onWindowResize);
+      window.addEventListener('orientationchange', () => setTimeout(onWindowResize, 150));
+      animate();
+    }
+
+    function setupLighting() {
+      ambientLight = new THREE.AmbientLight(studioThemes[0].ambientColor, studioThemes[0].ambientIntensity);
+      scene.add(ambientLight);
+
+      keyLight = new THREE.DirectionalLight(studioThemes[0].keyColor, 1.4);
+      keyLight.position.set(300, 450, 350);
+      keyLight.castShadow = true;
+      keyLight.shadow.mapSize.width = 2048;
+      keyLight.shadow.mapSize.height = 2048;
+      keyLight.shadow.bias = -0.0001;
+      scene.add(keyLight);
+
+      rimLight = new THREE.DirectionalLight(0x38bdf8, 0.8);
+      rimLight.position.set(-350, 200, -300);
+      scene.add(rimLight);
+
+      internalCopperLight = new THREE.PointLight(0xf59e0b, 2.2, 320);
+      internalCopperLight.position.set(0, 10, 0);
+      scene.add(internalCopperLight);
+    }
+
+    function buildEnvironment() {
+      const deskGeo = new THREE.PlaneGeometry(1600, 1200);
+      deskMat = new THREE.MeshStandardMaterial({
+        color: studioThemes[0].deskColor,
+        roughness: 0.7,
+        metalness: 0.1
+      });
+      deskMesh = new THREE.Mesh(deskGeo, deskMat);
+      deskMesh.rotation.x = -Math.PI / 2;
+      deskMesh.position.y = -95;
+      deskMesh.receiveShadow = true;
+      scene.add(deskMesh);
+
+      const wallGeo = new THREE.PlaneGeometry(1600, 800);
+      wallMat = new THREE.MeshStandardMaterial({
+        color: studioThemes[0].wallColor,
+        roughness: 0.85,
+        metalness: 0.05
+      });
+      wallMesh = new THREE.Mesh(wallGeo, wallMat);
+      wallMesh.position.set(0, 305, -350);
+      wallMesh.receiveShadow = true;
+      scene.add(wallMesh);
+    }
+
+    // 3. Build Detailed Amplifier Model (160mm Cube)
+    function buildAmplifier() {
+      ampGroup = new THREE.Group();
+
+      const darkAluMat = new THREE.MeshStandardMaterial({
+        color: 0x18181b,
+        metalness: 0.85,
+        roughness: 0.28
+      });
+
+      const polishedCopperMat = new THREE.MeshStandardMaterial({
+        color: 0xd97706,
+        metalness: 0.95,
+        roughness: 0.18
+      });
+
+      // Default Polycarbonate Material: Amber (Warm Frosted Glow)
+      polyMaterial = new THREE.MeshPhysicalMaterial({
+        color: 0xf59e0b,
+        transmission: 0.65,
+        opacity: 0.82,
+        transparent: true,
+        roughness: 0.38,
+        ior: 1.58,
+        metalness: 0.08
+      });
+
+      const goldBrassMat = new THREE.MeshStandardMaterial({
+        color: 0xfbbf24,
+        metalness: 0.9,
+        roughness: 0.2
+      });
+
+      const blackInsulatorMat = new THREE.MeshStandardMaterial({
+        color: 0x09090b,
+        roughness: 0.5
+      });
+
+      const redTerminalMat = new THREE.MeshStandardMaterial({
+        color: 0xef4444,
+        roughness: 0.3
+      });
+
+      const wallThick = 6;
+      const cubeSize = 160;
+
+      // Left Wall Plate
+      const leftPlateGeo = new THREE.BoxGeometry(wallThick, cubeSize, cubeSize);
+      const leftPlate = new THREE.Mesh(leftPlateGeo, darkAluMat);
+      leftPlate.position.set(-cubeSize/2 + wallThick/2, 0, 0);
+      leftPlate.castShadow = true;
+      leftPlate.receiveShadow = true;
+      ampGroup.add(leftPlate);
+
+      // Right Wall Plate
+      const rightPlate = leftPlate.clone();
+      rightPlate.position.x = cubeSize/2 - wallThick/2;
+      ampGroup.add(rightPlate);
+
+      // 10 Fins per side
+      const finCount = 10;
+      const finSpacing = (cubeSize - 20) / (finCount - 1);
+      const finDepth = 14;
+      const finThick = 2.5;
+
+      for (let i = 0; i < finCount; i++) {
+        const zPos = - (cubeSize - 20)/2 + i * finSpacing;
+        const finGeo = new THREE.BoxGeometry(finDepth, cubeSize, finThick);
+        
+        const finL = new THREE.Mesh(finGeo, darkAluMat);
+        finL.position.set(-cubeSize/2 - finDepth/2 + 2, 0, zPos);
+        finL.castShadow = true;
+        ampGroup.add(finL);
+
+        const finR = new THREE.Mesh(finGeo, darkAluMat);
+        finR.position.set(cubeSize/2 + finDepth/2 - 2, 0, zPos);
+        finR.castShadow = true;
+        ampGroup.add(finR);
+      }
+
+      // Central Copper Chimney (35mm OD)
+      const chimneyOuterGeo = new THREE.CylinderGeometry(17.5, 17.5, cubeSize + 2, 32, 1, true);
+      const chimneyOuter = new THREE.Mesh(chimneyOuterGeo, polishedCopperMat);
+      chimneyOuter.castShadow = true;
+      ampGroup.add(chimneyOuter);
+
+      const chimneyInnerGeo = new THREE.CylinderGeometry(15, 15, cubeSize + 4, 32, 1, true);
+      const chimneyInnerMat = new THREE.MeshStandardMaterial({ color: 0x9a3412, metalness: 0.8, roughness: 0.4, side: THREE.BackSide });
+      const chimneyInner = new THREE.Mesh(chimneyInnerGeo, chimneyInnerMat);
+      ampGroup.add(chimneyInner);
+
+      // 4 Corner Copper Tubes (15mm OD)
+      const cornerOffset = 62;
+      const cornerTubeGeo = new THREE.CylinderGeometry(7.5, 7.5, cubeSize + 2, 24);
+      const cornerPositions = [
+        [-cornerOffset, -cornerOffset],
+        [-cornerOffset,  cornerOffset],
+        [ cornerOffset, -cornerOffset],
+        [ cornerOffset,  cornerOffset]
+      ];
+
+      cornerPositions.forEach(([x, z]) => {
+        const pillar = new THREE.Mesh(cornerTubeGeo, polishedCopperMat);
+        pillar.position.set(x, 0, z);
+        pillar.castShadow = true;
+        ampGroup.add(pillar);
+      });
+
+      // Internal TPA3116D2 PCB plates & heatsinks
+      const pcbMat = new THREE.MeshStandardMaterial({ color: 0x166534, roughness: 0.4 });
+      const heatsinkMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, metalness: 0.8, roughness: 0.2 });
+
+      for (let b = 0; b < 3; b++) {
+        const pcb = new THREE.Mesh(new THREE.BoxGeometry(4, 35, 45), pcbMat);
+        pcb.position.set(-68, -40 + b * 42, -20);
+        ampGroup.add(pcb);
+
+        const miniHeatsink = new THREE.Mesh(new THREE.BoxGeometry(6, 20, 20), heatsinkMat);
+        miniHeatsink.position.set(-64, -40 + b * 42, -20);
+        ampGroup.add(miniHeatsink);
+      }
+
+      // WAGO 221-415 Connectors
+      const wagoMat = new THREE.MeshStandardMaterial({ color: 0xf97316, roughness: 0.3 });
+      const wago1 = new THREE.Mesh(new THREE.BoxGeometry(18, 12, 24), wagoMat);
+      wago1.position.set(25, -55, 30);
+      ampGroup.add(wago1);
+
+      const wago2 = wago1.clone();
+      wago2.position.set(25, -55, 5);
+      ampGroup.add(wago2);
+
+      // 4700uF Bulk Cap
+      const capMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.5, roughness: 0.3 });
+      const cap = new THREE.Mesh(new THREE.CylinderGeometry(9, 9, 32, 20), capMat);
+      cap.position.set(40, -45, -35);
+      ampGroup.add(cap);
+
+      // Top Polycarbonate Plate (4mm)
+      const topPlateGeo = new THREE.BoxGeometry(cubeSize - 2, 4, cubeSize - 2);
+      const topPlate = new THREE.Mesh(topPlateGeo, polyMaterial);
+      topPlate.position.set(0, cubeSize/2, 0);
+      ampGroup.add(topPlate);
+
+      // Decorative Top Chimney Ring
+      const topRingGeo = new THREE.RingGeometry(17.5, 22, 32);
+      const topRing = new THREE.Mesh(topRingGeo, darkAluMat);
+      topRing.rotation.x = -Math.PI / 2;
+      topRing.position.set(0, cubeSize/2 + 2.5, 0);
+      ampGroup.add(topRing);
+
+      // Bottom Polycarbonate Plate + Elevated Feet
+      const bottomPlate = new THREE.Mesh(topPlateGeo, polyMaterial);
+      bottomPlate.position.set(0, -cubeSize/2, 0);
+      ampGroup.add(bottomPlate);
+
+      const footGeo = new THREE.CylinderGeometry(10, 10, 15, 20);
+      const footMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.3, roughness: 0.8 });
+      cornerPositions.forEach(([x, z]) => {
+        const foot = new THREE.Mesh(footGeo, footMat);
+        foot.position.set(x, -cubeSize/2 - 7.5, z);
+        foot.castShadow = true;
+        ampGroup.add(foot);
+      });
+
+      // Front Polycarbonate Bezel + Screen
+      const frontPlateGeo = new THREE.BoxGeometry(cubeSize - 2, cubeSize - 2, 4);
+      const frontPlate = new THREE.Mesh(frontPlateGeo, polyMaterial);
+      frontPlate.position.set(0, 0, cubeSize/2);
+      ampGroup.add(frontPlate);
+
+      const screenGeo = new THREE.PlaneGeometry(115, 72);
+      const screenMat = new THREE.MeshBasicMaterial({ map: vuTexture });
+      const screenMesh = new THREE.Mesh(screenGeo, screenMat);
+      screenMesh.position.set(0, 18, cubeSize/2 + 2.5);
+      ampGroup.add(screenMesh);
+
+      // Volume Knob
+      const knobGeo = new THREE.CylinderGeometry(16, 16, 14, 32);
+      const knob = new THREE.Mesh(knobGeo, darkAluMat);
+      knob.rotation.x = Math.PI / 2;
+      knob.position.set(0, -42, cubeSize/2 + 8);
+      knob.castShadow = true;
+      ampGroup.add(knob);
+
+      const notchGeo = new THREE.BoxGeometry(2, 6, 2);
+      const notch = new THREE.Mesh(notchGeo, polishedCopperMat);
+      notch.position.set(0, -32, cubeSize/2 + 15);
+      ampGroup.add(notch);
+
+      // Rear Polycarbonate Panel
+      const rearPlate = new THREE.Mesh(frontPlateGeo, polyMaterial);
+      rearPlate.position.set(0, 0, -cubeSize/2);
+      ampGroup.add(rearPlate);
+
+      // GX16 4-Pin Aviation Socket
+      const gx16BaseGeo = new THREE.CylinderGeometry(10, 10, 8, 24);
+      const gx16Mat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.95, roughness: 0.2 });
+      const gx16 = new THREE.Mesh(gx16BaseGeo, gx16Mat);
+      gx16.rotation.x = Math.PI / 2;
+      gx16.position.set(45, -10, -cubeSize/2 - 4);
+      ampGroup.add(gx16);
+
+      const gx16Ring = new THREE.Mesh(new THREE.TorusGeometry(10.5, 2, 12, 24), gx16Mat);
+      gx16Ring.position.set(45, -10, -cubeSize/2 - 6);
+      ampGroup.add(gx16Ring);
+
+      // 12 Binding Posts
+      const postRadius = 4.5;
+      const postLength = 14;
+      const postSpacing = 16;
+      const postStartX = -50;
+
+      for (let p = 0; p < 6; p++) {
+        const xPos = postStartX + p * postSpacing;
+        const postRed = new THREE.Mesh(new THREE.CylinderGeometry(postRadius, postRadius, postLength, 16), redTerminalMat);
+        postRed.rotation.x = Math.PI / 2;
+        postRed.position.set(xPos, 28, -cubeSize/2 - postLength/2);
+        ampGroup.add(postRed);
+
+        const postBlk = new THREE.Mesh(new THREE.CylinderGeometry(postRadius, postRadius, postLength, 16), blackInsulatorMat);
+        postBlk.rotation.x = Math.PI / 2;
+        postBlk.position.set(xPos, 0, -cubeSize/2 - postLength/2);
+        ampGroup.add(postBlk);
+      }
+
+      // AUX & USB-C
+      const auxJack = new THREE.Mesh(new THREE.CylinderGeometry(5, 5, 4, 16), goldBrassMat);
+      auxJack.rotation.x = Math.PI / 2;
+      auxJack.position.set(-35, -45, -cubeSize/2 - 2);
+      ampGroup.add(auxJack);
+
+      const usbcMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.8 });
+      const usbc = new THREE.Mesh(new THREE.BoxGeometry(10, 4, 3), usbcMat);
+      usbc.position.set(30, -45, -cubeSize/2 - 2);
+      ampGroup.add(usbc);
+
+      scene.add(ampGroup);
+    }
+
+    // 4. Build Wall-Mounted Mean Well LRS-350 & Umbilical Cable
+    function buildWallMountedSmps() {
+      smpsGroup = new THREE.Group();
+
+      const smpsMat = new THREE.MeshStandardMaterial({
+        color: 0xd1d5db,
+        metalness: 0.85,
+        roughness: 0.35
+      });
+
+      const smpsBody = new THREE.Mesh(new THREE.BoxGeometry(215, 115, 30), smpsMat);
+      smpsBody.position.set(120, 260, -330);
+      smpsBody.castShadow = true;
+      smpsGroup.add(smpsBody);
+
+      const labelMat = new THREE.MeshBasicMaterial({ color: 0xf3f4f6 });
+      const label = new THREE.Mesh(new THREE.PlaneGeometry(160, 80), labelMat);
+      label.position.set(130, 260, -314);
+      smpsGroup.add(label);
+
+      const termBlockMat = new THREE.MeshStandardMaterial({ color: 0x1f2937, roughness: 0.8 });
+      const termBlock = new THREE.Mesh(new THREE.BoxGeometry(25, 90, 20), termBlockMat);
+      termBlock.position.set(22, 260, -320);
+      smpsGroup.add(termBlock);
+
+      const ledMat = new THREE.MeshBasicMaterial({ color: 0x22c55e });
+      const led = new THREE.Mesh(new THREE.SphereGeometry(3, 16, 16), ledMat);
+      led.position.set(40, 290, -313);
+      smpsGroup.add(led);
+
+      scene.add(smpsGroup);
+
+      const curve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(25, 240, -320),
+        new THREE.Vector3(60, 150, -280),
+        new THREE.Vector3(80, 50, -180),
+        new THREE.Vector3(55, 0, -100),
+        new THREE.Vector3(45, -10, -84)
+      ]);
+
+      const tubeGeo = new THREE.TubeGeometry(curve, 40, 4.5, 12, false);
+      const cableMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.85 });
+      umbilicalMesh = new THREE.Mesh(tubeGeo, cableMat);
+      umbilicalMesh.castShadow = true;
+      scene.add(umbilicalMesh);
+    }
+
+    // 5. Animation Loop
+    let clock = new THREE.Clock();
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      const delta = clock.getDelta();
+      const time = clock.getElapsedTime();
+
+      if (isRotating && ampGroup) {
+        ampGroup.rotation.y += rotationSpeed;
+      }
+
+      const needleL = 0.45 + Math.sin(time * 6) * 0.2 + Math.sin(time * 14) * 0.12;
+      const needleR = 0.48 + Math.cos(time * 5.5) * 0.22 + Math.sin(time * 11) * 0.1;
+      updateVuMeter(needleL, needleR);
+
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    function onWindowResize() {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const aspect = w / h;
+
+      camera.aspect = aspect;
+
+      if (aspect < 0.85) {
+        camera.fov = 54;
+      } else if (aspect < 1.1) {
+        camera.fov = 46;
+      } else {
+        camera.fov = 40;
+      }
+
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+    }
+
+    // 6. HUD Controls & Background Theme Switching
+    function toggleTurntable() {
+      isRotating = !isRotating;
+      const btn = document.getElementById('btn-turntable');
+      const label = document.getElementById('turntable-label');
+      if (isRotating) {
+        btn.classList.add('active');
+        if (label) label.innerText = 'Rotating';
+      } else {
+        btn.classList.remove('active');
+        if (label) label.innerText = 'Paused';
+      }
+    }
+
+    function updateSpeed(val) {
+      rotationSpeed = (val / 1000);
+    }
+
+    function resetCamera() {
+      controls.reset();
+      const aspect = window.innerWidth / window.innerHeight;
+      if (aspect < 0.85) {
+        camera.position.set(340, 260, 470);
+      } else {
+        camera.position.set(280, 220, 360);
+      }
+      controls.target.set(0, 0, 0);
+      if (ampGroup) ampGroup.rotation.y = 0;
+    }
+
+    // Polycarbonate finishes: 0 = Amber (Default), 1 = Smoked, 2 = Clear
+    function togglePolycarbonateStyle() {
+      polyStyleIndex = (polyStyleIndex + 1) % 3;
+      const label = document.getElementById('poly-label');
+      const btn = document.getElementById('btn-poly');
+
+      if (polyStyleIndex === 0) {
+        // Amber (Default)
+        polyMaterial.color.setHex(0xf59e0b);
+        polyMaterial.transmission = 0.65;
+        polyMaterial.opacity = 0.82;
+        polyMaterial.roughness = 0.38;
+        if (label) label.innerText = 'Amber';
+        btn.classList.add('active');
+      } else if (polyStyleIndex === 1) {
+        // Smoked Tinted
+        polyMaterial.color.setHex(0x334155);
+        polyMaterial.transmission = 0.75;
+        polyMaterial.opacity = 0.7;
+        polyMaterial.roughness = 0.18;
+        if (label) label.innerText = 'Smoked';
+        btn.classList.remove('active');
+      } else {
+        // Clear Crystal
+        polyMaterial.color.setHex(0xffffff);
+        polyMaterial.transmission = 0.95;
+        polyMaterial.opacity = 0.4;
+        polyMaterial.roughness = 0.05;
+        if (label) label.innerText = 'Clear';
+        btn.classList.remove('active');
+      }
+    }
+
+    // Background Theme Management
+    function setTheme(index) {
+      currentThemeIndex = index % studioThemes.length;
+      const theme = studioThemes[currentThemeIndex];
+
+      // Update HTML Body Gradient
+      document.body.style.background = theme.bodyBg;
+
+      // Update Three.js Fog
+      if (scene && scene.fog) {
+        scene.fog.color.setHex(theme.fogColor);
+        scene.fog.density = theme.fogDensity;
+      }
+
+      // Update 3D Desk & Wall Materials
+      if (deskMat) deskMat.color.setHex(theme.deskColor);
+      if (wallMat) wallMat.color.setHex(theme.wallColor);
+
+      // Update Lights
+      if (ambientLight) {
+        ambientLight.color.setHex(theme.ambientColor);
+        ambientLight.intensity = theme.ambientIntensity;
+      }
+      if (keyLight) {
+        keyLight.color.setHex(theme.keyColor);
+      }
+
+      // Update Button Labels
+      const themeLabel = document.getElementById('theme-label');
+      if (themeLabel) themeLabel.innerText = theme.name;
+
+      const topThemeLabel = document.getElementById('top-theme-label');
+      if (topThemeLabel) topThemeLabel.innerText = theme.name;
+
+      const viewThemeLabel = document.getElementById('view-theme-label');
+      if (viewThemeLabel) viewThemeLabel.innerText = theme.name;
+    }
+
+    function cycleTheme() {
+      setTheme(currentThemeIndex + 1);
+    }
+
+    function setThemeAndClose(index) {
+      setTheme(index);
+      closeAllDrawers();
+    }
+
+    function setView(view) {
+      isRotating = false;
+      document.getElementById('btn-turntable').classList.remove('active');
+      const label = document.getElementById('turntable-label');
+      if (label) label.innerText = 'Paused';
+
+      if (ampGroup) ampGroup.rotation.y = 0;
+
+      const aspect = window.innerWidth / window.innerHeight;
+      const mobileDistMul = aspect < 0.85 ? 1.3 : 1.0;
+
+      let targetPos = new THREE.Vector3();
+      let targetLook = new THREE.Vector3(0, 0, 0);
+
+      switch(view) {
+        case 'iso':
+          targetPos.set(280 * mobileDistMul, 220 * mobileDistMul, 360 * mobileDistMul);
+          break;
+        case 'front':
+          targetPos.set(0, 10, 360 * mobileDistMul);
+          break;
+        case 'top':
+          targetPos.set(0, 380 * mobileDistMul, 20);
+          break;
+        case 'back':
+          targetPos.set(0, 10, -360 * mobileDistMul);
+          break;
+        case 'left':
+          targetPos.set(-380 * mobileDistMul, 20, 0);
+          break;
+        case 'wall_smps':
+          targetPos.set(180, 240, -50);
+          targetLook.set(120, 260, -330);
+          break;
+      }
+
+      camera.position.copy(targetPos);
+      controls.target.copy(targetLook);
+      controls.update();
+    }
+
+    function setViewAndClose(view) {
+      setView(view);
+      closeAllDrawers();
+    }
+
+    // Drawer Management
+    function openViewsDrawer() {
+      closeAllDrawers();
+      document.getElementById('drawer-backdrop').style.display = 'block';
+      document.getElementById('views-drawer').style.display = 'block';
+    }
+
+    function openSpecsDrawer() {
+      closeAllDrawers();
+      document.getElementById('drawer-backdrop').style.display = 'block';
+      document.getElementById('specs-drawer').style.display = 'block';
+    }
+
+    function closeAllDrawers() {
+      document.getElementById('drawer-backdrop').style.display = 'none';
+      document.getElementById('views-drawer').style.display = 'none';
+      document.getElementById('specs-drawer').style.display = 'none';
+    }
+
+    // 7. Client-Side 360° GIF Generator
+    function startGifCapture() {
+      isRotating = false;
+      document.getElementById('btn-turntable').classList.remove('active');
+      const label = document.getElementById('turntable-label');
+      if (label) label.innerText = 'Paused';
+
+      const modal = document.getElementById('gif-modal');
+      const title = document.getElementById('modal-title');
+      const desc = document.getElementById('modal-desc');
+      const loading = document.getElementById('modal-loading-indicator');
+      const resultImg = document.getElementById('gif-result-img');
+      const downloadLink = document.getElementById('download-gif-link');
+      const progressText = document.getElementById('render-progress');
+
+      modal.style.display = 'flex';
+      title.innerHTML = '<i class="fa fa-circle-o-notch fa-spin"></i> Rendering 360° Slow Moving GIF...';
+      desc.innerText = 'Capturing 36 rotation frames around the amplifier chassis...';
+      loading.style.display = 'block';
+      resultImg.style.display = 'none';
+      downloadLink.style.display = 'none';
+
+      const totalFrames = 36;
+      let currentFrame = 0;
+      const frameDelay = 8;
+      const capturedCanvasArray = [];
+
+      const capWidth = 320;
+      const capHeight = 240;
+      const capCanvas = document.createElement('canvas');
+      capCanvas.width = capWidth;
+      capCanvas.height = capHeight;
+      const capCtx = capCanvas.getContext('2d');
+
+      const aspect = window.innerWidth / window.innerHeight;
+      const mobileDistMul = aspect < 0.85 ? 1.25 : 1.0;
+      camera.position.set(280 * mobileDistMul, 200 * mobileDistMul, 340 * mobileDistMul);
+      controls.target.set(0, 0, 0);
+      controls.update();
+
+      function captureStep() {
+        if (currentFrame < totalFrames) {
+          ampGroup.rotation.y = (currentFrame / totalFrames) * Math.PI * 2;
+          renderer.render(scene, camera);
+
+          capCtx.drawImage(renderer.domElement, 0, 0, capWidth, capHeight);
+          const frameImgData = capCtx.getImageData(0, 0, capWidth, capHeight);
+          capturedCanvasArray.push(frameImgData);
+
+          currentFrame++;
+          const percent = Math.round((currentFrame / totalFrames) * 60);
+          progressText.innerText = `${percent}% Captured (${currentFrame}/${totalFrames})`;
+          setTimeout(captureStep, 15);
+        } else {
+          progressText.innerText = 'Encoding GIF89a Palette & LZW...';
+          setTimeout(() => {
+            encodeGifFromFrames(capturedCanvasArray, capWidth, capHeight, frameDelay);
+          }, 40);
+        }
+      }
+
+      captureStep();
+    }
+
+    function closeGifModal() {
+      document.getElementById('gif-modal').style.display = 'none';
+      toggleTurntable();
+    }
+
+    function encodeGifFromFrames(frames, width, height, delayCentisecs) {
+      const progressText = document.getElementById('render-progress');
+      progressText.innerText = 'Assembling animated GIF...';
+
+      const palette = generateStandardPalette();
+      let gifBytes = [];
+
+      writeString(gifBytes, 'GIF89a');
+      writeShort(gifBytes, width);
+      writeShort(gifBytes, height);
+      gifBytes.push(0b11110101);
+      gifBytes.push(0);
+      gifBytes.push(0);
+
+      for (let i = 0; i < 256; i++) {
+        if (i < palette.length) {
+          gifBytes.push(palette[i][0], palette[i][1], palette[i][2]);
+        } else {
+          gifBytes.push(0, 0, 0);
+        }
+      }
+
+      gifBytes.push(0x21, 0xFF, 0x0B);
+      writeString(gifBytes, 'NETSCAPE2.0');
+      gifBytes.push(0x03, 0x01, 0x00, 0x00, 0x00);
+
+      for (let f = 0; f < frames.length; f++) {
+        const imgData = frames[f].data;
+
+        gifBytes.push(0x21, 0xF9, 0x04);
+        gifBytes.push(0x04);
+        writeShort(gifBytes, delayCentisecs);
+        gifBytes.push(0);
+        gifBytes.push(0);
+
+        gifBytes.push(0x2C);
+        writeShort(gifBytes, 0);
+        writeShort(gifBytes, 0);
+        writeShort(gifBytes, width);
+        writeShort(gifBytes, height);
+        gifBytes.push(0);
+
+        const indices = new Uint8Array(width * height);
+        for (let p = 0; p < width * height; p++) {
+          const r = imgData[p * 4];
+          const g = imgData[p * 4 + 1];
+          const b = imgData[p * 4 + 2];
+          indices[p] = findClosestColor(r, g, b, palette);
+        }
+
+        lzwEncode(indices, 8, gifBytes);
+      }
+
+      gifBytes.push(0x3B);
+
+      const byteArray = new Uint8Array(gifBytes);
+      const blob = new Blob([byteArray], { type: 'image/gif' });
+      const gifUrl = URL.createObjectURL(blob);
+
+      document.getElementById('modal-loading-indicator').style.display = 'none';
+      const resultImg = document.getElementById('gif-result-img');
+      resultImg.src = gifUrl;
+      resultImg.style.display = 'block';
+
+      const downloadLink = document.getElementById('download-gif-link');
+      downloadLink.href = gifUrl;
+      downloadLink.style.display = 'inline-flex';
+
+      document.getElementById('modal-title').innerHTML = '<i class="fa fa-check-circle w3-text-green"></i> 360° Amber GIF Ready!';
+      document.getElementById('modal-desc').innerText = 'Smooth 360-degree slow moving turntable loop encoded successfully.';
+    }
+
+    function writeString(arr, str) {
+      for (let i = 0; i < str.length; i++) arr.push(str.charCodeAt(i));
+    }
+    function writeShort(arr, val) {
+      arr.push(val & 0xFF, (val >> 8) & 0xFF);
+    }
+
+    function generateStandardPalette() {
+      const pal = [];
+      for (let r = 0; r < 6; r++) {
+        for (let g = 0; g < 6; g++) {
+          for (let b = 0; b < 6; b++) {
+            pal.push([r * 51, g * 51, b * 51]);
+          }
+        }
+      }
+      pal.push([217, 119, 6], [245, 158, 11], [251, 191, 36], [180, 83, 9], [56, 189, 248], [239, 68, 68], [15, 23, 42]);
+      return pal;
+    }
+
+    function findClosestColor(r, g, b, palette) {
+      let bestDist = Infinity;
+      let bestIdx = 0;
+      for (let i = 0; i < palette.length; i++) {
+        const pr = palette[i][0];
+        const pg = palette[i][1];
+        const pb = palette[i][2];
+        const d = (r - pr) * (r - pr) + (g - pg) * (g - pg) + (b - pb) * (b - pb);
+        if (d < bestDist) {
+          bestDist = d;
+          bestIdx = i;
+        }
+      }
+      return bestIdx;
+    }
+
+    function lzwEncode(pixels, minCodeSize, output) {
+      output.push(minCodeSize);
+      const clearCode = 1 << minCodeSize;
+      const eoiCode = clearCode + 1;
+
+      let codeSize = minCodeSize + 1;
+      let maxCode = (1 << codeSize);
+      let nextCode = clearCode + 2;
+
+      let dict = new Map();
+      function resetDict() {
+        dict.clear();
+        for (let i = 0; i < clearCode; i++) {
+          dict.set(String(i), i);
+        }
+        codeSize = minCodeSize + 1;
+        maxCode = 1 << codeSize;
+        nextCode = clearCode + 2;
+      }
+      resetDict();
+
+      let accum = 0;
+      let accumBits = 0;
+      let packet = [];
+
+      function writeBits(code) {
+        accum |= (code << accumBits);
+        accumBits += codeSize;
+        while (accumBits >= 8) {
+          packet.push(accum & 0xFF);
+          accum >>= 8;
+          accumBits -= 8;
+          if (packet.length === 254) {
+            output.push(packet.length);
+            for (let b of packet) output.push(b);
+            packet = [];
+          }
+        }
+      }
+
+      writeBits(clearCode);
+      let cur = String(pixels[0]);
+
+      for (let i = 1; i < pixels.length; i++) {
+        const nextPixel = pixels[i];
+        const combined = cur + ',' + nextPixel;
+        if (dict.has(combined)) {
+          cur = combined;
+        } else {
+          writeBits(dict.get(cur));
+          if (nextCode < 4096) {
+            dict.set(combined, nextCode++);
+            if (nextCode >= maxCode && codeSize < 12) {
+              codeSize++;
+              maxCode = 1 << codeSize;
+            }
+          } else {
+            writeBits(clearCode);
+            resetDict();
+          }
+          cur = String(nextPixel);
+        }
+      }
+
+      writeBits(cur);
+      writeBits(eoiCode);
+
+      if (accumBits > 0) packet.push(accum & 0xFF);
+      if (packet.length > 0) {
+        output.push(packet.length);
+        for (let b of packet) output.push(b);
+      }
+      output.push(0);
+    }
+
+    window.onload = init;
+  </script>
+</body>
+</html>

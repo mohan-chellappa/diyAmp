@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AIAG-VDA Design FMEA, Process FMEA, and IATF 16949 Quality Control Plan Dashboard for DIY 5.1 Analog Amplifier Copper Chimney V2.">
+  <title>DIY 5.1 Analog Amplifier - Quality Management Dashboard (DFMEA, PFMEA, Control Plan)</title>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0b0f19;
+      --bg-card: #111827;
+      --bg-card-hover: #1f2937;
+      --border-color: #374151;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --accent-copper: #f59e0b;
+      --accent-cyan: #06b6d4;
+      --accent-blue: #3b82f6;
+      --accent-emerald: #10b981;
+      --accent-rose: #f43f5e;
+      --accent-purple: #8b5cf6;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      margin: 0;
+      padding: 0;
+      line-height: 1.5;
+    }
+
+    h1, h2, h3, h4, h5, .brand-font {
+      font-family: 'Outfit', sans-serif;
+      letter-spacing: -0.02em;
+    }
+
+    .mono-font {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Top Navigation Bar */
+    .top-nav {
+      background: rgba(17, 24, 39, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      display: inline-block;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: #ffffff;
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+    }
+
+    /* Hero Header */
+    .hero-banner {
+      background: linear-gradient(135deg, #111827 0%, #1e1b4b 50%, #111827 100%);
+      border-bottom: 1px solid var(--border-color);
+      padding: 36px 20px;
+    }
+
+    /* Metric Cards */
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 16px 20px;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent-copper);
+    }
+
+    .stat-val {
+      font-size: 1.85rem;
+      font-weight: 800;
+      font-family: 'Outfit', sans-serif;
+      line-height: 1.2;
+    }
+
+    .stat-lbl {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Tab Switcher */
+    .tab-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 8px;
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid transparent;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn:hover {
+      color: #fff;
+      background: var(--bg-card);
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, #d97706, #f59e0b);
+      color: #111827;
+      border-color: #f59e0b;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+    }
+
+    /* Filter Controls */
+    .filter-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .search-input {
+      background: #0f172a;
+      border: 1px solid var(--border-color);
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      min-width: 260px;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--accent-copper);
+    }
+
+    .pill-btn {
+      background: #1e293b;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .pill-btn:hover, .pill-btn.active {
+      background: var(--accent-copper);
+      color: #111827;
+      font-weight: 600;
+      border-color: var(--accent-copper);
+    }
+
+    /* Data Tables */
+    .table-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      overflow-x: auto;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      text-align: left;
+    }
+
+    .data-table th {
+      background: #1f2937;
+      color: #93c5fd;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      padding: 12px 14px;
+      border-bottom: 2px solid var(--border-color);
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .data-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #1f2937;
+      color: #e5e7eb;
+      vertical-align: top;
+    }
+
+    .data-table tr:hover td {
+      background: #1e293b;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+
+    .badge-critical {
+      background: rgba(244, 63, 94, 0.2);
+      color: #fb7185;
+      border: 1px solid #f43f5e;
+    }
+
+    .badge-safety {
+      background: rgba(139, 92, 246, 0.2);
+      color: #c084fc;
+      border: 1px solid #8b5cf6;
+    }
+
+    .badge-significant {
+      background: rgba(245, 158, 11, 0.2);
+      color: #fcd34d;
+      border: 1px solid #f59e0b;
+    }
+
+    .badge-standard {
+      background: rgba(16, 185, 129, 0.2);
+      color: #6ee7b7;
+      border: 1px solid #10b981;
+    }
+
+    .badge-rpn-high {
+      background: rgba(239, 68, 68, 0.25);
+      color: #f87171;
+      font-weight: 800;
+      border: 1px solid #ef4444;
+    }
+
+    .badge-rpn-med {
+      background: rgba(245, 158, 11, 0.25);
+      color: #fbbf24;
+      font-weight: 800;
+      border: 1px solid #f59e0b;
+    }
+
+    .badge-rpn-low {
+      background: rgba(16, 185, 129, 0.25);
+      color: #34d399;
+      font-weight: 800;
+      border: 1px solid #10b981;
+    }
+
+    /* 6-Point Gate Cards */
+    .gate-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .gate-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 16px 20px;
+      position: relative;
+    }
+
+    .gate-card.passed {
+      border-left: 5px solid var(--accent-emerald);
+    }
+
+    .gate-step-no {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--accent-copper);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .gate-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .gate-spec {
+      background: #0f172a;
+      border: 1px solid #334155;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      color: #38bdf8;
+      margin-bottom: 8px;
+    }
+
+    .gate-desc {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+    }
+
+    /* Print Styles */
+    @media print {
+      body {
+        background: #fff;
+        color: #000;
+      }
+      .top-nav, .filter-panel, .tab-bar, .no-print {
+        display: none !important;
+      }
+      .data-table th {
+        background: #eee !important;
+        color: #000 !important;
+      }
+      .data-table td {
+        color: #000 !important;
+        border-bottom: 1px solid #ccc !important;
+      }
+      .stat-card, .table-container, .gate-card {
+        border: 1px solid #999 !important;
+        box-shadow: none !important;
+        background: #fff !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <nav class="top-nav w3-container w3-padding" id="mainNavbar">
+    <div class="w3-row" style="display: flex; align-items: center; justify-content: space-between;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-size: 1.25rem; font-weight: 800; color: var(--accent-copper); font-family: 'Outfit';">COPPER CHIMNEY V2</span>
+        <span class="badge badge-standard" id="stdBadge">AIAG-VDA / IATF 16949</span>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px;" id="navLinksContainer">
+        <a href="file:///d:/Documents/DIY%20Amp/PROJECT.html" class="nav-link" id="lnkProject">Master Overview</a>
+        <a href="file:///d:/Documents/DIY%20Amp/CIRCUIT_DIAGRAM.html" class="nav-link" id="lnkCircuit">Circuit Schematic</a>
+        <a href="file:///d:/Documents/DIY%20Amp/WIRING_DIAGRAM.html" class="nav-link" id="lnkWiring">Wiring Layout</a>
+        <a href="file:///d:/Documents/DIY%20Amp/PRINTABLE_WIRING_DIAGRAM.html" class="nav-link" id="lnkPrintWiring">Blueprint PDF</a>
+        <a href="file:///d:/Documents/DIY%20Amp/QUALITY_MANAGEMENT_FMEA_CP.md" class="nav-link active" id="lnkQmd">Quality Report (MD)</a>
+        <a href="file:///d:/Documents/DIY%20Amp/ASSEMBLY_MANUAL.html" class="nav-link" id="lnkAssembly">Assembly Manual</a>
+        <a href="file:///d:/Documents/DIY%20Amp/CHASSIS_360_VIEWER.html" class="nav-link" id="lnk360">360° Viewer</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Banner -->
+  <header class="hero-banner" id="heroBanner">
+    <div class="w3-content" style="max-width: 1400px;">
+      <div class="w3-row">
+        <div class="w3-col l8 m12">
+          <div style="color: var(--accent-copper); font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;">
+            Comprehensive Reliability Engineering & Quality Assurance
+          </div>
+          <h1 style="margin: 0; font-size: 2.2rem; font-weight: 800; color: #ffffff;">
+            DIY 5.1 Analog Amplifier - Quality Management Dashboard
+          </h1>
+          <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 8px; margin-bottom: 0;">
+            Integrated Design FMEA (DFMEA), Process FMEA (PFMEA), and IATF 16949 Quality Control Plan for the 6-Channel TPA3116D2 / ESP32-S3 audiophile cube.
+          </p>
+        </div>
+        <div class="w3-col l4 m12" style="display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-top: 16px;">
+          <button class="pill-btn active" id="btnPrintReport" style="padding: 10px 18px; font-size: 0.9rem;">
+            🖨️ Print Quality Audit Report
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick KPI Stats Row -->
+      <div class="w3-row-padding" style="margin-top: 24px; margin-left: -8px; margin-right: -8px;" id="kpiStatsRow">
+        <div class="w3-col l2 m4 s6 w3-margin-bottom">
+          <div class="stat-card">
+            <div class="stat-val" style="color: var(--accent-cyan);" id="statDfmeaCount">12</div>
+            <div class="stat-lbl">DFMEA Modes</div>
+          </div>
+        </div>
+        <div class="w3-col l2 m4 s6 w3-margin-bottom">
+          <div class="stat-card">
+            <div class="stat-val" style="color: var(--accent-copper);" id="statPfmeaCount">10</div>
+            <div class="stat-lbl">PFMEA Operations</div>
+          </div>
+        </div>
+        <div class="w3-col l2 m4 s6 w3-margin-bottom">
+          <div class="stat-card">
+            <div class="stat-val" style="color: var(--accent-rose);" id="statInitialRpn">420</div>
+            <div class="stat-lbl">Initial Max RPN</div>
+          </div>
+        </div>
+        <div class="w3-col l2 m4 s6 w3-margin-bottom">
+          <div class="stat-card">
+            <div class="stat-val" style="color: var(--accent-emerald);" id="statFinalRpn">36</div>
+            <div class="stat-lbl">Final Max RPN</div>
+          </div>
+        </div>
+        <div class="w3-col l2 m4 s6 w3-margin-bottom">
+          <div class="stat-card">
+            <div class="stat-val" style="color: #a78bfa;" id="statRiskDrop">89.7%</div>
+            <div class="stat-lbl">Risk Reduction</div>
+          </div>
+        </div>
+        <div class="w3-col l2 m4 s6 w3-margin-bottom">
+          <div class="stat-card">
+            <div class="stat-val" style="color: #38bdf8;" id="statGates">100%</div>
+            <div class="stat-lbl">Poka-Yoke Protected</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Dashboard -->
+  <main class="w3-content w3-padding" style="max-width: 1400px; margin-top: 20px;">
+
+    <!-- Navigation Tabs -->
+    <div class="tab-bar" id="tabBar">
+      <button class="tab-btn active" id="tabBtnDfmea" data-tab="dfmea">Design FMEA (DFMEA)</button>
+      <button class="tab-btn" id="tabBtnPfmea" data-tab="pfmea">Process FMEA (PFMEA)</button>
+      <button class="tab-btn" id="tabBtnControlPlan" data-tab="controlPlan">Quality Control Plan (CP)</button>
+      <button class="tab-btn" id="tabBtnGate" data-tab="gate">Pre-Power 6-Point Gate (OP-90)</button>
+      <button class="tab-btn" id="tabBtnMatrix" data-tab="matrix">Risk Matrix & RPN Reduction</button>
+    </div>
+
+    <!-- Interactive Filter Panel -->
+    <div class="filter-panel" id="filterPanel">
+      <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+        <input type="text" id="searchInput" class="search-input" placeholder="Search failure modes, causes, controls...">
+        <div style="display: flex; gap: 6px;" id="filterPills">
+          <button class="pill-btn active" id="pillAll" data-filter="all">All Records</button>
+          <button class="pill-btn" id="pillHighRpn" data-filter="high-rpn">High Initial RPN (≥ 200)</button>
+          <button class="pill-btn" id="pillCriticalSev" data-filter="crit-sev">Critical Severity (≥ 9)</button>
+        </div>
+      </div>
+      <div style="color: var(--text-muted); font-size: 0.85rem;" id="tableCounterText">
+        Showing records
+      </div>
+    </div>
+
+    <!-- Tab Section 1: DFMEA -->
+    <section id="sectionDfmea" class="tab-content">
+      <div class="table-container">
+        <table class="data-table" id="tableDfmea">
+          <!-- Dynamically populated via DOM API -->
+        </table>
+      </div>
+    </section>
+
+    <!-- Tab Section 2: PFMEA -->
+    <section id="sectionPfmea" class="tab-content" style="display: none;">
+      <div class="table-container">
+        <table class="data-table" id="tablePfmea">
+          <!-- Dynamically populated via DOM API -->
+        </table>
+      </div>
+    </section>
+
+    <!-- Tab Section 3: Control Plan -->
+    <section id="sectionControlPlan" class="tab-content" style="display: none;">
+      <div class="table-container">
+        <table class="data-table" id="tableControlPlan">
+          <!-- Dynamically populated via DOM API -->
+        </table>
+      </div>
+    </section>
+
+    <!-- Tab Section 4: 6-Point Pre-Power Gate (OP-90) -->
+    <section id="sectionGate" class="tab-content" style="display: none;">
+      <div class="w3-card w3-padding" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px;">
+        <h3 style="color: var(--accent-copper); margin-top: 0; font-size: 1.3rem;">
+          Mandatory Pre-Power Quality Gate (Operation OP-90 / CP-90)
+        </h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px;">
+          To eliminate catastrophic silicon destruction and electrical hazards, mains power MUST NOT be connected until all 6 cold DC measurements pass on the physical checklist card.
+        </p>
+        <div class="gate-grid" id="gateCardsContainer">
+          <!-- Dynamically populated via DOM API -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab Section 5: Risk Matrix & Reduction Summary -->
+    <section id="sectionMatrix" class="tab-content" style="display: none;">
+      <div class="w3-row-padding" style="margin-left: -8px; margin-right: -8px;">
+        <div class="w3-col l6 m12 w3-margin-bottom">
+          <div class="stat-card" style="padding: 24px;">
+            <h3 style="margin-top: 0; color: var(--accent-copper); font-size: 1.25rem;">DFMEA Risk Reduction Summary</h3>
+            <p style="color: var(--text-muted); font-size: 0.88rem;">
+              Comparison of pre-mitigation risk vs. final engineering risk after mechanical isolation, reservoir filtering, and firmware limiting.
+            </p>
+            <div class="table-container" style="box-shadow: none; margin-top: 12px;">
+              <table class="data-table" id="tableDfmeaSummary">
+                <!-- Dynamically populated via DOM API -->
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="w3-col l6 m12 w3-margin-bottom">
+          <div class="stat-card" style="padding: 24px;">
+            <h3 style="margin-top: 0; color: var(--accent-cyan); font-size: 1.25rem;">PFMEA Risk Reduction Summary</h3>
+            <p style="color: var(--text-muted); font-size: 0.88rem;">
+              Comparison of manufacturing risk before tooling vs. after calibrated strippers, torque drivers, and automated burn-in fixtures.
+            </p>
+            <div class="table-container" style="box-shadow: none; margin-top: 12px;">
+              <table class="data-table" id="tablePfmeaSummary">
+                <!-- Dynamically populated via DOM API -->
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="w3-container w3-padding-32 w3-center" style="border-top: 1px solid var(--border-color); margin-top: 40px; color: var(--text-muted); font-size: 0.85rem;" id="mainFooter">
+    <div style="font-family: 'Outfit'; font-weight: 700; color: #e5e7eb; margin-bottom: 6px;">
+      DIY 5.1 ANALOG AMPLIFIER QUALITY MANAGEMENT SYSTEM
+    </div>
+    <div>Conforming to AIAG-VDA 1st Edition FMEA & IATF 16949 Standards</div>
+    <div style="margin-top: 8px;">
+      <a href="file:///d:/Documents/DIY%20Amp/DFMEA.tsv" style="color: var(--accent-copper); text-decoration: none; margin: 0 8px;">DFMEA.tsv</a> |
+      <a href="file:///d:/Documents/DIY%20Amp/PFMEA.tsv" style="color: var(--accent-copper); text-decoration: none; margin: 0 8px;">PFMEA.tsv</a> |
+      <a href="file:///d:/Documents/DIY%20Amp/CONTROL_PLAN.tsv" style="color: var(--accent-copper); text-decoration: none; margin: 0 8px;">CONTROL_PLAN.tsv</a> |
+      <a href="file:///d:/Documents/DIY%20Amp/quality_assurance_schema.sql" style="color: var(--accent-copper); text-decoration: none; margin: 0 8px;">quality_assurance_schema.sql</a>
+    </div>
+  </footer>
+
+  <!-- Vanilla JavaScript Application Logic (Strictly DOM API - NO HTML strings in JS) -->
+  <script>
+    (function () {
+      "use strict";
+
+      // 2D Array Datasets (Pure data representation, separating SQL/data from UI)
+      const DFMEA_HEADERS = [
+        "ID", "Subsystem", "Item Function", "Potential Failure Mode", "Effects",
+        "S", "Potential Causes", "O", "Current Controls", "D", "Initial RPN",
+        "Recommended Action & Status", "Rev S", "Rev O", "Rev D", "Final RPN"
+      ];
+
+      const DFMEA_DATA = [
+        [
+          "DFM-01", "Acoustic Output", "BTL Speaker Negative Return Isolation",
+          "Speaker negative lead shorts to chassis ground",
+          "BTL H-bridge lower MOSFET overcurrent, catastrophic TPA3116 die destruction",
+          10, "Metal-to-chassis contact through conducting rear plate or loose terminal washers",
+          7, "Isolate binding posts from aluminum frame; bench DMM check", 6, 420,
+          "Mount all 12 binding posts into 4mm non-conductive Polycarbonate rear panel; eliminate all conductive chassis path",
+          10, 1, 2, 20
+        ],
+        [
+          "DFM-02", "Thermal Management", "Amplifier Heat Dissipation",
+          "TPA3116 die temperature exceeds 150°C junction limit",
+          "Amplifier thermal shutdown, audio dropout, long-term silicon aging",
+          8, "Insufficient passive heatsinking surface, trapped heat inside sealed chamber",
+          8, "Internal aluminum heat plates; thermal imaging during bench prototyping", 5, 320,
+          "Direct flat clamping of TPA3116 chips to AL6061 finned side plates with Arctic MX-4 paste + 35mm central convective copper chimney",
+          8, 2, 2, 32
+        ],
+        [
+          "DFM-03", "Power Supply", "24V DC Rail Stability",
+          "Voltage drop/sag (> 3.5V) during high-transient bass hits",
+          "Audible clipping, distortion, low-frequency rail pumping, brownout",
+          7, "High internal resistance on long umbilical or inadequate reservoir capacitance",
+          7, "Standard Mean Well SMPS internal output caps; scope transient capture", 5, 245,
+          "Bridge 4700uF 50V Low-ESR bulk electrolytic reservoir capacitor directly across WAGO 221-415 bus bars",
+          7, 2, 2, 28
+        ],
+        [
+          "DFM-04", "Audio Processing", "ESP32-S3 Digital Audio Supervisory",
+          "Digital full-scale (0 dBFS) clipping into DAC inputs",
+          "Audible harmonic distortion (> 10% THD), harsh treble clipping",
+          7, "Overdriven software gain scaling or volume multiplier mismatch in firmware",
+          8, "Default ESP-IDF audio volume algorithm; listening tests at full volume", 4, 224,
+          "Firmware hard limit set at 83.6% voltage amplitude ceiling (70% power ceiling = 210W peak unclipped)",
+          7, 1, 2, 14
+        ],
+        [
+          "DFM-05", "I2S Bus", "Clock Synchronization across 3x PCM5102A",
+          "Bit Clock (BCK) or Word Select (LRCK) skew and jitter",
+          "Channel phase misalignment, digital clicks, DAC decoding failure",
+          6, "Long daisy-chained clock traces with excessive parasitic capacitance (> 50pF)",
+          6, "Standard ribbon cable interconnects; logic analyzer verification", 5, 180,
+          "Star clock distribution bus with trace runs < 60mm; stack DACs directly behind ESP32 front panel",
+          6, 2, 2, 24
+        ],
+        [
+          "DFM-06", "Logic Regulation", "XL4015 DC-DC Buck Step-Down",
+          "Buck output drifts above 5.5V logic absolute maximum",
+          "Permanent overvoltage burnout of ESP32-S3, DACs, and ADC",
+          9, "Potentiometer wiper vibration drift or failure under heat",
+          6, "Single multi-turn trimming potentiometer; bench DMM probe before plug", 5, 270,
+          "Pre-calibrate buck trimmer with thread-locking compound; add zener clamp overvoltage crowbar on 5V logic bus",
+          9, 2, 2, 36
+        ],
+        [
+          "DFM-07", "Analog Audio", "3.5mm Stereo AUX Line Input",
+          "Ground loop 50Hz/100Hz mains hum induced into analog signal",
+          "Audible hum through all 6 speakers, degraded SNR (< 75 dB)",
+          6, "Multiple ground return paths between input jack, DAC ground, and power ground",
+          7, "Common ground return wire; bench acoustic noise floor analysis", 4, 168,
+          "Isolated audio ground path; shielded 2-core cable grounded strictly at DAC AGND end only",
+          6, 2, 2, 24
+        ],
+        [
+          "DFM-08", "Acoustics & PSU", "Mean Well LRS-350-24 Fan Operation",
+          "Internal SMPS fan switches ON during quiet listening sessions",
+          "Acoustic background fan noise (38 dBA) destroys listening ambiance",
+          5, "Thermal load on internal SMPS heatsink exceeds 50°C fan threshold",
+          8, "Internal SMPS fan thermostat; sound level meter at 1m distance", 3, 120,
+          "External wall mounting of SMPS outside cube + ESP32 70% power ceiling keeps PSU load <= 60% (fan remains off)",
+          5, 2, 2, 20
+        ],
+        [
+          "DFM-09", "Wireless RF", "2.4 GHz Wi-Fi & Bluetooth 5.0 LE",
+          "Faraday cage attenuation drops RF signal (> 25 dB loss)",
+          "Bluetooth audio dropouts, loss of web dashboard connectivity, erratic playback",
+          7, "All-metal aluminum chassis enclosure completely shielding internal antenna",
+          9, "Internal PCB antenna on ESP32-S3; RF RSSI signal strength mapping", 4, 252,
+          "Adopt 4-Face Polycarbonate enclosure (Front, Back, Top, Bottom) with dielectric constant er ≈ 2.9 (RF transparent)",
+          7, 1, 2, 14
+        ],
+        [
+          "DFM-10", "Enclosure Mechanics", "Polycarbonate Chimney Exhaust Interface",
+          "Thermal softening or optical haze on top plate around copper pipe",
+          "Top panel distortion, loosened chimney seal, aesthetic degradation",
+          6, "Continuous conductive heat transfer from central copper pipe (> 65°C) to plastic",
+          6, "Direct contact between copper pipe and laser cutout; thermal soak test", 4, 144,
+          "Insert high-temperature silicone rubber isolation grommet between copper chimney and polycarbonate top plate",
+          6, 2, 2, 24
+        ],
+        [
+          "DFM-11", "Electrical Safety", "230V AC Mains Insulation",
+          "Mains Live conductor loose wire touches external chassis",
+          "Electric shock hazard, user injury, ground fault trip",
+          10, "Vibration loosening screw terminal or insulation abrasion on sharp metal edge",
+          5, "Standard terminal cover on SMPS; Hipot dielectric test 1500V AC", 4, 200,
+          "3A fused IEC socket with heat-shrink insulated boot + M4 star-washer chassis ground bonding (< 0.1 ohm)",
+          10, 1, 2, 20
+        ],
+        [
+          "DFM-12", "DAC Initialization", "PCM5102A Start-Up Synchronization",
+          "DAC powers up before external system clock stabilizes",
+          "Pop noise on power-on, soft-mute stuck in muted state",
+          7, "Asynchronous power-up between XL4015 buck and ESP32 I2S clock generator",
+          7, "Internal PCM5102A power-on reset circuit; scope timing trace", 4, 196,
+          "Hardwire PCM5102A SCK pin directly to GND to enable internal PLL; ESP32 initializes audio bus before unmuting",
+          7, 2, 2, 28
+        ]
+      ];
+
+      const PFMEA_HEADERS = [
+        "Op No", "Process Step", "Process Function", "Potential Failure Mode", "Effects",
+        "S", "Potential Causes", "O", "Current Controls", "D", "Initial RPN",
+        "Recommended Action & Status", "Rev S", "Rev O", "Rev D", "Final RPN"
+      ];
+
+      const PFMEA_DATA = [
+        [
+          "OP-10", "Chassis Machining & Cutouts", "CNC laser cut Polycarbonate panels & mill AL6061 fin plates",
+          "Micro-cracks, burrs, or dimensional mismatch (> 0.5mm) on cutouts",
+          "Air leaks around chimney, binding post loose fit, cracked plastic panel",
+          6, "Feed rate too fast, incorrect laser power setting, dull CNC milling bit",
+          6, "Machine tool calibration and test cut; vernier caliper check", 4, 144,
+          "Use specialized single-flute plastic endmill; anneal laser-cut edges; verify cutouts against go/no-go acrylic gauge",
+          6, 2, 2, 24
+        ],
+        [
+          "OP-20", "Thermal Interface Dispensing", "Apply Arctic MX-4 thermal compound on TPA3116 chips",
+          "Uneven paste spread, air voids, or paste dry-out (> 50 micron layer)",
+          "Elevated thermal resistance (> 3.5°C/W), localized hot spot, thermal throttling",
+          8, "Improper dot dispensing pattern, inadequate clamping pressure on PCB",
+          7, "Visual estimation of paste blob; thermal camera soak test", 5, 280,
+          "Standardize on 'X-pattern' micro-dispensing (0.05g per chip); torque-controlled M3 nylon clamping standoffs (0.35 N·m)",
+          8, 2, 2, 32
+        ],
+        [
+          "OP-30", "PCB Solder Pad Assembly", "Hand solder 10-pad terminals on XH-M562 boards & dev headers",
+          "Solder bridge between adjacent pads (Pads 4/5 or 8/9) or cold joint",
+          "Short circuit on 24V rail, speaker BTL short to GND, high contact resistance",
+          9, "Excess solder feed, iron tip too wide, dwelling > 5s on pad, oxidation",
+          8, "Standard rosin solder; 10x magnifying loupe & DMM continuity probe", 5, 360,
+          "Use 0.8mm 63/37 leaded solder, temperature-controlled iron at 350°C, strict 3-second dwell rule, backlight inspection jig",
+          9, 2, 2, 36
+        ],
+        [
+          "OP-40", "Power Bus Wire Splicing", "Strip and insert 16/20 AWG wires into WAGO 221-415 blocks",
+          "Wire strip length out of spec (< 10mm or > 12mm), loose wire strand",
+          "Exposed live conductor shorting, high resistance joint, wire slip-out",
+          8, "Manual stripping without calibrated wire stripper or length guide",
+          7, "Visual check against WAGO housing mark; post-insertion 30N pull test", 4, 224,
+          "Use automatic calibrated wire stripper with built-in 11mm mechanical stop; verify lever snaps 100% flat",
+          8, 1, 2, 16
+        ],
+        [
+          "OP-50", "Signal Harness Crimping", "Crimp JST-XH terminals and prepare 2-core shielded audio cable",
+          "Loose crimp pin, open circuit, nicked drain wire, broken shield braid",
+          "Audio channel dropout, ground loop hum, intermittent crackling",
+          7, "Improper crimp die size, excessive operator hand pressure, wire tension",
+          7, "Manual ratchet crimper (SN-01BM); tug test & DMM loop resistance check", 4, 196,
+          "Use calibrated ratcheting crimper with exact AWG die; slide 2:1 dual-wall heat-shrink over shield ground drain transition",
+          7, 2, 2, 28
+        ],
+        [
+          "OP-60", "Rear Panel I/O Dressing", "Press-fit and bolt 12x JS-910B binding posts in Polycarbonate",
+          "Loose binding post rotation, stripped M8 plastic threads, cracked panel",
+          "Terminal spins when tightening speaker cable, inter-terminal short",
+          8, "Over-torquing metal nuts on plastic panel without torque limiter",
+          6, "Operator manual wrench tightening; torque wrench inspection", 4, 192,
+          "Use double nylon lock washers; apply torque-limiting nut runner preset to 0.8 N·m; press-fit flat keyed D-hole profile",
+          8, 1, 2, 16
+        ],
+        [
+          "OP-70", "Buck Converter Calibration", "Trim XL4015 buck converter multi-turn pot to 5.00V output",
+          "Output voltage set incorrectly (> 5.5V or < 4.75V) before connecting loads",
+          "Overvoltage destruction of ESP32 and DACs, or brownout boot failure",
+          9, "Operator forgets to trim under 24V input or reads incorrect multimeter scale",
+          6, "Manual multimeter adjustment; two-stage power-up protocol", 4, 216,
+          "Mandatory two-stage assembly work instruction: lock trimmer with green Loctite 290 threadlocker after measuring 5.00V ± 0.05V",
+          9, 1, 2, 18
+        ],
+        [
+          "OP-80", "Firmware Flashing & Config", "Flash ESP32-S3 firmware with volume limiter and I2S registers",
+          "Incorrect firmware branch flashed or volume ceiling limiter disabled",
+          "TPA3116 driven into 10% THD clipping; PSU overload (> 250W); fan starts",
+          7, "Operator flashing wrong build target or corrupted non-volatile settings",
+          5, "Automated esptool.py flash script; boot log diagnostic verification", 3, 105,
+          "Single master automated flash script with checksum verification; hardcoded 83.6% voltage ceiling compiled into binary firmware",
+          7, 1, 2, 14
+        ],
+        [
+          "OP-90", "Pre-Power Bench Checkout", "Perform electrical continuity and ground isolation test protocol",
+          "Power applied while short circuit or BTL-to-chassis fault exists",
+          "Smoked components, blown SMPS fuse, permanent damage to prototype",
+          10, "Rushing assembly sequence, skipping pre-power test checklist",
+          6, "Paper checklist filled by operator; 6-step resistance sign-off", 3, 180,
+          "Implement physical lock-out tag on mains IEC inlet until all 6 resistance checkpoints (> 10k bus, < 0.1 ground) are verified and signed",
+          10, 1, 2, 20
+        ],
+        [
+          "OP-100", "Acoustic & Burn-In Test", "Run 6-channel full load sweep at 70% power into 4 ohm dummy loads",
+          "High harmonic distortion, channel imbalance, excessive thermal rise",
+          7, "Defective batch capacitor, cold solder joint failing under thermal stress",
+          5, "Acoustic sweep generator and 6x 100W 4 ohm load bank; FLIR camera", 3, 105,
+          "Automated 30-minute burn-in sequence: log thermal equilibrium (< 52°C) and THD+N (< 0.05%) on all 6 channels simultaneously",
+          7, 1, 2, 14
+        ]
+      ];
+
+      const CP_HEADERS = [
+        "Plan ID", "Op No", "Process Name", "Machine / Device / Jig", "Type",
+        "Controlled Characteristic", "Class", "Specification Tolerance",
+        "Measurement Technique", "Sample Size / Freq", "Control Method", "Reaction Plan"
+      ];
+
+      const CP_DATA = [
+        [
+          "CP-10", "OP-10", "Chassis Machining & Cutouts", "CO2 Laser Cutter / CNC Mill with single-flute acrylic cutter",
+          "Product", "Polycarbonate panel perimeter, cutouts & AL6061 fin hole spacing",
+          "SC (Significant)", "±0.15 mm on mounting holes, ±0.20 mm on chimney aperture",
+          "Digital Vernier Caliper & Go/No-Go Acrylic Gauge Jig", "100% of panels (1st piece + every panel)",
+          "CNC program lock, calibrated fixture stop blocks",
+          "Quarantine panel; reject piece if tolerance exceeded; readjust laser offset and re-cut"
+        ],
+        [
+          "CP-20", "OP-20", "Thermal Interface Dispensing", "Micro-syringe precision dispenser & Torq-Master 0.35 N·m driver",
+          "Process", "Arctic MX-4 thermal compound volume & standoff clamp torque",
+          "SC (Significant)", "0.05 g ± 0.01 g per chip; 0.35 N·m ± 0.03 N·m screw torque",
+          "High-precision micro-scale & calibrated torque driver", "100% of amplifier board mounts (3 boards/unit)",
+          "Visual verification of full-die squeeze-out; torque click sign-off",
+          "Wipe clean with 99% Isopropanol (IPA), re-dispense paste and re-torque to spec"
+        ],
+        [
+          "CP-30", "OP-30", "PCB Solder Pad Assembly", "TS100 / Hakko FX-888D soldering station (350°C, 2.4D chisel)",
+          "Product", "XH-M562 10-pad solder fillets, pad wetness, zero solder bridging",
+          "CC (Critical)", "100% shiny concave meniscus, zero bridge, pad dwell < 3.0 s",
+          "10x Optical Inspection Loupe & DMM Adjacent Pad Probe", "100% solder pads (10 pads × 3 boards = 30 pads)",
+          "Backlight jig bridge inspection; DMM continuity test between adjacent pads",
+          "Desolder bridge with fluxed copper wick, clean with IPA, re-inspect under 10x magnification"
+        ],
+        [
+          "CP-40", "OP-40", "Power Bus Wire Splicing", "Automatic wire stripper with 11mm mechanical stop",
+          "Process", "16 AWG / 20 AWG strip length and WAGO lever full closure",
+          "CC (Critical)", "Strip length 11.0 mm (+1.0/-0.5 mm); pull force > 30 N",
+          "Visual strip gauge template & calibrated mechanical pull tester", "100% of conductor terminations (10 wires/unit)",
+          "WAGO molded strip guide check; 100% manual tug test",
+          "Re-strip wire if copper exposed outside housing; re-terminate if pull test yields movement"
+        ],
+        [
+          "CP-50", "OP-50", "Signal Harness Crimping", "IWISS / Engineer PA-09 ratchet crimp tool with dual-wall heatshrink",
+          "Process", "JST-XH terminal crimp height, retention force & shield grounding",
+          "SC (Significant)", "Retention force > 15 N; 100% heatshrink insulation over drain wire",
+          "Calibrated tensile pull gauge & DMM loop resistance (< 0.05 Ω)", "100% of signal harnesses (3 I2S + 1 AUX)",
+          "Ratchet cycle-lock tool prevents partial crimps; heat-gun thermal indicator",
+          "Cut off defective crimp pin, re-strip conductor, crimp fresh JST terminal, re-heatshrink"
+        ],
+        [
+          "CP-60", "OP-60", "Rear Panel I/O Dressing", "Keyed D-hole punch jig & 0.8 N·m preset torque socket",
+          "Product", "JS-910B binding post alignment, anti-rotation & Polycarbonate stress",
+          "CC (Critical)", "Rotational slip torque > 1.2 N·m; panel tightening torque 0.8 N·m ± 0.05 N·m",
+          "Calibrated digital torque wrench & angle vernier", "100% of binding posts (12 terminals/unit)",
+          "Double nylon washer lock; D-shaped anti-rotation cutout profile",
+          "Disassemble post; replace sheared nylon washer or cracked polycarbonate panel; re-torque"
+        ],
+        [
+          "CP-70", "OP-70", "Buck Converter Calibration", "Regulated bench DC power supply (24.0V) & 4.5-digit true-RMS DMM",
+          "Product", "XL4015 DC-DC Buck converter output voltage under no load and 1A load",
+          "CC (Critical)", "5.00 V DC ± 0.05 V (range: 4.95 V to 5.05 V DC max)",
+          "Fluke 87V 4.5-digit DMM connected to buck output test pads", "100% of buck modules prior to brain wiring",
+          "Two-stage power checkout; Loctite 290 threadlocker on potentiometer",
+          "Quarantine buck module; do not connect to ESP32/DAC rail; readjust trimmer or discard defective module"
+        ],
+        [
+          "CP-80", "OP-80", "Firmware Flashing & Config", "Automated esptool.py flash fixture with checksum validator",
+          "Process", "ESP32-S3 firmware build SHA256, 83.6% voltage ceiling & I2S clocks",
+          "SC (Significant)", "SHA256 match; volume ceiling hardcoded <= 83.6% (210W peak unclipped)",
+          "Serial monitor automated boot script & SHA256 log audit", "100% of ESP32-S3 boards during assembly",
+          "Automated flash runner with automatic pass/fail bit in NVS",
+          "Reflash firmware binary; if hash mismatch persists, erase flash completely and re-upload golden image"
+        ],
+        [
+          "CP-90", "OP-90", "Pre-Power Bench Checkout", "Fluke 87V Multimeter (Resistance & Insulation modes)",
+          "Product", "Cold DC resistance on 24V rail, 5V rail & BTL-to-chassis isolation",
+          "YS (Safety)", "24V bus > 10 kΩ; 5V bus > 2 kΩ; BTL speaker (-) to chassis = OPEN (∞ Ω)",
+          "DMM 2-wire resistance & 500V DC insulation tester on speaker posts", "100% of completed amplifier assemblies before AC plug-in",
+          "Physical lock-out tag on IEC mains socket; mandatory 6-point checklist card",
+          "Do NOT energize unit; locate short with thermal cam on 1V current-limited bench supply; rectify wiring error"
+        ],
+        [
+          "CP-100", "OP-100", "Acoustic & Burn-In Test", "6-channel 4Ω 100W non-inductive load bank, FLIR E4, Audio Analyzer",
+          "Product", "THD+N (< 0.05% @ 1kHz 10W), SNR (> 102 dB), max heatsink temp (< 52°C)",
+          "SC (Significant)", "THD+N < 0.05%; heatsink rise < 25°C above ambient; idle current < 120 mA",
+          "Audio Precision / QuantAsylum QA403 analyzer & FLIR thermal camera", "100% of production amplifiers for 30 minutes continuous",
+          "Automated test script records JSON/TSV log; thermal camera continuous alarm",
+          "Halt test immediately if temp > 55°C or THD > 0.1%; trace to defective chip or cold solder joint; rework board"
+        ]
+      ];
+
+      const GATE_CHECKS = [
+        {
+          no: "Check 1 (YS)",
+          title: "Protective Earth (PE) Chassis Ground Bond",
+          spec: "Resistance < 0.10 Ω (IEC Socket Ground to AL6061 Fins)",
+          desc: "Verified with Fluke 87V true 4-wire low-ohm mode. Guarantees safety fault clearing in event of 230V AC mains breach."
+        },
+        {
+          no: "Check 2 (CC)",
+          title: "24V DC Bulk Power Rail Resistance",
+          spec: "Cold Resistance > 10.0 kΩ across WAGO 221-415 Bus",
+          desc: "Initial meter dip while 4700µF capacitor charges, followed by steady rise past 10 kΩ. Proves zero short circuit on main power rail."
+        },
+        {
+          no: "Check 3 (CC)",
+          title: "5.00V DC Logic Bus Resistance",
+          spec: "Cold Resistance > 2.0 kΩ across XL4015 Output",
+          desc: "Proves zero short across ESP32-S3, 3x PCM5102A DACs, and PCM1808 ADC logic power feeds prior to energizing."
+        },
+        {
+          no: "Check 4 (CC/YS)",
+          title: "BTL Speaker Output Chassis Isolation",
+          spec: "Resistance = OPEN (∞ Ω) on ALL 12 Binding Posts to Chassis",
+          desc: "CRITICAL: Any continuity between speaker negative (-) terminals and chassis will instantly blow the lower MOSFETs. 100% isolation enforced by polycarbonate rear panel."
+        },
+        {
+          no: "Check 5 (SC)",
+          title: "Adjacent Channel-to-Channel Isolation",
+          spec: "Resistance > 100 kΩ between Adjacent Binding Post Pairs",
+          desc: "Prevents inter-channel cross-shorting caused by swarf or wire strands between adjacent speaker output binding posts."
+        },
+        {
+          no: "Check 6 (SC)",
+          title: "3.5mm AUX Shield AGND Isolation",
+          spec: "Resistance > 1.0 MΩ between AUX Shield and Aluminum Frame",
+          desc: "Guarantees dedicated single-point star grounding to eliminate ground loop 50Hz/100Hz mains hum through audio inputs."
+        }
+      ];
+
+      // State Management
+      let currentTab = "dfmea";
+      let activeFilter = "all";
+      let searchQuery = "";
+
+      // Pure DOM Helper Functions (No HTML Strings)
+      function clearElement(el) {
+        while (el.firstChild) {
+          el.removeChild(el.firstChild);
+        }
+      }
+
+      function createTextCell(text, className) {
+        const td = document.createElement("td");
+        if (className) td.className = className;
+        td.textContent = text;
+        return td;
+      }
+
+      function createRpnBadge(val) {
+        const span = document.createElement("span");
+        span.className = "badge ";
+        const num = Number(val);
+        if (num >= 200) {
+          span.className += "badge-rpn-high";
+        } else if (num >= 100) {
+          span.className += "badge-rpn-med";
+        } else {
+          span.className += "badge-rpn-low";
+        }
+        span.textContent = String(val);
+        return span;
+      }
+
+      function createSevBadge(val) {
+        const span = document.createElement("span");
+        span.className = "badge ";
+        const num = Number(val);
+        if (num >= 9) {
+          span.className += "badge-critical";
+        } else if (num >= 7) {
+          span.className += "badge-significant";
+        } else {
+          span.className += "badge-standard";
+        }
+        span.textContent = String(val);
+        return span;
+      }
+
+      function createClassBadge(val) {
+        const span = document.createElement("span");
+        span.className = "badge ";
+        if (val.indexOf("Critical") !== -1) {
+          span.className += "badge-critical";
+        } else if (val.indexOf("Safety") !== -1) {
+          span.className += "badge-safety";
+        } else if (val.indexOf("Significant") !== -1) {
+          span.className += "badge-significant";
+        } else {
+          span.className += "badge-standard";
+        }
+        span.textContent = val;
+        return span;
+      }
+
+      // Render Table Helper
+      function renderTable(tableEl, headers, rows, isPfmea, isCp) {
+        clearElement(tableEl);
+
+        // Header Row
+        const thead = document.createElement("thead");
+        const headerTr = document.createElement("tr");
+        for (let i = 0; i < headers.length; i++) {
+          const th = document.createElement("th");
+          th.textContent = headers[i];
+          headerTr.appendChild(th);
+        }
+        thead.appendChild(headerTr);
+        tableEl.appendChild(thead);
+
+        // Body Rows
+        const tbody = document.createElement("tbody");
+        let visibleCount = 0;
+
+        for (let r = 0; r < rows.length; r++) {
+          const rowData = rows[r];
+
+          // Apply Search Filter
+          if (searchQuery.trim() !== "") {
+            const query = searchQuery.toLowerCase();
+            let rowMatches = false;
+            for (let c = 0; c < rowData.length; c++) {
+              if (String(rowData[c]).toLowerCase().indexOf(query) !== -1) {
+                rowMatches = true;
+                break;
+              }
+            }
+            if (!rowMatches) continue;
+          }
+
+          // Apply Pill Filter
+          if (!isCp) {
+            const sev = Number(rowData[5]);
+            const initRpn = Number(rowData[10]);
+
+            if (activeFilter === "high-rpn" && initRpn < 200) {
+              continue;
+            }
+            if (activeFilter === "crit-sev" && sev < 9) {
+              continue;
+            }
+          }
+
+          visibleCount++;
+          const tr = document.createElement("tr");
+
+          for (let c = 0; c < rowData.length; c++) {
+            const val = rowData[c];
+            const td = document.createElement("td");
+
+            if (isCp) {
+              // Control Plan Formatting
+              if (c === 0 || c === 1) {
+                td.className = "mono-font";
+                td.style.fontWeight = "600";
+                td.textContent = String(val);
+              } else if (c === 6) {
+                td.appendChild(createClassBadge(String(val)));
+              } else {
+                td.textContent = String(val);
+              }
+            } else {
+              // FMEA Formatting
+              if (c === 0) {
+                td.className = "mono-font";
+                td.style.fontWeight = "600";
+                td.textContent = String(val);
+              } else if (c === 5) {
+                td.appendChild(createSevBadge(val));
+              } else if (c === 10) {
+                td.appendChild(createRpnBadge(val));
+              } else if (c === 12) {
+                td.appendChild(createSevBadge(val));
+              } else if (c === 15) {
+                td.appendChild(createRpnBadge(val));
+              } else {
+                td.textContent = String(val);
+              }
+            }
+
+            tr.appendChild(td);
+          }
+          tbody.appendChild(tr);
+        }
+
+        tableEl.appendChild(tbody);
+        return visibleCount;
+      }
+
+      // Render 6-Point Gate Cards
+      function renderGateCards() {
+        const container = document.getElementById("gateCardsContainer");
+        clearElement(container);
+
+        for (let i = 0; i < GATE_CHECKS.length; i++) {
+          const item = GATE_CHECKS[i];
+          const card = document.createElement("div");
+          card.className = "gate-card passed";
+
+          const stepNo = document.createElement("div");
+          stepNo.className = "gate-step-no";
+          stepNo.textContent = item.no;
+          card.appendChild(stepNo);
+
+          const title = document.createElement("div");
+          title.className = "gate-title";
+          title.textContent = item.title;
+          card.appendChild(title);
+
+          const spec = document.createElement("div");
+          spec.className = "gate-spec mono-font";
+          spec.textContent = item.spec;
+          card.appendChild(spec);
+
+          const desc = document.createElement("div");
+          desc.className = "gate-desc";
+          desc.textContent = item.desc;
+          card.appendChild(desc);
+
+          container.appendChild(card);
+        }
+      }
+
+      // Render Risk Reduction Summary Tables
+      function renderSummaryTables() {
+        // DFMEA Summary Table
+        const dfmeaTable = document.getElementById("tableDfmeaSummary");
+        clearElement(dfmeaTable);
+
+        const dHead = document.createElement("thead");
+        const dTr = document.createElement("tr");
+        ["ID", "Subsystem", "Failure Mode", "Init RPN", "Final RPN", "Reduction"].forEach(function(h) {
+          const th = document.createElement("th");
+          th.textContent = h;
+          dTr.appendChild(th);
+        });
+        dHead.appendChild(dTr);
+        dfmeaTable.appendChild(dHead);
+
+        const dBody = document.createElement("tbody");
+        for (let i = 0; i < DFMEA_DATA.length; i++) {
+          const r = DFMEA_DATA[i];
+          const initRpn = Number(r[10]);
+          const finRpn = Number(r[15]);
+          const pct = (((initRpn - finRpn) / initRpn) * 100).toFixed(1) + "%";
+
+          const tr = document.createElement("tr");
+          tr.appendChild(createTextCell(r[0], "mono-font"));
+          tr.appendChild(createTextCell(r[1]));
+          tr.appendChild(createTextCell(r[3]));
+
+          const tdInit = document.createElement("td");
+          tdInit.appendChild(createRpnBadge(initRpn));
+          tr.appendChild(tdInit);
+
+          const tdFin = document.createElement("td");
+          tdFin.appendChild(createRpnBadge(finRpn));
+          tr.appendChild(tdFin);
+
+          const tdPct = document.createElement("td");
+          tdPct.className = "mono-font";
+          tdPct.style.color = "var(--accent-emerald)";
+          tdPct.style.fontWeight = "700";
+          tdPct.textContent = "-" + pct;
+          tr.appendChild(tdPct);
+
+          dBody.appendChild(tr);
+        }
+        dfmeaTable.appendChild(dBody);
+
+        // PFMEA Summary Table
+        const pfmeaTable = document.getElementById("tablePfmeaSummary");
+        clearElement(pfmeaTable);
+
+        const pHead = document.createElement("thead");
+        const pTr = document.createElement("tr");
+        ["Op No", "Process Step", "Failure Mode", "Init RPN", "Final RPN", "Reduction"].forEach(function(h) {
+          const th = document.createElement("th");
+          th.textContent = h;
+          pTr.appendChild(th);
+        });
+        pHead.appendChild(pTr);
+        pfmeaTable.appendChild(pHead);
+
+        const pBody = document.createElement("tbody");
+        for (let i = 0; i < PFMEA_DATA.length; i++) {
+          const r = PFMEA_DATA[i];
+          const initRpn = Number(r[10]);
+          const finRpn = Number(r[15]);
+          const pct = (((initRpn - finRpn) / initRpn) * 100).toFixed(1) + "%";
+
+          const tr = document.createElement("tr");
+          tr.appendChild(createTextCell(r[0], "mono-font"));
+          tr.appendChild(createTextCell(r[1]));
+          tr.appendChild(createTextCell(r[3]));
+
+          const tdInit = document.createElement("td");
+          tdInit.appendChild(createRpnBadge(initRpn));
+          tr.appendChild(tdInit);
+
+          const tdFin = document.createElement("td");
+          tdFin.appendChild(createRpnBadge(finRpn));
+          tr.appendChild(tdFin);
+
+          const tdPct = document.createElement("td");
+          tdPct.className = "mono-font";
+          tdPct.style.color = "var(--accent-cyan)";
+          tdPct.style.fontWeight = "700";
+          tdPct.textContent = "-" + pct;
+          tr.appendChild(tdPct);
+
+          pBody.appendChild(tr);
+        }
+        pfmeaTable.appendChild(pBody);
+      }
+
+      // Update Views
+      function updateViews() {
+        const counterEl = document.getElementById("tableCounterText");
+        let count = 0;
+
+        if (currentTab === "dfmea") {
+          count = renderTable(document.getElementById("tableDfmea"), DFMEA_HEADERS, DFMEA_DATA, false, false);
+          counterEl.textContent = "Showing " + count + " of " + DFMEA_DATA.length + " DFMEA Failure Modes";
+        } else if (currentTab === "pfmea") {
+          count = renderTable(document.getElementById("tablePfmea"), PFMEA_HEADERS, PFMEA_DATA, true, false);
+          counterEl.textContent = "Showing " + count + " of " + PFMEA_DATA.length + " PFMEA Operations";
+        } else if (currentTab === "controlPlan") {
+          count = renderTable(document.getElementById("tableControlPlan"), CP_HEADERS, CP_DATA, false, true);
+          counterEl.textContent = "Showing " + count + " of " + CP_DATA.length + " Quality Control Plan Stations";
+        } else if (currentTab === "gate") {
+          renderGateCards();
+          counterEl.textContent = "Showing 6 Pre-Power Quality Gate Verification Checkpoints";
+        } else if (currentTab === "matrix") {
+          renderSummaryTables();
+          counterEl.textContent = "Showing Risk Priority Number (RPN) Reduction Analysis";
+        }
+      }
+
+      // Tab Switching Handler
+      function setupTabs() {
+        const tabBtns = document.querySelectorAll(".tab-btn");
+        const tabSections = {
+          dfmea: document.getElementById("sectionDfmea"),
+          pfmea: document.getElementById("sectionPfmea"),
+          controlPlan: document.getElementById("sectionControlPlan"),
+          gate: document.getElementById("sectionGate"),
+          matrix: document.getElementById("sectionMatrix")
+        };
+
+        for (let i = 0; i < tabBtns.length; i++) {
+          tabBtns[i].addEventListener("click", function() {
+            const target = this.getAttribute("data-tab");
+            currentTab = target;
+
+            for (let j = 0; j < tabBtns.length; j++) {
+              tabBtns[j].classList.remove("active");
+            }
+            this.classList.add("active");
+
+            for (const key in tabSections) {
+              if (tabSections.hasOwnProperty(key)) {
+                tabSections[key].style.display = (key === target) ? "block" : "none";
+              }
+            }
+
+            // Hide or show filter panel based on tab
+            const filterPanel = document.getElementById("filterPanel");
+            if (target === "gate" || target === "matrix") {
+              filterPanel.style.display = "none";
+            } else {
+              filterPanel.style.display = "flex";
+            }
+
+            updateViews();
+          });
+        }
+      }
+
+      // Filter Pill Setup
+      function setupFilters() {
+        const pills = document.querySelectorAll(".pill-btn[data-filter]");
+        for (let i = 0; i < pills.length; i++) {
+          pills[i].addEventListener("click", function() {
+            for (let j = 0; j < pills.length; j++) {
+              pills[j].classList.remove("active");
+            }
+            this.classList.add("active");
+            activeFilter = this.getAttribute("data-filter");
+            updateViews();
+          });
+        }
+
+        const searchBox = document.getElementById("searchInput");
+        searchBox.addEventListener("input", function() {
+          searchQuery = this.value;
+          updateViews();
+        });
+
+        const printBtn = document.getElementById("btnPrintReport");
+        printBtn.addEventListener("click", function() {
+          window.print();
+        });
+      }
+
+      // Initialization on DOMContentLoaded
+      document.addEventListener("DOMContentLoaded", function() {
+        setupTabs();
+        setupFilters();
+        updateViews();
+      });
+
+    })();
+  </script>
+</body>
+</html>

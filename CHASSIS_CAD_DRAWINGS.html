@@ -1,0 +1,2146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Copper Chimney V2 — 2D CAD Blueprint & DXF Fabrication Suite</title>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --card-bg: rgba(15, 23, 42, 0.90);
+      --card-border: rgba(148, 163, 184, 0.22);
+      --copper: #d97706;
+      --copper-glow: #f59e0b;
+      --alu: #94a3b8;
+      --accent: #38bdf8;
+      --laser-cut: #ef4444;
+      --holes: #22c55e;
+      --engrave: #06b6d4;
+      --dims: #f59e0b;
+      --centerlines: #64748b;
+    }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #060911;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: #f8fafc;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    #cad-canvas {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+      cursor: crosshair;
+      touch-action: none;
+    }
+    .glass-panel {
+      background: var(--card-bg);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.65);
+    }
+
+    /* Top HUD Header */
+    .hud-header {
+      position: absolute;
+      top: env(safe-area-inset-top, 14px);
+      left: 16px;
+      right: 16px;
+      z-index: 20;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      pointer-events: none;
+    }
+    .hud-header-left {
+      pointer-events: auto;
+    }
+    .hud-title {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: 0.6px;
+      color: #f1f5f9;
+      text-transform: uppercase;
+      margin: 0;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.85);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .hud-subtitle {
+      font-size: 11px;
+      color: var(--copper-glow);
+      margin-top: 3px;
+      letter-spacing: 0.3px;
+    }
+    .hud-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(217, 119, 6, 0.20);
+      border: 1px solid rgba(217, 119, 6, 0.45);
+      color: #fcd34d;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      margin-top: 4px;
+      font-weight: 600;
+    }
+    .hud-header-right {
+      pointer-events: auto;
+      display: flex;
+      gap: 8px;
+    }
+    .top-action-btn {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      color: #cbd5e1;
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+    .top-action-btn:hover, .top-action-btn:active {
+      transform: scale(0.97);
+      background: #334155;
+      color: #ffffff;
+    }
+
+    /* Left Panel Selector Bar */
+    .panel-selector-bar {
+      position: absolute;
+      top: 76px;
+      left: 16px;
+      z-index: 20;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      width: 210px;
+      max-height: calc(100vh - 160px);
+      overflow-y: auto;
+    }
+    .panel-selector-title {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #94a3b8;
+      padding: 4px 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .panel-btn {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #cbd5e1;
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .panel-btn:hover {
+      background: #334155;
+      color: #ffffff;
+      border-color: #64748b;
+    }
+    .panel-btn.active {
+      background: linear-gradient(135deg, #b45309, #d97706);
+      color: #ffffff;
+      border-color: #f59e0b;
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+    }
+    .panel-tag {
+      font-size: 9px;
+      padding: 1px 5px;
+      border-radius: 3px;
+      background: rgba(0,0,0,0.3);
+      color: #93c5fd;
+    }
+
+    /* Right Layer Controller Panel */
+    .layer-panel {
+      position: absolute;
+      top: 76px;
+      right: 16px;
+      z-index: 20;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      width: 195px;
+    }
+    .layer-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #cbd5e1;
+      padding: 4px 6px;
+      border-radius: 4px;
+      background: rgba(30, 41, 59, 0.5);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .layer-item:hover {
+      background: rgba(51, 65, 85, 0.8);
+    }
+    .layer-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .layer-color-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    /* Bottom Control Bar / Dock */
+    .hud-bottom-dock {
+      position: absolute;
+      bottom: env(safe-area-inset-bottom, 16px);
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: nowrap;
+      justify-content: center;
+      max-width: 96vw;
+    }
+    .hud-btn {
+      background: #1e293b;
+      color: #cbd5e1;
+      border: 1px solid #334155;
+      padding: 8px 13px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      white-space: nowrap;
+      min-height: 38px;
+      text-decoration: none;
+    }
+    .hud-btn:hover {
+      background: #334155;
+      color: #ffffff;
+      border-color: #64748b;
+    }
+    .hud-btn.primary {
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      border-color: #38bdf8;
+      color: #ffffff;
+    }
+    .hud-btn.dxf-btn {
+      background: linear-gradient(135deg, #d97706, #b45309);
+      border-color: #fbbf24;
+      color: #ffffff;
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.35);
+    }
+    .hud-btn.active {
+      background: #b45309;
+      color: #fff;
+      border-color: #f59e0b;
+    }
+
+    /* Live Cursor Coordinate HUD (Bottom Left) */
+    .coord-hud {
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      z-index: 20;
+      padding: 6px 12px;
+      font-size: 11px;
+      font-family: monospace;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      pointer-events: none;
+    }
+    .coord-val {
+      color: #fcd34d;
+      font-weight: bold;
+    }
+
+    /* Scale & Zoom Indicator (Bottom Right) */
+    .scale-hud {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      z-index: 20;
+      padding: 6px 12px;
+      font-size: 11px;
+      font-family: monospace;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    /* Specs & Fabrication Drawer */
+    .drawer-backdrop {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 50;
+      backdrop-filter: blur(4px);
+    }
+    .drawer-modal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 92%;
+      max-width: 680px;
+      max-height: 85vh;
+      overflow-y: auto;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 22px;
+      z-index: 60;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.85);
+    }
+    .drawer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      border-bottom: 1px solid #1e293b;
+      padding-bottom: 10px;
+    }
+    .drawer-close {
+      cursor: pointer;
+      color: #94a3b8;
+      font-size: 18px;
+    }
+
+    @media (max-width: 768px) {
+      .panel-selector-bar {
+        display: none;
+      }
+      .layer-panel {
+        display: none;
+      }
+      .coord-hud {
+        display: none;
+      }
+      .hud-title {
+        font-size: 14px;
+      }
+      .hud-subtitle {
+        display: none;
+      }
+      .hud-bottom-dock {
+        padding: 6px 10px;
+        gap: 6px;
+        border-radius: 30px;
+      }
+      .hud-btn {
+        padding: 6px 9px;
+        font-size: 11px;
+        min-height: 34px;
+      }
+      .btn-text {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 2D Canvas Target -->
+  <canvas id="cad-canvas"></canvas>
+
+  <!-- Header Overlay -->
+  <div class="hud-header">
+    <div class="hud-header-left">
+      <h1 class="hud-title"><i class="fa fa-pencil-square-o w3-text-amber"></i> Copper Chimney V2 — 2D CAD Blueprint</h1>
+      <div class="hud-subtitle">CNC Laser &amp; Mill Fabrication Suite &bull; True 1:1 Metric DXF Drawings</div>
+      <div class="hud-badge"><i class="fa fa-crosshairs"></i> AutoCAD R12 / 2000 ASCII Standard</div>
+    </div>
+
+    <!-- Top Right Action Buttons -->
+    <div class="hud-header-right">
+      <a href="CHASSIS_360_VIEWER.html" class="top-action-btn" title="Return to 3D Turntable Studio">
+        <i class="fa fa-cube w3-text-amber"></i> 360° Studio
+      </a>
+      <a href="PROJECT.html" class="top-action-btn" target="_blank" title="Project Specification">
+        <i class="fa fa-book w3-text-cyan"></i> Spec
+      </a>
+      <a href="WIRING_DIAGRAM.html" class="top-action-btn" target="_blank" title="Wiring Blueprint">
+        <i class="fa fa-sitemap w3-text-green"></i> Wiring
+      </a>
+      <button class="top-action-btn" onclick="openFabModal()">
+        <i class="fa fa-info-circle w3-text-amber"></i> Fab Notes
+      </button>
+    </div>
+  </div>
+
+  <!-- Left Panel Selector -->
+  <div class="panel-selector-bar glass-panel">
+    <div class="panel-selector-title">
+      <span><i class="fa fa-th-large"></i> Chassis Parts</span>
+      <span class="panel-tag">8 DXFs</span>
+    </div>
+
+    <button id="pbtn-multiview" class="panel-btn active" onclick="selectPanel('multiview')">
+      <span><i class="fa fa-th-large w3-text-amber"></i> Multi-View Assembly</span>
+      <span class="panel-tag">5 Views (A1)</span>
+    </button>
+    <button id="pbtn-master" class="panel-btn" onclick="selectPanel('master')">
+      <span><i class="fa fa-object-group w3-text-amber"></i> Master Sheet</span>
+      <span class="panel-tag">600×400</span>
+    </button>
+    <button id="pbtn-front" class="panel-btn" onclick="selectPanel('front')">
+      <span><i class="fa fa-tv w3-text-cyan"></i> Front Bezel</span>
+      <span class="panel-tag">Amber 4mm</span>
+    </button>
+    <button id="pbtn-rear" class="panel-btn" onclick="selectPanel('rear')">
+      <span><i class="fa fa-plug w3-text-red"></i> Rear I/O Panel</span>
+      <span class="panel-tag">12 Terminals</span>
+    </button>
+    <button id="pbtn-top" class="panel-btn" onclick="selectPanel('top')">
+      <span><i class="fa fa-arrow-up w3-text-amber"></i> Top Chimney</span>
+      <span class="panel-tag">Ø35mm Flue</span>
+    </button>
+    <button id="pbtn-bottom" class="panel-btn" onclick="selectPanel('bottom')">
+      <span><i class="fa fa-arrow-down w3-text-green"></i> Bottom Intake</span>
+      <span class="panel-tag">Radial Slots</span>
+    </button>
+    <button id="pbtn-plinth" class="panel-btn" onclick="selectPanel('plinth')">
+      <span><i class="fa fa-square w3-text-orange"></i> Wood Plinth</span>
+      <span class="panel-tag">Walnut 18mm</span>
+    </button>
+    <button id="pbtn-heatsink" class="panel-btn" onclick="selectPanel('heatsink')">
+      <span><i class="fa fa-th w3-text-blue"></i> Side Heatsink</span>
+      <span class="panel-tag">AL6061 10-Fin</span>
+    </button>
+  </div>
+
+  <!-- Right Layer Controller -->
+  <div class="layer-panel glass-panel">
+    <div class="panel-selector-title">
+      <span><i class="fa fa-sliders"></i> CAD Layers</span>
+      <span class="panel-tag">Toggle</span>
+    </div>
+
+    <div class="layer-item" onclick="toggleLayer('cut')">
+      <div class="layer-left">
+        <span class="layer-color-dot" style="background: var(--laser-cut);"></span>
+        <span>CUT_OUTLINE</span>
+      </div>
+      <input type="checkbox" id="chk-cut" checked>
+    </div>
+
+    <div class="layer-item" onclick="toggleLayer('holes')">
+      <div class="layer-left">
+        <span class="layer-color-dot" style="background: var(--holes);"></span>
+        <span>HOLES_DRILL</span>
+      </div>
+      <input type="checkbox" id="chk-holes" checked>
+    </div>
+
+    <div class="layer-item" onclick="toggleLayer('engrave')">
+      <div class="layer-left">
+        <span class="layer-color-dot" style="background: var(--engrave);"></span>
+        <span>ENGRAVE_TEXT</span>
+      </div>
+      <input type="checkbox" id="chk-engrave" checked>
+    </div>
+
+    <div class="layer-item" onclick="toggleLayer('dims')">
+      <div class="layer-left">
+        <span class="layer-color-dot" style="background: var(--dims);"></span>
+        <span>DIMENSIONS</span>
+      </div>
+      <input type="checkbox" id="chk-dims" checked>
+    </div>
+
+    <div class="layer-item" onclick="toggleLayer('centerlines')">
+      <div class="layer-left">
+        <span class="layer-color-dot" style="background: var(--centerlines);"></span>
+        <span>CENTERLINES</span>
+      </div>
+      <input type="checkbox" id="chk-centerlines" checked>
+    </div>
+
+    <div class="layer-item" onclick="toggleLayer('grid')">
+      <div class="layer-left">
+        <span class="layer-color-dot" style="background: #334155;"></span>
+        <span>GRID (10mm/50mm)</span>
+      </div>
+      <input type="checkbox" id="chk-grid" checked>
+    </div>
+  </div>
+
+  <!-- Cursor Coordinate HUD -->
+  <div class="coord-hud glass-panel">
+    <span>X: <span id="hud-x" class="coord-val">0.00</span> mm</span>
+    <span>Y: <span id="hud-y" class="coord-val">0.00</span> mm</span>
+    <span id="hud-snap" style="color: #38bdf8;">GRID: 5mm</span>
+  </div>
+
+  <!-- Scale Indicator HUD -->
+  <div class="scale-hud glass-panel">
+    <span>ZOOM: <span id="hud-zoom" class="coord-val">100%</span></span>
+    <span>1mm = <span id="hud-px-per-mm" class="coord-val">3.2px</span></span>
+  </div>
+
+  <!-- Bottom Floating Navigation & Download Dock -->
+  <div class="hud-bottom-dock glass-panel">
+    <button class="hud-btn" onclick="zoomIn()" title="Zoom In">
+      <i class="fa fa-search-plus"></i>
+    </button>
+    <button class="hud-btn" onclick="zoomOut()" title="Zoom Out">
+      <i class="fa fa-search-minus"></i>
+    </button>
+    <button class="hud-btn primary" onclick="resetView()" title="Fit to Screen">
+      <i class="fa fa-arrows-alt"></i> <span class="btn-text">Fit View</span>
+    </button>
+
+    <button id="btn-measure" class="hud-btn" onclick="toggleMeasure()" title="Measuring Caliper Tool">
+      <i class="fa fa-tachometer w3-text-cyan"></i> <span class="btn-text" id="measure-label">Measure</span>
+    </button>
+
+    <!-- 1-Click DXF Download for Active Panel -->
+    <a id="btn-download-dxf" class="hud-btn dxf-btn" href="dxf/CHASSIS_MULTI_VIEW_ASSEMBLY.dxf" download="CHASSIS_MULTI_VIEW_ASSEMBLY.dxf" title="Download Active Panel DXF for CNC/Laser Cutting">
+      <i class="fa fa-download"></i> <span class="btn-text" id="download-label">Download Multi-View DXF</span>
+    </a>
+
+    <!-- Download All Bundle -->
+    <button class="hud-btn" onclick="downloadAllBundle()" title="Download All DXF Drawings Package">
+      <i class="fa fa-folder-open-o w3-text-amber"></i> <span class="btn-text">Download All</span>
+    </button>
+  </div>
+
+  <!-- Fabrication & Shop Notes Modal -->
+  <div id="fab-backdrop" class="drawer-backdrop" onclick="closeFabModal()"></div>
+  <div id="fab-modal" class="drawer-modal">
+    <div class="drawer-header">
+      <h3 style="margin: 0; color: #f59e0b; font-size: 16px; font-weight: 700;">
+        <i class="fa fa-cogs"></i> CNC &amp; Laser Fabrication Specifications
+      </h3>
+      <div class="drawer-close" onclick="closeFabModal()"><i class="fa fa-times"></i></div>
+    </div>
+    <div style="font-size: 13px; color: #cbd5e1; line-height: 1.6;">
+      <div class="w3-padding-small w3-margin-bottom" style="background: rgba(30,41,59,0.7); border-radius: 8px; border-left: 3px solid #ef4444;">
+        <strong class="w3-text-red">1. Layer <code>CUT_OUTLINE</code> (Red, ACI 1):</strong><br>
+        Outer perimeter contour cut. Use 0.15mm beam kerf compensation on CO2 Laser (60W-100W) or 2.0mm single-flute spiral upcut carbide bit on CNC Router.
+      </div>
+
+      <div class="w3-padding-small w3-margin-bottom" style="background: rgba(30,41,59,0.7); border-radius: 8px; border-left: 3px solid #22c55e;">
+        <strong class="w3-text-green">2. Layer <code>HOLES_DRILL</code> (Green, ACI 3):</strong><br>
+        Internal through-apertures: Central Ø35.0mm chimney flue, 4× Ø15.0mm corner tubes, GX16 4-pin (Ø16mm), 12× speaker binding posts (Ø8mm), 3.5mm AUX (Ø6mm), USB-C (10×4.2mm).
+      </div>
+
+      <div class="w3-padding-small w3-margin-bottom" style="background: rgba(30,41,59,0.7); border-radius: 8px; border-left: 3px solid #06b6d4;">
+        <strong class="w3-text-cyan">3. Layer <code>ENGRAVE_TEXT</code> (Cyan, ACI 4):</strong><br>
+        Surface kiss-cut / vector etching (depth 0.25mm – 0.40mm). Markings for speaker polarity (+ / -), audio channels (FL, FR, C, SL, SR, SUB), volume scale, and part identification.
+      </div>
+
+      <div class="w3-padding-small w3-margin-bottom" style="background: rgba(30,41,59,0.7); border-radius: 8px; border-left: 3px solid #f59e0b;">
+        <strong class="w3-text-amber">4. Materials &amp; Thicknesses:</strong><br>
+        &bull; <strong>Front Bezel &amp; Top Cover:</strong> 4.0mm Frosted Amber Polycarbonate.<br>
+        &bull; <strong>Rear I/O &amp; Base Plate:</strong> 5.0mm Amber or Smoked Polycarbonate.<br>
+        &bull; <strong>Acoustic Isolation Plinth:</strong> 18.0mm Solid Walnut / Teak with R14 rounded corners.<br>
+        &bull; <strong>Side Heatsink Flanks:</strong> AL6061 Extruded Aluminum with 10 vertical cooling fins.
+      </div>
+
+      <div style="margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap;">
+        <a href="dxf/CHASSIS_MULTI_VIEW_ASSEMBLY.dxf" download class="hud-btn dxf-btn" style="flex: 1; text-decoration: none; font-size: 11px;">
+          <i class="fa fa-download"></i> Multi-View Assembly DXF (A1)
+        </a>
+        <a href="dxf/CHASSIS_MASTER_FABRICATION_SHEET.dxf" download class="hud-btn" style="flex: 1; text-decoration: none; font-size: 11px;">
+          <i class="fa fa-download"></i> Master Sheet DXF
+        </a>
+        <a href="CHASSIS_360_VIEWER.html" class="hud-btn primary" style="flex: 1; text-decoration: none; font-size: 11px;">
+          <i class="fa fa-cube"></i> View in 360° 3D
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- CAD RENDERING ENGINE SCRIPT -->
+  <script>
+    const canvas = document.getElementById('cad-canvas');
+    const ctx = canvas.getContext('2d');
+
+    // Pan & Zoom State
+    let scale = 1.6;
+    let panX = 0;
+    let panY = 0;
+    let isDragging = false;
+    let dragStartX = 0;
+    let dragStartY = 0;
+
+    // Measurement Tool State
+    let isMeasuring = false;
+    let measureP1 = null;
+    let measureP2 = null;
+
+    // Active Panel Selection
+    let activePanelKey = 'multiview';
+
+    // Layer Visibility
+    const layers = {
+      cut: true,
+      holes: true,
+      engrave: true,
+      dims: true,
+      centerlines: true,
+      grid: true
+    };
+
+    // Panel Definitions & File Mapping
+    const panelConfigs = {
+      multiview: {
+        name: 'Multi-View Orthographic Blueprint',
+        dxfFile: 'dxf/CHASSIS_MULTI_VIEW_ASSEMBLY.dxf',
+        bounds: { x: 0, y: 0, w: 840, h: 594 },
+        tag: '5 Views (ISO A1 Blueprint)'
+      },
+      master: {
+        name: 'Master Laser & CNC Sheet',
+        dxfFile: 'dxf/CHASSIS_MASTER_FABRICATION_SHEET.dxf',
+        bounds: { x: 0, y: 0, w: 600, h: 400 },
+        tag: '600×400mm Standard Sheet'
+      },
+      front: {
+        name: 'Front Bezel Panel',
+        dxfFile: 'dxf/PANEL_FRONT.dxf',
+        bounds: { x: 0, y: 0, w: 160, h: 160 },
+        tag: '4mm Amber Polycarbonate'
+      },
+      rear: {
+        name: 'Rear I/O Panel',
+        dxfFile: 'dxf/PANEL_REAR_IO.dxf',
+        bounds: { x: 0, y: 0, w: 160, h: 160 },
+        tag: '4-5mm Polycarbonate'
+      },
+      top: {
+        name: 'Top Chimney Cover',
+        dxfFile: 'dxf/PANEL_TOP_CHIMNEY.dxf',
+        bounds: { x: 0, y: 0, w: 160, h: 160 },
+        tag: '4mm Amber Polycarbonate'
+      },
+      bottom: {
+        name: 'Bottom Convection Plate',
+        dxfFile: 'dxf/PANEL_BOTTOM_BASE.dxf',
+        bounds: { x: 0, y: 0, w: 160, h: 160 },
+        tag: '5mm Polycarbonate / AL6061'
+      },
+      plinth: {
+        name: 'Solid Wood Plinth Base',
+        dxfFile: 'dxf/PLINTH_WOOD_BASE.dxf',
+        bounds: { x: 0, y: 0, w: 180, h: 180 },
+        tag: '18mm Solid Walnut'
+      },
+      heatsink: {
+        name: 'Side Heatsink Flank Profile',
+        dxfFile: 'dxf/PANEL_SIDE_HEATSINK.dxf',
+        bounds: { x: 0, y: 0, w: 220, h: 160 },
+        tag: 'AL6061 Extrusion (10 Fins)'
+      }
+    };
+
+    // Window Resize Handling
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      render();
+    }
+    window.addEventListener('resize', resizeCanvas);
+
+    // Initial View Setup
+    function resetView() {
+      const cfg = panelConfigs[activePanelKey];
+      const margin = 80;
+      const availW = canvas.width - margin * 2;
+      const availH = canvas.height - margin * 2;
+      const sX = availW / cfg.bounds.w;
+      const sY = availH / cfg.bounds.h;
+      scale = Math.min(sX, sY, 3.5);
+
+      // Center the drawing
+      panX = (canvas.width - cfg.bounds.w * scale) / 2;
+      panY = (canvas.height + cfg.bounds.h * scale) / 2; // Invert Y (CAD convention: +Y is UP)
+      updateHud();
+      render();
+    }
+
+    // World to Screen & Screen to World Coordinates
+    function worldToScreen(wx, wy) {
+      return {
+        x: panX + wx * scale,
+        y: panY - wy * scale
+      };
+    }
+
+    function screenToWorld(sx, sy) {
+      return {
+        x: (sx - panX) / scale,
+        y: (panY - sy) / scale
+      };
+    }
+
+    // Drawing Primitives
+    function drawGrid() {
+      if (!layers.grid) return;
+
+      const swBottomLeft = screenToWorld(0, canvas.height);
+      const swTopRight = screenToWorld(canvas.width, 0);
+
+      const minX = Math.floor(swBottomLeft.x / 10) * 10;
+      const maxX = Math.ceil(swTopRight.x / 10) * 10;
+      const minY = Math.floor(swBottomLeft.y / 10) * 10;
+      const maxY = Math.ceil(swTopRight.y / 10) * 10;
+
+      // 10mm Minor Grid
+      ctx.lineWidth = 0.5;
+      ctx.strokeStyle = 'rgba(30, 41, 59, 0.45)';
+      ctx.beginPath();
+      for (let x = minX; x <= maxX; x += 10) {
+        const p1 = worldToScreen(x, minY);
+        const p2 = worldToScreen(x, maxY);
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+      }
+      for (let y = minY; y <= maxY; y += 10) {
+        const p1 = worldToScreen(minX, y);
+        const p2 = worldToScreen(maxX, y);
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+      }
+      ctx.stroke();
+
+      // 50mm Major Grid with labels
+      ctx.lineWidth = 1.0;
+      ctx.strokeStyle = 'rgba(51, 65, 85, 0.65)';
+      ctx.fillStyle = '#475569';
+      ctx.font = '9px monospace';
+      ctx.beginPath();
+      for (let x = Math.floor(minX / 50) * 50; x <= maxX; x += 50) {
+        const p1 = worldToScreen(x, minY);
+        const p2 = worldToScreen(x, maxY);
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+        if (p1.y > 20 && p1.y < canvas.height - 20) {
+          ctx.fillText(x + 'mm', p1.x + 4, canvas.height - 35);
+        }
+      }
+      for (let y = Math.floor(minY / 50) * 50; y <= maxY; y += 50) {
+        const p1 = worldToScreen(minX, y);
+        const p2 = worldToScreen(maxX, y);
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+        if (p1.x > 20 && p1.x < canvas.width - 20) {
+          ctx.fillText(y + 'mm', 20, p1.y - 4);
+        }
+      }
+      ctx.stroke();
+
+      // Origin Axes (0,0) in Red/Green
+      const o = worldToScreen(0, 0);
+      ctx.lineWidth = 1.5;
+      // X Axis
+      ctx.strokeStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.moveTo(o.x, o.y);
+      ctx.lineTo(o.x + 40, o.y);
+      ctx.stroke();
+      ctx.fillStyle = '#ef4444';
+      ctx.fillText('+X', o.x + 44, o.y + 3);
+
+      // Y Axis
+      ctx.strokeStyle = '#22c55e';
+      ctx.beginPath();
+      ctx.moveTo(o.x, o.y);
+      ctx.lineTo(o.x, o.y - 40);
+      ctx.stroke();
+      ctx.fillStyle = '#22c55e';
+      ctx.fillText('+Y', o.x - 6, o.y - 44);
+    }
+
+    function cadLine(x1, y1, x2, y2) {
+      const p1 = worldToScreen(x1, y1);
+      const p2 = worldToScreen(x2, y2);
+      ctx.moveTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
+    }
+
+    function cadCircle(cx, cy, r) {
+      const p = worldToScreen(cx, cy);
+      ctx.arc(p.x, p.y, r * scale, 0, Math.PI * 2);
+    }
+
+    function cadArc(cx, cy, r, startDeg, endDeg) {
+      const p = worldToScreen(cx, cy);
+      // Invert angle for CAD Y-up coordinate system
+      const sRad = - endDeg * Math.PI / 180.0;
+      const eRad = - startDeg * Math.PI / 180.0;
+      ctx.arc(p.x, p.y, r * scale, sRad, eRad);
+    }
+
+    function cadRoundedRect(x, y, w, h, r) {
+      if (r <= 0.01) {
+        const p1 = worldToScreen(x, y + h);
+        const p2 = worldToScreen(x + w, y);
+        ctx.rect(p1.x, p1.y, (w) * scale, (h) * scale);
+        return;
+      }
+      cadLine(x + r, y, x + w - r, y);
+      cadArc(x + w - r, y + r, r, 270, 360);
+      cadLine(x + w, y + r, x + w, y + h - r);
+      cadArc(x + w - r, y + h - r, r, 0, 90);
+      cadLine(x + w - r, y + h, x + r, y + h);
+      cadArc(x + r, y + h - r, r, 90, 180);
+      cadLine(x, y + h - r, x, y + r);
+      cadArc(x + r, y + r, r, 180, 270);
+    }
+
+    function cadCrosshair(cx, cy, size) {
+      const half = size / 2;
+      cadLine(cx - half, cy, cx + half, cy);
+      cadLine(cx, cy - half, cx, cy + half);
+    }
+
+    function cadText(text, x, y, sizeMm, rot = 0) {
+      const p = worldToScreen(x, y);
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      if (rot !== 0) ctx.rotate(-rot * Math.PI / 180.0);
+      ctx.font = `${Math.max(Math.round(sizeMm * scale), 8)}px monospace`;
+      ctx.fillText(text, 0, 0);
+      ctx.restore();
+    }
+
+    function cadDimH(x1, x2, y, offset, label) {
+      if (!layers.dims) return;
+      const dimY = y + offset;
+      ctx.beginPath();
+      // Extension lines
+      cadLine(x1, y, x1, dimY + (offset > 0 ? 3 : -3));
+      cadLine(x2, y, x2, dimY + (offset > 0 ? 3 : -3));
+      // Dimension line
+      cadLine(x1, dimY, x2, dimY);
+      // Arrow ticks
+      const t = 2.0;
+      cadLine(x1, dimY - t, x1 + t, dimY);
+      cadLine(x1, dimY + t, x1 + t, dimY);
+      cadLine(x2, dimY - t, x2 - t, dimY);
+      cadLine(x2, dimY + t, x2 - t, dimY);
+      ctx.stroke();
+
+      const midX = (x1 + x2) / 2;
+      cadText(label, midX - 8, dimY + 1.5, 3.2);
+    }
+
+    function cadDimV(y1, y2, x, offset, label) {
+      if (!layers.dims) return;
+      const dimX = x + offset;
+      ctx.beginPath();
+      cadLine(x, y1, dimX + (offset > 0 ? 3 : -3), y1);
+      cadLine(x, y2, dimX + (offset > 0 ? 3 : -3), y2);
+      cadLine(dimX, y1, dimX, y2);
+      const t = 2.0;
+      cadLine(dimX - t, y1, dimX, y1 + t);
+      cadLine(dimX + t, y1, dimX, y1 + t);
+      cadLine(dimX - t, y2, dimX, y2 - t);
+      cadLine(dimX + t, y2, dimX, y2 - t);
+      ctx.stroke();
+
+      const midY = (y1 + y2) / 2;
+      cadText(label, dimX + 1.5, midY - 6, 3.0, 90);
+    }
+
+    // Geometry Renderers for Individual Panels
+    function renderFrontPanel(offsetX = 0, offsetY = 0) {
+      const ox = offsetX;
+      const oy = offsetY;
+
+      // 1. Cut Outline (160x160 with R8)
+      if (layers.cut) {
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = 2.0;
+        ctx.beginPath();
+        cadRoundedRect(ox, oy, 160, 160, 8);
+        ctx.stroke();
+      }
+
+      // 2. Drill Holes (LCD screen window + Volume shaft + 4 corners)
+      if (layers.holes) {
+        ctx.strokeStyle = '#22c55e';
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        // Waveshare 4.3"/5" LCD Screen Cutout (115x72 R3 at center (80, 98))
+        cadRoundedRect(ox + 22.5, oy + 62.0, 115, 72, 3);
+        // Volume Knob Shaft (Dia 7.5mm)
+        cadCircle(ox + 80, oy + 36, 3.75);
+        // Anti-rotation tab hole (Dia 3.0mm)
+        cadCircle(ox + 80, oy + 26.5, 1.5);
+        // 4 Fastener holes (Dia 3.5mm)
+        const corners = [[8, 8], [152, 8], [152, 152], [8, 152]];
+        corners.forEach(([x, y]) => cadCircle(ox + x, oy + y, 1.75));
+        ctx.stroke();
+      }
+
+      // 3. Centerlines
+      if (layers.centerlines) {
+        ctx.strokeStyle = '#64748b';
+        ctx.lineWidth = 0.8;
+        ctx.beginPath();
+        cadCrosshair(ox + 80, oy + 36, 16);
+        cadCrosshair(ox + 80, oy + 98, 24);
+        ctx.stroke();
+      }
+
+      // 4. Engraved Text & References
+      if (layers.engrave) {
+        ctx.strokeStyle = '#06b6d4';
+        ctx.fillStyle = '#06b6d4';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        // Compact OLED Bezel (64x32 R4)
+        cadRoundedRect(ox + 48, oy + 82, 64, 32, 4);
+        // Volume Dial scale
+        cadCircle(ox + 80, oy + 36, 18);
+        // Volume scale ticks
+        const ticks = [-135, -108, -81, -54, -27, 0, 27, 54, 81, 108, 135];
+        ticks.forEach(deg => {
+          const rad = (deg - 90) * Math.PI / 180.0;
+          const t1x = ox + 80 + Math.cos(rad) * 19.5;
+          const t1y = oy + 36 + Math.sin(rad) * 19.5;
+          const t2x = ox + 80 + Math.cos(rad) * 22.0;
+          const t2y = oy + 36 + Math.sin(rad) * 22.0;
+          cadLine(t1x, t1y, t2x, t2y);
+        });
+        ctx.stroke();
+
+        cadText('[ 120W AMP ]', ox + 65, oy + 96, 3.2);
+        cadText('MIN', ox + 55, oy + 14, 2.5);
+        cadText('MAX', ox + 98, oy + 14, 2.5);
+        cadText('VOLUME', ox + 72, oy + 56, 2.8);
+        cadText('COPPER CHIMNEY V2 • HMI BEZEL', ox + 42, oy + 148, 3.2);
+        cadText('4mm FROSTED AMBER POLYCARBONATE', ox + 40, oy + 8, 2.4);
+      }
+
+      // 5. Dimensions
+      if (layers.dims && activePanelKey === 'front') {
+        ctx.strokeStyle = '#f59e0b';
+        ctx.fillStyle = '#f59e0b';
+        ctx.lineWidth = 1.2;
+        cadDimH(ox, ox + 160, oy + 160, 12, '160.00 mm');
+        cadDimV(oy, oy + 160, ox + 160, 12, '160.00 mm');
+        cadDimH(ox + 22.5, ox + 137.5, oy + 62, -10, '115.00 mm SCREEN');
+        cadDimV(oy + 62, oy + 134, ox + 137.5, 8, '72.00 mm');
+      }
+    }
+
+    function renderRearPanel(offsetX = 0, offsetY = 0) {
+      const ox = offsetX;
+      const oy = offsetY;
+
+      if (layers.cut) {
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = 2.0;
+        ctx.beginPath();
+        cadRoundedRect(ox, oy, 160, 160, 8);
+        ctx.stroke();
+      }
+
+      if (layers.holes) {
+        ctx.strokeStyle = '#22c55e';
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        // GX16 (Dia 16mm -> R8)
+        cadCircle(ox + 125, oy + 68, 8);
+        // 12 Binding Posts (Dia 8mm)
+        const cols = [25, 41, 57, 73, 89, 105];
+        cols.forEach(cx => {
+          cadCircle(ox + cx, oy + 108, 4);
+          cadCircle(ox + cx, oy + 82, 4);
+        });
+        // AUX 3.5mm (Dia 6mm)
+        cadCircle(ox + 40, oy + 32, 3);
+        // USB-C (10x4.2mm with R2.1)
+        cadRoundedRect(ox + 105, oy + 29.9, 10, 4.2, 2.1);
+        cadCircle(ox + 97.5, oy + 32, 1.25);
+        cadCircle(ox + 122.5, oy + 32, 1.25);
+        // Convection slits
+        [35, 60, 85, 110].forEach(sx => {
+          cadRoundedRect(ox + sx - 9, oy + 13, 18, 3.5, 1.75);
+        });
+        // 4 Fasteners
+        [[8,8], [152,8], [152,152], [8,152]].forEach(([x, y]) => cadCircle(ox + x, oy + y, 1.75));
+        ctx.stroke();
+      }
+
+      if (layers.centerlines) {
+        ctx.strokeStyle = '#64748b';
+        ctx.lineWidth = 0.8;
+        ctx.beginPath();
+        cadCrosshair(ox + 125, oy + 68, 22);
+        [25, 41, 57, 73, 89, 105].forEach(cx => {
+          cadCrosshair(ox + cx, oy + 108, 11);
+          cadCrosshair(ox + cx, oy + 82, 11);
+        });
+        cadCrosshair(ox + 40, oy + 32, 10);
+        ctx.stroke();
+      }
+
+      if (layers.engrave) {
+        ctx.strokeStyle = '#06b6d4';
+        ctx.fillStyle = '#06b6d4';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        cadCircle(ox + 125, oy + 68, 10.5);
+        ctx.stroke();
+
+        cadText('DC IN 24V 14.6A', ox + 112, oy + 52, 2.4);
+        cadText('GX16-4', ox + 118, oy + 47, 2.2);
+
+        cadText('5.1 SPEAKER TERMINALS (4-8 OHM)', ox + 22, oy + 126, 3.0);
+        const labels = ['FL', 'FR', 'C', 'SL', 'SR', 'SUB'];
+        const cols = [25, 41, 57, 73, 89, 105];
+        cols.forEach((cx, idx) => {
+          cadText(labels[idx], ox + cx - 2.5, oy + 116, 2.5);
+          cadText('+', ox + cx - 1.5, oy + 96, 2.5);
+          cadText('-', ox + cx - 1.5, oy + 71, 2.5);
+        });
+
+        cadText('AUX IN', ox + 32, oy + 22, 2.3);
+        cadText('USB-C CONFIG', ox + 100, oy + 22, 2.3);
+        cadText('COPPER CHIMNEY V2 • REAR I/O', ox + 38, oy + 148, 3.2);
+      }
+
+      if (layers.dims && activePanelKey === 'rear') {
+        ctx.strokeStyle = '#f59e0b';
+        ctx.fillStyle = '#f59e0b';
+        ctx.lineWidth = 1.2;
+        cadDimH(ox, ox + 160, oy + 160, 12, '160.00 mm');
+        cadDimV(oy, oy + 160, ox + 160, 12, '160.00 mm');
+        cadDimH(ox + 25, ox + 105, oy + 108, 8, '80.00 mm (16mm PITCH)');
+      }
+    }
+
+    function renderTopPanel(offsetX = 0, offsetY = 0) {
+      const ox = offsetX;
+      const oy = offsetY;
+
+      if (layers.cut) {
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = 2.0;
+        ctx.beginPath();
+        cadRoundedRect(ox, oy, 160, 160, 8);
+        ctx.stroke();
+      }
+
+      if (layers.holes) {
+        ctx.strokeStyle = '#22c55e';
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        // Central Chimney Flue (Dia 35mm -> R17.5)
+        cadCircle(ox + 80, oy + 80, 17.5);
+        // 4 Corner Copper Tubes (Dia 15mm -> R7.5)
+        [[18,18], [142,18], [142,142], [18,142]].forEach(([x, y]) => {
+          cadCircle(ox + x, oy + y, 7.5);
+        });
+        // 4 Fastener holes
+        [[8,8], [152,8], [152,152], [8,152]].forEach(([x, y]) => cadCircle(ox + x, oy + y, 1.75));
+        ctx.stroke();
+      }
+
+      if (layers.centerlines) {
+        ctx.strokeStyle = '#64748b';
+        ctx.lineWidth = 0.8;
+        ctx.beginPath();
+        cadCrosshair(ox + 80, oy + 80, 42);
+        [[18,18], [142,18], [142,142], [18,142]].forEach(([x, y]) => cadCrosshair(ox + x, oy + y, 18));
+        ctx.stroke();
+      }
+
+      if (layers.engrave) {
+        ctx.strokeStyle = '#06b6d4';
+        ctx.fillStyle = '#06b6d4';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        // Decorative Collar Outer (Dia 44mm) & Inner Tube Wall
+        cadCircle(ox + 80, oy + 80, 22);
+        cadCircle(ox + 80, oy + 80, 16);
+        ctx.stroke();
+
+        cadText('COPPER CHIMNEY V2 • TOP COVER', ox + 42, oy + 148, 3.2);
+        cadText('THERMOSIPHON EXHAUST APERTURE (O35mm)', ox + 32, oy + 8, 2.3);
+      }
+
+      if (layers.dims && activePanelKey === 'top') {
+        ctx.strokeStyle = '#f59e0b';
+        ctx.fillStyle = '#f59e0b';
+        ctx.lineWidth = 1.2;
+        cadDimH(ox, ox + 160, oy + 160, 12, '160.00 mm');
+        cadDimV(oy, oy + 160, ox + 160, 12, '160.00 mm');
+        cadDimH(ox + 18, ox + 142, oy, -10, '124.00 mm PITCH');
+      }
+    }
+
+    function renderBottomPanel(offsetX = 0, offsetY = 0) {
+      const ox = offsetX;
+      const oy = offsetY;
+
+      if (layers.cut) {
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = 2.0;
+        ctx.beginPath();
+        cadRoundedRect(ox, oy, 160, 160, 8);
+        ctx.stroke();
+      }
+
+      if (layers.holes) {
+        ctx.strokeStyle = '#22c55e';
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        // Central Intake Aperture
+        cadCircle(ox + 80, oy + 80, 17.5);
+        // 8 Radial Intake Slots
+        const count = 8;
+        const step = (Math.PI * 2) / count;
+        const rIn = 23;
+        const rOut = 34;
+        const halfW = 1.75;
+        for (let i = 0; i < count; i++) {
+          const ang = i * step;
+          const c = Math.cos(ang);
+          const s = Math.sin(ang);
+          const pc = -s;
+          const ps = c;
+          const p1x = ox + 80 + c * rIn - pc * halfW;
+          const p1y = oy + 80 + s * rIn - ps * halfW;
+          const p2x = ox + 80 + c * rOut - pc * halfW;
+          const p2y = oy + 80 + s * rOut - ps * halfW;
+          const p3x = ox + 80 + c * rOut + pc * halfW;
+          const p3y = oy + 80 + s * rOut + ps * halfW;
+          const p4x = ox + 80 + c * rIn + pc * halfW;
+          const p4y = oy + 80 + s * rIn + ps * halfW;
+          cadLine(p1x, p1y, p2x, p2y);
+          cadLine(p2x, p2y, p3x, p3y);
+          cadLine(p3x, p3y, p4x, p4y);
+          cadLine(p4x, p4y, p1x, p1y);
+        }
+        // 4 Corner Air Flues
+        [[18,18], [142,18], [142,142], [18,142]].forEach(([x, y]) => cadCircle(ox + x, oy + y, 7.5));
+        // 4 Feet Mounts (Dia 4.5mm)
+        [[22,22], [138,22], [138,138], [22,138]].forEach(([x, y]) => cadCircle(ox + x, oy + y, 2.25));
+        // 4 Corner Fasteners
+        [[8,8], [152,8], [152,152], [8,152]].forEach(([x, y]) => cadCircle(ox + x, oy + y, 1.75));
+        ctx.stroke();
+      }
+
+      if (layers.centerlines) {
+        ctx.strokeStyle = '#64748b';
+        ctx.lineWidth = 0.8;
+        ctx.beginPath();
+        cadCrosshair(ox + 80, oy + 80, 44);
+        [[18,18], [142,18], [142,142], [18,142]].forEach(([x, y]) => cadCrosshair(ox + x, oy + y, 18));
+        ctx.stroke();
+      }
+
+      if (layers.engrave) {
+        ctx.strokeStyle = '#06b6d4';
+        ctx.fillStyle = '#06b6d4';
+        cadText('CHASSIS BASE PLATE • AIR INTAKE', ox + 42, oy + 148, 3.2);
+        cadText('ELEVATED 15mm CONVECTIVE PLENUM', ox + 38, oy + 8, 2.3);
+      }
+
+      if (layers.dims && activePanelKey === 'bottom') {
+        ctx.strokeStyle = '#f59e0b';
+        ctx.fillStyle = '#f59e0b';
+        ctx.lineWidth = 1.2;
+        cadDimH(ox, ox + 160, oy + 160, 12, '160.00 mm');
+        cadDimV(oy, oy + 160, ox + 160, 12, '160.00 mm');
+        cadDimH(ox + 22, ox + 138, oy, -10, '96.00 mm FEET PITCH');
+      }
+    }
+
+    function renderPlinthPanel(offsetX = 0, offsetY = 0) {
+      const ox = offsetX;
+      const oy = offsetY;
+
+      if (layers.cut) {
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = 2.0;
+        ctx.beginPath();
+        cadRoundedRect(ox, oy, 180, 180, 14);
+        ctx.stroke();
+      }
+
+      if (layers.holes) {
+        ctx.strokeStyle = '#22c55e';
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        // Central Flue Bore (Dia 38mm -> R19)
+        cadCircle(ox + 90, oy + 90, 19);
+        // 4 Chassis Mount Holes (Dia 4.5mm)
+        [[32,32], [148,32], [148,148], [32,148]].forEach(([x, y]) => cadCircle(ox + x, oy + y, 2.25));
+        ctx.stroke();
+      }
+
+      if (layers.centerlines) {
+        ctx.strokeStyle = '#64748b';
+        ctx.lineWidth = 0.8;
+        ctx.beginPath();
+        cadCrosshair(ox + 90, oy + 90, 48);
+        [[32,32], [148,32], [148,148], [32,148]].forEach(([x, y]) => cadCrosshair(ox + x, oy + y, 10));
+        ctx.stroke();
+      }
+
+      if (layers.engrave) {
+        ctx.strokeStyle = '#06b6d4';
+        ctx.fillStyle = '#06b6d4';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        // Underside Chamfer (Dia 54mm)
+        cadCircle(ox + 90, oy + 90, 27);
+        // Underside Rubber Feet Pockets (Dia 26mm)
+        [[24,24], [156,24], [156,156], [24,156]].forEach(([x, y]) => cadCircle(ox + x, oy + y, 13));
+        // Chassis Seating Outline (160x160 R8 at (10, 10))
+        cadRoundedRect(ox + 10, oy + 10, 160, 160, 8);
+        ctx.stroke();
+
+        cadText('SOLID WALNUT PLINTH BASE (18-20mm)', ox + 38, oy + 168, 3.2);
+        cadText('AIR FLUE O38mm • CHASSIS ALIGNMENT STEP', ox + 32, oy + 14, 2.3);
+      }
+
+      if (layers.dims && activePanelKey === 'plinth') {
+        ctx.strokeStyle = '#f59e0b';
+        ctx.fillStyle = '#f59e0b';
+        ctx.lineWidth = 1.2;
+        cadDimH(ox, ox + 180, oy + 180, 12, '180.00 mm');
+        cadDimV(oy, oy + 180, ox + 180, 12, '180.00 mm');
+      }
+    }
+
+    function renderHeatsinkPanel(offsetX = 0, offsetY = 0) {
+      const ox = offsetX;
+      const oy = offsetY;
+
+      if (layers.cut) {
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = 2.0;
+        ctx.beginPath();
+        cadRoundedRect(ox, oy, 160, 160, 2);
+        // Section A-A Extrusion Profile to the right
+        cadLine(ox + 180, oy + 0, ox + 185, oy + 0);
+        cadLine(ox + 180, oy + 0, ox + 180, oy + 160);
+        cadLine(ox + 180, oy + 160, ox + 185, oy + 160);
+        // 10 fins
+        const finSpacing = 140 / 9;
+        for (let i = 0; i < 10; i++) {
+          const fy = oy + 10 + i * finSpacing;
+          cadLine(ox + 185, fy, ox + 199, fy);
+          cadLine(ox + 199, fy, ox + 199, fy + 2.5);
+          cadLine(ox + 199, fy + 2.5, ox + 185, fy + 2.5);
+          if (i < 9) cadLine(ox + 185, fy + 2.5, ox + 185, fy + finSpacing);
+        }
+        cadLine(ox + 185, oy + 0, ox + 185, oy + 10);
+        cadLine(ox + 185, oy + 10 + 9 * finSpacing + 2.5, ox + 185, oy + 160);
+        ctx.stroke();
+      }
+
+      if (layers.holes) {
+        ctx.strokeStyle = '#22c55e';
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        // 4 Corner M4 tapped holes
+        [[8,8], [152,8], [152,152], [8,152]].forEach(([x, y]) => cadCircle(ox + x, oy + y, 1.65));
+        // 3x TPA3116D2 module mounting patterns (30x36mm)
+        [36, 80, 124].forEach(by => {
+          cadCircle(ox + 65, oy + by - 18, 1.25);
+          cadCircle(ox + 95, oy + by - 18, 1.25);
+          cadCircle(ox + 95, oy + by + 18, 1.25);
+          cadCircle(ox + 65, oy + by + 18, 1.25);
+        });
+        ctx.stroke();
+      }
+
+      if (layers.engrave) {
+        ctx.strokeStyle = '#06b6d4';
+        ctx.fillStyle = '#06b6d4';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        [36, 80, 124].forEach(by => {
+          cadRoundedRect(ox + 68, oy + by - 12, 24, 24, 2);
+        });
+        ctx.stroke();
+
+        cadText('ARCTIC MX-4 PASTE', ox + 69, oy + 79, 2.0);
+        cadText('AL6061 HEATSINK FLANK (10 FINS)', ox + 36, oy + 148, 3.2);
+        cadText('SECTION A-A FIN EXTRUSION', ox + 172, oy + 164, 2.8);
+      }
+
+      if (layers.dims && activePanelKey === 'heatsink') {
+        ctx.strokeStyle = '#f59e0b';
+        ctx.fillStyle = '#f59e0b';
+        ctx.lineWidth = 1.2;
+        cadDimH(ox, ox + 160, oy + 160, 12, '160.00 mm');
+        cadDimV(oy, oy + 160, ox + 160, 12, '160.00 mm');
+        cadDimH(ox + 180, ox + 199, oy, -10, '19.00 mm');
+      }
+    }
+
+    function renderMasterSheet() {
+      // 1. Drawing Border & Title Block
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 2.0;
+      ctx.beginPath();
+      cadLine(0, 0, 600, 0);
+      cadLine(600, 0, 600, 400);
+      cadLine(600, 400, 0, 400);
+      cadLine(0, 400, 0, 0);
+
+      // Inner margin frame
+      cadLine(10, 10, 590, 10);
+      cadLine(590, 10, 590, 390);
+      cadLine(590, 390, 10, 390);
+      cadLine(10, 390, 10, 10);
+
+      // Master Title Block
+      const tbX = 350;
+      const tbY = 10;
+      cadLine(tbX, tbY, tbX + 240, tbY);
+      cadLine(tbX + 240, tbY, tbX + 240, tbY + 50);
+      cadLine(tbX + 240, tbY + 50, tbX, tbY + 50);
+      cadLine(tbX, tbY + 50, tbX, tbY);
+      cadLine(tbX, tbY + 25, tbX + 240, tbY + 25);
+      cadLine(tbX + 150, tbY, tbX + 150, tbY + 25);
+      ctx.stroke();
+
+      ctx.fillStyle = '#f1f5f9';
+      cadText('COPPER CHIMNEY V2 — 5.1 CHASSIS', tbX + 6, tbY + 36, 4.5);
+      cadText('COMPLETE LASER & CNC MASTER SHEET', tbX + 6, tbY + 28, 3.2);
+      cadText('TOLERANCES: +/-0.15mm | UNITS: mm', tbX + 6, tbY + 14, 2.6);
+      cadText('SCALE: 1:1 TRUE METRIC BLUEPRINT', tbX + 6, tbY + 4, 2.4);
+      cadText('SHEET 1 OF 1', tbX + 156, tbY + 14, 2.8);
+      cadText('AUTOCAD R12/2000', tbX + 156, tbY + 4, 2.4);
+
+      // 2. Render all panels in layout
+      renderFrontPanel(25, 215);
+      renderRearPanel(205, 215);
+      renderTopPanel(25, 25);
+      renderBottomPanel(205, 25);
+      renderPlinthPanel(385, 205);
+
+      // Legend in Title block area
+      ctx.fillStyle = '#94a3b8';
+      cadText('CAD LAYER COLOR CODES:', 385, 175, 3.0);
+      ctx.fillStyle = '#ef4444';
+      cadText('• RED (ACI 1)   : CUT_OUTLINE (Laser / CNC Perimeter)', 385, 165, 2.5);
+      ctx.fillStyle = '#22c55e';
+      cadText('• GREEN (ACI 3) : HOLES_DRILL (Apertures & Mounting)', 385, 156, 2.5);
+      ctx.fillStyle = '#06b6d4';
+      cadText('• CYAN (ACI 4)  : ENGRAVE_TEXT (Surface Etching)', 385, 147, 2.5);
+      ctx.fillStyle = '#f59e0b';
+      cadText('• YELLOW (ACI 2): DIMENSIONS (Inspection Checks)', 385, 138, 2.5);
+    }
+
+    // Geometry Renderer for Multi-View Orthographic Assembly (840 x 594 mm, ISO A1)
+    function renderMultiViewAssembly() {
+      // 1. ISO A1 Sheet Outer and Inner Border Frame (840 x 594 mm)
+      ctx.strokeStyle = '#f1f5f9';
+      ctx.lineWidth = 2.0;
+      ctx.beginPath();
+      cadLine(0, 0, 840, 0);
+      cadLine(840, 0, 840, 594);
+      cadLine(840, 594, 0, 594);
+      cadLine(0, 594, 0, 0);
+
+      // Inner Border Frame (20mm margin)
+      cadLine(20, 20, 820, 20);
+      cadLine(820, 20, 820, 574);
+      cadLine(820, 574, 20, 574);
+      cadLine(20, 574, 20, 20);
+      ctx.stroke();
+
+      // =========================================================================
+      // VIEW A: FRONT ELEVATION VIEW (fx = 70, fy = 60)
+      // =========================================================================
+      const fx = 70.0;
+      const fy = 60.0;
+      ctx.fillStyle = '#f59e0b';
+      cadText('VIEW A: FRONT ELEVATION', fx + 25.0, fy + 225.0, 4.0);
+
+      const cy = fy + 18.0;
+      const topY = cy + 160.0;
+      const chimX = fx + 80.0;
+
+      // Solid Wood Plinth Base & Chassis Outline
+      if (layers.cut) {
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        cadRoundedRect(fx - 10.0, fy, 180.0, 18.0, 6.0);
+        cadRoundedRect(fx, cy, 160.0, 160.0, 8.0);
+
+        // Left & Right Heatsink Fins (10 fins each flank)
+        for (let i = 0; i < 10; i++) {
+          const finY = cy + 10.0 + i * 15.5;
+          // Left
+          cadLine(fx, finY, fx - 12.0, finY);
+          cadLine(fx - 12.0, finY, fx - 12.0, finY + 2.5);
+          cadLine(fx - 12.0, finY + 2.5, fx, finY + 2.5);
+          // Right
+          cadLine(fx + 160.0, finY, fx + 172.0, finY);
+          cadLine(fx + 172.0, finY, fx + 172.0, finY + 2.5);
+          cadLine(fx + 172.0, finY + 2.5, fx + 160.0, finY + 2.5);
+        }
+
+        // Top Central Chimney Protrusion (14mm above chassis)
+        cadLine(chimX - 17.5, topY, chimX - 17.5, topY + 14.0);
+        cadLine(chimX + 17.5, topY, chimX + 17.5, topY + 14.0);
+        cadLine(chimX - 17.5, topY + 14.0, chimX + 17.5, topY + 14.0);
+        cadRoundedRect(chimX - 22.0, topY + 6.0, 44.0, 5.0, 1.5);
+
+        // 4 Corner Pillars Top Studs
+        cadLine(fx + 18.0 - 7.5, topY, fx + 18.0 - 7.5, topY + 3.0);
+        cadLine(fx + 18.0 + 7.5, topY, fx + 18.0 + 7.5, topY + 3.0);
+        cadLine(fx + 18.0 - 7.5, topY + 3.0, fx + 18.0 + 7.5, topY + 3.0);
+        cadLine(fx + 142.0 - 7.5, topY, fx + 142.0 - 7.5, topY + 3.0);
+        cadLine(fx + 142.0 + 7.5, topY, fx + 142.0 + 7.5, topY + 3.0);
+        cadLine(fx + 142.0 - 7.5, topY + 3.0, fx + 142.0 + 7.5, topY + 3.0);
+        ctx.stroke();
+      }
+
+      // Front Bezel Features (LCD Screen, Volume Knob)
+      if (layers.holes) {
+        ctx.strokeStyle = '#22c55e';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        cadRoundedRect(fx + 22.5, cy + 62.0, 115.0, 72.0, 3.0);
+        cadCircle(chimX, cy + 36.0, 18.0);
+        cadCircle(chimX, cy + 36.0, 15.0);
+        ctx.stroke();
+      }
+
+      // Centerlines
+      if (layers.centerlines) {
+        ctx.strokeStyle = '#64748b';
+        ctx.lineWidth = 0.8;
+        ctx.beginPath();
+        cadLine(chimX, fy - 10.0, chimX, topY + 25.0);
+        cadCrosshair(chimX, cy + 36.0, 12.0);
+        ctx.stroke();
+      }
+
+      // Engraved Text & Labels
+      if (layers.engrave) {
+        ctx.fillStyle = '#06b6d4';
+        cadText('COPPER CHIMNEY V2', chimX - 22.0, cy + 104.0, 3.5);
+        cadText('[ 120W AMP ]', chimX - 16.0, cy + 94.0, 3.0);
+        cadText('6-CH VU METERS', chimX - 12.0, cy + 82.0, 2.5);
+        cadText('VOLUME', chimX - 9.0, cy + 14.0, 2.6);
+        cadText('SOLID WALNUT ACOUSTIC ISOLATION PLINTH (18mm)', fx + 10.0, fy + 6.0, 2.4);
+      }
+
+      // Dimensions
+      if (layers.dims) {
+        ctx.strokeStyle = '#f59e0b';
+        ctx.fillStyle = '#fcd34d';
+        ctx.lineWidth = 1.0;
+        cadDimH(fx, fx + 160.0, fy, -14.0, '160.00 mm CHASSIS');
+        cadDimH(fx - 10.0, fx + 170.0, fy, -28.0, '180.00 mm PLINTH');
+        cadDimV(fy, fy + 18.0, fx - 10.0, -12.0, '18.00');
+        cadDimV(cy, topY, fx - 10.0, -22.0, '160.00 mm');
+        cadDimV(fy, topY + 14.0, fx + 170.0, 20.0, '192.00 mm TOTAL HEIGHT');
+      }
+
+      // =========================================================================
+      // VIEW B: TOP PLAN VIEW (tx = 70, ty = 330)
+      // =========================================================================
+      const tx = fx;
+      const ty = 330.0;
+      ctx.fillStyle = '#f59e0b';
+      cadText('VIEW B: TOP PLAN VIEW', tx + 30.0, ty + 205.0, 4.0);
+
+      // Plinth dashed boundary (180 x 180 mm)
+      if (layers.centerlines) {
+        ctx.strokeStyle = '#64748b';
+        ctx.lineWidth = 0.8;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        cadRoundedRect(tx - 10.0, ty - 10.0, 180.0, 180.0, 14.0);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      // Top Plate (160 x 160 mm) & Extruded Fins
+      if (layers.cut) {
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        cadRoundedRect(tx, ty, 160.0, 160.0, 8.0);
+        // Outer chimney collar ring
+        cadCircle(tx + 80.0, ty + 80.0, 22.0);
+
+        // 10 fins left & right
+        for (let i = 0; i < 10; i++) {
+          const fz = ty + 10.0 + i * 15.5;
+          cadLine(tx, fz, tx - 14.0, fz);
+          cadLine(tx - 14.0, fz, tx - 14.0, fz + 2.5);
+          cadLine(tx - 14.0, fz + 2.5, tx, fz + 2.5);
+
+          cadLine(tx + 160.0, fz, tx + 174.0, fz);
+          cadLine(tx + 174.0, fz, tx + 174.0, fz + 2.5);
+          cadLine(tx + 174.0, fz + 2.5, tx + 160.0, fz + 2.5);
+        }
+
+        // Volume knob protrusion (front edge)
+        cadRoundedRect(tx + 80.0 - 18.0, ty - 16.0, 36.0, 16.0, 4.0);
+
+        // Rear binding posts protrusion (back edge)
+        const xCols = [25.0, 41.0, 57.0, 73.0, 89.0, 105.0];
+        xCols.forEach(rc => {
+          cadRoundedRect(tx + rc - 4.0, ty + 160.0, 8.0, 14.0, 2.0);
+        });
+        ctx.stroke();
+      }
+
+      // Top Chimney Flue & 4 Corner Tubes
+      const corners = [[18.0, 18.0], [142.0, 18.0], [142.0, 142.0], [18.0, 142.0]];
+      if (layers.holes) {
+        ctx.strokeStyle = '#22c55e';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        cadCircle(tx + 80.0, ty + 80.0, 17.5);
+        corners.forEach(c => {
+          cadCircle(tx + c[0], ty + c[1], 7.5);
+        });
+        ctx.stroke();
+      }
+
+      if (layers.centerlines) {
+        ctx.strokeStyle = '#64748b';
+        ctx.lineWidth = 0.8;
+        ctx.beginPath();
+        cadCrosshair(tx + 80.0, ty + 80.0, 50.0);
+        corners.forEach(c => {
+          cadCrosshair(tx + c[0], ty + c[1], 18.0);
+        });
+        // Projection alignment vertical guideline linking Top to Front
+        ctx.setLineDash([3, 3]);
+        cadLine(tx + 80.0, ty - 20.0, tx + 80.0, cy + 160.0);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      if (layers.engrave) {
+        ctx.fillStyle = '#06b6d4';
+        cadText('CHIMNEY O35mm', tx + 60.0, ty + 85.0, 3.2);
+        cadText('NATURAL EXHAUST', tx + 62.0, ty + 75.0, 2.5);
+        cadText('[FRONT - VOLUME DIAL]', tx + 38.0, ty - 22.0, 2.6);
+        cadText('[REAR - SPEAKER TERMINALS]', tx + 38.0, ty + 180.0, 2.6);
+      }
+
+      if (layers.dims) {
+        ctx.strokeStyle = '#f59e0b';
+        ctx.fillStyle = '#fcd34d';
+        ctx.lineWidth = 1.0;
+        cadDimV(ty, ty + 160.0, tx - 14.0, -18.0, '160.00 mm BODY');
+        cadDimH(tx - 14.0, tx + 174.0, ty + 160.0, 24.0, '188.00 mm OVER FINS');
+      }
+
+      // =========================================================================
+      // VIEW C: LEFT SIDE SECTION & HEATSINK (sx = 320, sy = 60)
+      // =========================================================================
+      const sx = 320.0;
+      const sy = fy;
+      ctx.fillStyle = '#f59e0b';
+      cadText('VIEW C: LEFT SIDE SECTION & HEATSINK', sx + 20.0, sy + 225.0, 4.0);
+
+      const scy = sy + 18.0;
+
+      if (layers.cut) {
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        cadRoundedRect(sx - 10.0, sy, 180.0, 18.0, 6.0);
+        cadRoundedRect(sx, scy, 160.0, 160.0, 2.0);
+
+        // 10 vertical cooling fins
+        for (let i = 0; i < 10; i++) {
+          const fz = sx + 10.0 + i * 15.5;
+          cadLine(fz, scy, fz, scy + 160.0);
+          cadLine(fz + 2.5, scy, fz + 2.5, scy + 160.0);
+        }
+
+        // Volume Knob on Front (Right edge)
+        cadRoundedRect(sx + 160.0, scy + 36.0 - 18.0, 16.0, 36.0, 3.0);
+        // Rear binding posts on Back (Left edge)
+        cadRoundedRect(sx - 16.0, scy + 82.0 - 5.0, 16.0, 10.0, 2.0);
+        cadRoundedRect(sx - 16.0, scy + 108.0 - 5.0, 16.0, 10.0, 2.0);
+
+        // Top Chimney
+        cadLine(sx + 80.0 - 17.5, scy + 160.0, sx + 80.0 - 17.5, scy + 174.0);
+        cadLine(sx + 80.0 + 17.5, scy + 160.0, sx + 80.0 + 17.5, scy + 174.0);
+        cadLine(sx + 80.0 - 17.5, scy + 174.0, sx + 80.0 + 17.5, scy + 174.0);
+        cadRoundedRect(sx + 80.0 - 22.0, scy + 166.0, 44.0, 5.0, 1.5);
+        ctx.stroke();
+      }
+
+      // Internal Chimney Draft Flue & Thermal Arrows
+      if (layers.centerlines) {
+        ctx.strokeStyle = '#64748b';
+        ctx.lineWidth = 0.8;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        cadLine(sx + 80.0 - 17.5, scy, sx + 80.0 - 17.5, scy + 160.0);
+        cadLine(sx + 80.0 + 17.5, scy, sx + 80.0 + 17.5, scy + 160.0);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.beginPath();
+        cadCrosshair(sx + 80.0, scy + 80.0, 20.0);
+        ctx.stroke();
+      }
+
+      if (layers.engrave) {
+        ctx.fillStyle = '#06b6d4';
+        cadText('▲ ▲', sx + 74.0, scy + 30.0, 3.0);
+        cadText('▲ ▲', sx + 74.0, scy + 80.0, 3.0);
+        cadText('▲ ▲', sx + 74.0, scy + 130.0, 3.0);
+        cadText('NATURAL DRAFT', sx + 52.0, scy + 90.0, 2.5);
+        cadText('10x AL6061 COOLING FINS', sx + 15.0, scy + 148.0, 2.8);
+        cadText('22.0W PASSIVE HEAT REJECTION', sx + 15.0, scy + 140.0, 2.2);
+      }
+
+      if (layers.dims) {
+        ctx.strokeStyle = '#f59e0b';
+        ctx.fillStyle = '#fcd34d';
+        ctx.lineWidth = 1.0;
+        cadDimH(sx, sx + 160.0, scy, -14.0, '160.00 mm DEPTH');
+        cadDimH(sx + 160.0, sx + 176.0, scy + 36.0, 12.0, '16.00');
+      }
+
+      // =========================================================================
+      // VIEW D: REAR I/O ELEVATION (rx = 320, ry = 330)
+      // =========================================================================
+      const rx = sx;
+      const ry = ty;
+      ctx.fillStyle = '#f59e0b';
+      cadText('VIEW D: REAR I/O ELEVATION', rx + 30.0, ry + 205.0, 4.0);
+
+      const rcy = ry + 18.0;
+
+      if (layers.cut) {
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        cadRoundedRect(rx - 10.0, ry, 180.0, 18.0, 6.0);
+        cadRoundedRect(rx, rcy, 160.0, 160.0, 8.0);
+        // Chimney on top
+        cadLine(rx + 80.0 - 17.5, rcy + 160.0, rx + 80.0 - 17.5, rcy + 174.0);
+        cadLine(rx + 80.0 + 17.5, rcy + 160.0, rx + 80.0 + 17.5, rcy + 174.0);
+        cadLine(rx + 80.0 - 17.5, rcy + 174.0, rx + 80.0 + 17.5, rcy + 174.0);
+        cadRoundedRect(rx + 80.0 - 22.0, rcy + 166.0, 44.0, 5.0, 1.5);
+        ctx.stroke();
+      }
+
+      if (layers.holes) {
+        ctx.strokeStyle = '#22c55e';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        // GX16 Aviation Socket (Dia 16mm)
+        cadCircle(rx + 125.0, rcy + 68.0, 8.0);
+        // 12 Binding Posts
+        const xCols = [25.0, 41.0, 57.0, 73.0, 89.0, 105.0];
+        xCols.forEach(colX => {
+          cadCircle(rx + colX, rcy + 108.0, 4.0);
+          cadCircle(rx + colX, rcy + 82.0, 4.0);
+        });
+        // AUX
+        cadCircle(rx + 40.0, rcy + 32.0, 3.0);
+        // USB-C
+        cadRoundedRect(rx + 105.0, rcy + 29.9, 10.0, 4.2, 2.1);
+        // Convective slits
+        [35.0, 60.0, 85.0, 110.0].forEach(slX => {
+          cadRoundedRect(rx + slX - 9.0, rcy + 13.0, 18.0, 3.5, 1.75);
+        });
+        ctx.stroke();
+      }
+
+      if (layers.engrave) {
+        ctx.fillStyle = '#06b6d4';
+        cadCircle(rx + 125.0, rcy + 68.0, 10.5);
+        cadText('24V 14.6A', rx + 114.0, rcy + 52.0, 2.3);
+        cadText('GX16-4', rx + 117.0, rcy + 47.0, 2.0);
+        cadText('5.1 HIGH-CURRENT BINDING POSTS', rx + 22.0, rcy + 124.0, 2.6);
+        const lbls = ['FL', 'FR', 'C', 'SL', 'SR', 'SUB'];
+        const cols = [25.0, 41.0, 57.0, 73.0, 89.0, 105.0];
+        for (let k = 0; k < 6; k++) {
+          cadText(lbls[k], rx + cols[k] - 2.5, rcy + 115.0, 2.3);
+          cadText('+', rx + cols[k] - 1.5, rcy + 95.0, 2.3);
+          cadText('-', rx + cols[k] - 1.5, rcy + 71.0, 2.3);
+        }
+        cadText('AUX IN', rx + 32.0, rcy + 22.0, 2.2);
+        cadText('USB-C', rx + 100.0, rcy + 22.0, 2.2);
+      }
+
+      if (layers.dims) {
+        ctx.strokeStyle = '#f59e0b';
+        ctx.fillStyle = '#fcd34d';
+        ctx.lineWidth = 1.0;
+        cadDimH(rx + 25.0, rx + 105.0, rcy + 108.0, 26.0, '80.00 mm PITCH');
+      }
+
+      // =========================================================================
+      // VIEW E: 3D ISOMETRIC VIEW (ix = 650, iy = 330)
+      // =========================================================================
+      const ix = 650.0;
+      const iy = 330.0;
+      ctx.fillStyle = '#f59e0b';
+      cadText('VIEW E: 3D ISOMETRIC VIEW', ix - 40.0, iy + 205.0, 4.0);
+
+      const s = 0.70;
+      const cos30 = 0.866 * s;
+      const sin30 = 0.500 * s;
+      function getIso(x, y, z) {
+        return {
+          x: ix + (x - z) * cos30,
+          y: iy + (x + z) * sin30 + y * s
+        };
+      }
+
+      if (layers.cut) {
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        // Plinth 8 vertices
+        const p000 = getIso(0, 0, 0);
+        const p100 = getIso(180, 0, 0);
+        const p101 = getIso(180, 0, 180);
+        const p001 = getIso(0, 0, 180);
+        const p010 = getIso(0, 18, 0);
+        const p110 = getIso(180, 18, 0);
+        const p111 = getIso(180, 18, 180);
+        const p011 = getIso(0, 18, 180);
+
+        cadLine(p000.x, p000.y, p100.x, p100.y);
+        cadLine(p100.x, p100.y, p101.x, p101.y);
+        cadLine(p101.x, p101.y, p001.x, p001.y);
+        cadLine(p001.x, p001.y, p000.x, p000.y);
+
+        cadLine(p010.x, p010.y, p110.x, p110.y);
+        cadLine(p110.x, p110.y, p111.x, p111.y);
+        cadLine(p111.x, p111.y, p011.x, p011.y);
+        cadLine(p011.x, p011.y, p010.x, p010.y);
+
+        cadLine(p000.x, p000.y, p010.x, p010.y);
+        cadLine(p100.x, p100.y, p110.x, p110.y);
+        cadLine(p101.x, p101.y, p111.x, p111.y);
+        cadLine(p001.x, p001.y, p011.x, p011.y);
+
+        // Chassis Body
+        const c000 = getIso(10, 18, 10);
+        const c100 = getIso(170, 18, 10);
+        const c101 = getIso(170, 18, 170);
+        const c001 = getIso(10, 18, 170);
+        const c010 = getIso(10, 178, 10);
+        const c110 = getIso(170, 178, 10);
+        const c111 = getIso(170, 178, 170);
+        const c011 = getIso(10, 178, 170);
+
+        cadLine(c010.x, c010.y, c110.x, c110.y);
+        cadLine(c110.x, c110.y, c111.x, c111.y);
+        cadLine(c111.x, c111.y, c011.x, c011.y);
+        cadLine(c011.x, c011.y, c010.x, c010.y);
+
+        cadLine(c000.x, c000.y, c010.x, c010.y);
+        cadLine(c100.x, c100.y, c110.x, c110.y);
+        cadLine(c101.x, c101.y, c111.x, c111.y);
+        cadLine(c001.x, c001.y, c011.x, c011.y);
+
+        // Top Chimney Cylinder
+        const chBot = getIso(90, 178, 90);
+        const chTop = getIso(90, 192, 90);
+        cadCircle(chBot.x, chBot.y, 12.0 * s);
+        cadCircle(chTop.x, chTop.y, 12.0 * s);
+        cadLine(chBot.x - 12.0 * s, chBot.y, chTop.x - 12.0 * s, chTop.y);
+        cadLine(chBot.x + 12.0 * s, chBot.y, chTop.x + 12.0 * s, chTop.y);
+
+        // Heatsink fins on right face
+        for (let k = 0; k < 6; k++) {
+          const fz1 = getIso(170, 30 + k * 24, 25);
+          const fz2 = getIso(170, 30 + k * 24, 155);
+          cadLine(fz1.x, fz1.y, fz2.x, fz2.y);
+        }
+        ctx.stroke();
+      }
+
+      // Front LCD & Knob in Isometric view
+      if (layers.holes) {
+        ctx.strokeStyle = '#22c55e';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        const sc1 = getIso(35, 80, 10);
+        const sc2 = getIso(145, 80, 10);
+        const sc3 = getIso(145, 150, 10);
+        const sc4 = getIso(35, 150, 10);
+        cadLine(sc1.x, sc1.y, sc2.x, sc2.y);
+        cadLine(sc2.x, sc2.y, sc3.x, sc3.y);
+        cadLine(sc3.x, sc3.y, sc4.x, sc4.y);
+        cadLine(sc4.x, sc4.y, sc1.x, sc1.y);
+
+        const knobCenter = getIso(90, 54, 10);
+        cadCircle(knobCenter.x, knobCenter.y, 12.0 * s);
+        ctx.stroke();
+      }
+
+      // =========================================================================
+      // MASTER ISO/ANSI TITLE BLOCK (tbX = 540, tbY = 20, W = 280, H = 90)
+      // =========================================================================
+      const tbX = 540.0;
+      const tbY = 20.0;
+
+      // Title Block Opaque Background
+      const tbP1 = worldToScreen(tbX, tbY + 90.0);
+      const tbP2 = worldToScreen(820.0, tbY);
+      ctx.fillStyle = '#060911';
+      ctx.fillRect(tbP1.x, tbP1.y, tbP2.x - tbP1.x, tbP2.y - tbP1.y);
+
+      ctx.strokeStyle = '#f1f5f9';
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      cadLine(tbX, tbY, 820.0, tbY);
+      cadLine(820.0, tbY, 820.0, tbY + 90.0);
+      cadLine(820.0, tbY + 90.0, tbX, tbY + 90.0);
+      cadLine(tbX, tbY + 90.0, tbX, tbY);
+
+      cadLine(tbX, tbY + 45.0, 820.0, tbY + 45.0);
+      cadLine(tbX + 175.0, tbY, tbX + 175.0, tbY + 45.0);
+
+      // 3rd Angle Projection Symbol
+      const pSymX = tbX + 230.0;
+      const pSymY = tbY + 68.0;
+      cadCircle(pSymX + 22.0, pSymY, 5.0);
+      cadCircle(pSymX + 22.0, pSymY, 10.0);
+      cadCrosshair(pSymX + 22.0, pSymY, 24.0);
+
+      cadLine(pSymX - 10.0, pSymY - 10.0, pSymX + 6.0, pSymY - 5.0);
+      cadLine(pSymX + 6.0, pSymY - 5.0, pSymX + 6.0, pSymY + 5.0);
+      cadLine(pSymX + 6.0, pSymY + 5.0, pSymX - 10.0, pSymY + 10.0);
+      cadLine(pSymX - 10.0, pSymY + 10.0, pSymX - 10.0, pSymY - 10.0);
+      cadLine(pSymX - 14.0, pSymY, pSymX + 10.0, pSymY);
+      ctx.stroke();
+
+      ctx.fillStyle = '#f1f5f9';
+      cadText('COPPER CHIMNEY V2', tbX + 8.0, tbY + 75.0, 5.0);
+      cadText('5.1 AUDIOPHILE CHASSIS', tbX + 8.0, tbY + 65.0, 3.6);
+      cadText('MULTI-VIEW ORTHOGRAPHIC ASSEMBLY BLUEPRINT', tbX + 8.0, tbY + 53.0, 3.0);
+
+      cadText('DRAWING NO: CC-V2-ASM-01', tbX + 8.0, tbY + 34.0, 2.8);
+      cadText('TOLERANCES: +/-0.15mm | ANGLE +/-0.2 DEG', tbX + 8.0, tbY + 22.0, 2.8);
+      cadText('MATL: AL6061-T6 / AMBER POLYCARB / WALNUT', tbX + 8.0, tbY + 8.0, 2.4);
+
+      cadText('SCALE: 1:1 METRIC', tbX + 182.0, tbY + 34.0, 2.7);
+      cadText('PROJECTION: 3RD ANGLE', tbX + 182.0, tbY + 22.0, 2.5);
+      cadText('UNITS: MILLIMETERS', tbX + 182.0, tbY + 10.0, 2.4);
+    }
+
+    // Main Canvas Render Loop
+    function render() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      drawGrid();
+
+      if (activePanelKey === 'multiview') {
+        renderMultiViewAssembly();
+      } else if (activePanelKey === 'master') {
+        renderMasterSheet();
+      } else if (activePanelKey === 'front') {
+        renderFrontPanel(0, 0);
+      } else if (activePanelKey === 'rear') {
+        renderRearPanel(0, 0);
+      } else if (activePanelKey === 'top') {
+        renderTopPanel(0, 0);
+      } else if (activePanelKey === 'bottom') {
+        renderBottomPanel(0, 0);
+      } else if (activePanelKey === 'plinth') {
+        renderPlinthPanel(0, 0);
+      } else if (activePanelKey === 'heatsink') {
+        renderHeatsinkPanel(0, 0);
+      }
+
+      // Draw active measurement line if measuring
+      if (isMeasuring && measureP1 && measureP2) {
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        cadLine(measureP1.x, measureP1.y, measureP2.x, measureP2.y);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        const dist = Math.hypot(measureP2.x - measureP1.x, measureP2.y - measureP1.y);
+        const midX = (measureP1.x + measureP2.x) / 2;
+        const midY = (measureP1.y + measureP2.y) / 2;
+        ctx.fillStyle = '#38bdf8';
+        cadText(`L: ${dist.toFixed(2)} mm`, midX + 4, midY + 4, 3.8);
+      }
+    }
+
+    // Panel Selection Logic
+    function selectPanel(key) {
+      activePanelKey = key;
+
+      // Update button styles
+      document.querySelectorAll('.panel-btn').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = document.getElementById(`pbtn-${key}`);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      // Update DXF Download Link
+      const cfg = panelConfigs[key];
+      const dlBtn = document.getElementById('btn-download-dxf');
+      dlBtn.href = cfg.dxfFile;
+      dlBtn.download = cfg.dxfFile.split('/').pop();
+      document.getElementById('download-label').innerText = `Download ${cfg.name.split(' ')[0]} DXF`;
+
+      resetView();
+    }
+
+    // Layer Toggle Logic
+    function toggleLayer(layerKey) {
+      layers[layerKey] = !layers[layerKey];
+      const chk = document.getElementById(`chk-${layerKey}`);
+      if (chk) chk.checked = layers[layerKey];
+      render();
+    }
+
+    // Mouse & Touch Interactivity
+    canvas.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
+
+      if (isMeasuring) {
+        const wPos = screenToWorld(e.clientX, e.clientY);
+        if (!measureP1) {
+          measureP1 = wPos;
+        } else {
+          measureP2 = wPos;
+        }
+        render();
+      }
+    });
+
+    window.addEventListener('mouseup', () => {
+      isDragging = false;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (isDragging && !isMeasuring) {
+        const dx = e.clientX - dragStartX;
+        const dy = e.clientY - dragStartY;
+        panX += dx;
+        panY += dy;
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+        render();
+      }
+
+      const wPos = screenToWorld(e.clientX, e.clientY);
+      document.getElementById('hud-x').innerText = wPos.x.toFixed(2);
+      document.getElementById('hud-y').innerText = wPos.y.toFixed(2);
+
+      if (isMeasuring && measureP1 && !measureP2) {
+        render();
+        // Draw live rubber band
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 1.2;
+        ctx.setLineDash([3, 3]);
+        ctx.beginPath();
+        cadLine(measureP1.x, measureP1.y, wPos.x, wPos.y);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        const dist = Math.hypot(wPos.x - measureP1.x, wPos.y - measureP1.y);
+        ctx.fillStyle = '#38bdf8';
+        cadText(`L: ${dist.toFixed(2)} mm`, wPos.x + 3, wPos.y + 3, 3.5);
+      }
+    });
+
+    canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const zoomFactor = e.deltaY < 0 ? 1.15 : 0.85;
+
+      const mouseWorld = screenToWorld(e.clientX, e.clientY);
+      scale *= zoomFactor;
+      scale = Math.max(0.2, Math.min(scale, 20.0));
+
+      panX = e.clientX - mouseWorld.x * scale;
+      panY = e.clientY + mouseWorld.y * scale;
+
+      updateHud();
+      render();
+    }, { passive: false });
+
+    // Touch Support for Mobile
+    let lastTouchDist = 0;
+    canvas.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 1) {
+        isDragging = true;
+        dragStartX = e.touches[0].clientX;
+        dragStartY = e.touches[0].clientY;
+      } else if (e.touches.length === 2) {
+        lastTouchDist = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+      }
+    });
+
+    canvas.addEventListener('touchmove', (e) => {
+      if (e.touches.length === 1 && isDragging) {
+        const dx = e.touches[0].clientX - dragStartX;
+        const dy = e.touches[0].clientY - dragStartY;
+        panX += dx;
+        panY += dy;
+        dragStartX = e.touches[0].clientX;
+        dragStartY = e.touches[0].clientY;
+        render();
+      } else if (e.touches.length === 2) {
+        const dist = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+        const factor = dist / lastTouchDist;
+        scale *= factor;
+        lastTouchDist = dist;
+        updateHud();
+        render();
+      }
+    });
+
+    canvas.addEventListener('touchend', () => {
+      isDragging = false;
+    });
+
+    function zoomIn() {
+      scale *= 1.25;
+      updateHud();
+      render();
+    }
+
+    function zoomOut() {
+      scale *= 0.8;
+      updateHud();
+      render();
+    }
+
+    function updateHud() {
+      document.getElementById('hud-zoom').innerText = `${Math.round(scale * 100 / 1.6)}%`;
+      document.getElementById('hud-px-per-mm').innerText = `${scale.toFixed(1)}px`;
+    }
+
+    function toggleMeasure() {
+      isMeasuring = !isMeasuring;
+      measureP1 = null;
+      measureP2 = null;
+      const btn = document.getElementById('btn-measure');
+      const lbl = document.getElementById('measure-label');
+      if (isMeasuring) {
+        btn.classList.add('active');
+        lbl.innerText = 'Click 2 Pts';
+      } else {
+        btn.classList.remove('active');
+        lbl.innerText = 'Measure';
+      }
+      render();
+    }
+
+    function downloadAllBundle() {
+      // Trigger download of all 8 files sequentially (including Multi-View Assembly)
+      const files = [
+        'dxf/CHASSIS_MULTI_VIEW_ASSEMBLY.dxf',
+        'dxf/CHASSIS_MASTER_FABRICATION_SHEET.dxf',
+        'dxf/PANEL_FRONT.dxf',
+        'dxf/PANEL_REAR_IO.dxf',
+        'dxf/PANEL_TOP_CHIMNEY.dxf',
+        'dxf/PANEL_BOTTOM_BASE.dxf',
+        'dxf/PLINTH_WOOD_BASE.dxf',
+        'dxf/PANEL_SIDE_HEATSINK.dxf'
+      ];
+      files.forEach((f, idx) => {
+        setTimeout(() => {
+          const a = document.createElement('a');
+          a.href = f;
+          a.download = f.split('/').pop();
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        }, idx * 250);
+      });
+    }
+
+    function openFabModal() {
+      document.getElementById('fab-backdrop').style.display = 'block';
+      document.getElementById('fab-modal').style.display = 'block';
+    }
+
+    function closeFabModal() {
+      document.getElementById('fab-backdrop').style.display = 'none';
+      document.getElementById('fab-modal').style.display = 'none';
+    }
+
+    // Startup
+    window.onload = () => {
+      resizeCanvas();
+      resetView();
+    };
+  </script>
+</body>
+</html>

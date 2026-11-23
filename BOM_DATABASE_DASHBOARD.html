@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Embedded Database BOM & Asset Manager — DIY 5.1 Hybrid Amp</title>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <style>
+    body { background: #060a12; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; margin: 0; padding: 0; }
+    .page-wrap { max-width: 1560px; margin: 0 auto; padding: 20px 16px; }
+    .db-card {
+      background: #0d1522;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+    .stat-box {
+      background: #0f1929;
+      border-radius: 6px;
+      padding: 14px 16px;
+      border: 1px solid #1e293b;
+    }
+    .stat-val { font-size: 24px; font-weight: bold; }
+    .stat-lbl { font-size: 11.5px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+    .prog-bar-bg { background: #1e293b; height: 8px; border-radius: 4px; overflow: hidden; margin-top: 8px; }
+    .prog-bar-fill { background: #10b981; height: 100%; transition: width 0.4s ease; }
+    .filter-btn {
+      background: #1e293b;
+      color: #94a3b8;
+      border: 1px solid #334155;
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-right: 6px;
+    }
+    .filter-btn:hover { background: #334155; color: #f8fafc; }
+    .filter-btn.active { background: #0284c7; color: #fff; border-color: #38bdf8; }
+  </style>
+</head>
+<body>
+  <div class="page-wrap">
+    
+    <!-- Header -->
+    <div class="w3-row w3-margin-bottom" style="align-items: center;">
+      <div class="w3-col l8 m12">
+        <h2 style="margin: 0; font-size: 24px; font-weight: 400; color: #38bdf8;">
+          Embedded Database BOM &amp; Tech Asset Manager
+        </h2>
+        <div style="font-size: 13px; color: #94a3b8; margin-top: 4px;">
+          Backed by Browser-Embedded IndexedDB &bull; 2D Array Architecture &bull; Instant Image Lightbox &amp; Doc Links
+        </div>
+      </div>
+      <div class="w3-col l4 m12 w3-right-align" style="margin-top: 8px;">
+        <span class="w3-tag w3-teal w3-round" style="padding: 6px 12px; font-size: 12px; font-weight: bold;">
+          Single Source of Truth (SSOT)
+        </span>
+      </div>
+    </div>
+
+    <!-- Live Dynamic KPI Cards -->
+    <div class="w3-row-padding w3-margin-bottom" style="margin-left: -8px; margin-right: -8px;">
+      <div class="w3-col l3 m6 s12 w3-margin-bottom">
+        <div class="stat-box" style="border-left: 4px solid #10b981;">
+          <div class="stat-val" style="color: #4ade80;" id="kpi-inhand">0 Items</div>
+          <div class="stat-lbl">In Hand (Verified in Lab)</div>
+        </div>
+      </div>
+      <div class="w3-col l3 m6 s12 w3-margin-bottom">
+        <div class="stat-box" style="border-left: 4px solid #0284c7;">
+          <div class="stat-val" style="color: #38bdf8;" id="kpi-ordered">0 Items</div>
+          <div class="stat-lbl">In Transit (Ordered Online)</div>
+        </div>
+      </div>
+      <div class="w3-col l3 m6 s12 w3-margin-bottom">
+        <div class="stat-box" style="border-left: 4px solid #ef4444;">
+          <div class="stat-val" style="color: #f87171;" id="kpi-missing">0 Items</div>
+          <div class="stat-lbl">Pending Procurement (To Buy)</div>
+        </div>
+      </div>
+      <div class="w3-col l3 m6 s12 w3-margin-bottom">
+        <div class="stat-box" style="border-left: 4px solid #c084fc;">
+          <div class="stat-val" style="color: #e879f9;" id="kpi-totalval">₹ 0.00</div>
+          <div class="stat-lbl">Total BOM Valuation</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Readiness Progress Bar -->
+    <div class="db-card w3-margin-bottom" style="padding: 12px 16px;">
+      <div style="display: flex; justify-content: space-between; font-size: 12.5px; font-weight: bold; color: #cbd5e1;">
+        <span>Hardware Procurement Readiness</span>
+        <span id="readiness-label" style="color: #38bdf8;">Loading...</span>
+      </div>
+      <div class="prog-bar-bg">
+        <div id="readiness-bar" class="prog-bar-fill" style="width: 0%;"></div>
+      </div>
+    </div>
+
+    <!-- Filter Buttons Bar -->
+    <div class="w3-margin-bottom" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+      <div>
+        <button id="btn-all" class="filter-btn active" onclick="applyFilter('all')">All Components (27)</button>
+        <button id="btn-inhand" class="filter-btn" onclick="applyFilter('inhand')">✔ In Hand Only</button>
+        <button id="btn-ordered" class="filter-btn" onclick="applyFilter('ordered')">✈ In Transit</button>
+        <button id="btn-missing" class="filter-btn" onclick="applyFilter('missing')">⚠ Pending / To Buy</button>
+      </div>
+      <div style="font-size: 12px; color: #94a3b8;">
+        Click any thumbnail image to zoom &bull; Click status dropdown to change &amp; auto-save to IndexedDB
+      </div>
+    </div>
+
+    <!-- Table Container rendered by xtbl.js -->
+    <div class="db-card" style="padding: 0; overflow-x: auto;">
+      <div id="table-mount"></div>
+    </div>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="db.js"></script>
+  <script src="xtbl.js"></script>
+  <script>
+    var currentDataset = [];
+    var activeFilterKey = "all";
+
+    document.addEventListener("DOMContentLoaded", function() {
+      loadDatabaseData();
+    });
+
+    function loadDatabaseData() {
+      AppDB.getAllAs2DArray().then(function(data2D) {
+        currentDataset = data2D;
+        refreshUI();
+      }).catch(function(err) {
+        console.warn("Falling back to seed data:", err);
+        currentDataset = AppDB.getInitialSeed2D();
+        refreshUI();
+      });
+    }
+
+    function refreshUI() {
+      // 1. Calculate Stats
+      var stats = xTbl.calculateStats(currentDataset);
+
+      // Update KPI Elements
+      document.getElementById("kpi-inhand").textContent = stats.inHandCount + " Items";
+      document.getElementById("kpi-ordered").textContent = stats.orderedCount + " Items";
+      document.getElementById("kpi-missing").textContent = stats.missingCount + " Items";
+      document.getElementById("kpi-totalval").textContent = "₹ " + stats.totalValue.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+      var readyPct = Math.round(((stats.inHandCount + stats.orderedCount) / stats.totalItems) * 100);
+      document.getElementById("readiness-label").textContent = readyPct + "% Secured (" + (stats.inHandCount + stats.orderedCount) + " of " + stats.totalItems + " items)";
+      document.getElementById("readiness-bar").style.width = readyPct + "%";
+
+      // 2. Filter dataset
+      var displayData = currentDataset;
+      if (activeFilterKey !== "all") {
+        displayData = currentDataset.filter(function(row) {
+          return row[8] === activeFilterKey;
+        });
+      }
+
+      // 3. Render Table via xtbl.js
+      xTbl.renderTable("table-mount", displayData, {
+        headers: ["Category", "Component Name", "Hardware Specification", "Qty", "Unit Rate", "Total", "Status & Edit", "Vendor", "Image", "Spec Doc"],
+        onStatusChange: function(id, newStatus) {
+          AppDB.updateComponentStatus(id, newStatus).then(function() {
+            loadDatabaseData();
+          });
+        }
+      });
+    }
+
+    function applyFilter(key) {
+      activeFilterKey = key;
+      document.querySelectorAll(".filter-btn").forEach(function(b) {
+        b.className = "filter-btn";
+      });
+      var btn = document.getElementById("btn-" + key);
+      if (btn) btn.className = "filter-btn active";
+      refreshUI();
+    }
+  </script>
+</body>
+</html>
