@@ -24,7 +24,20 @@
       background: #07170c;
     }
     .w3-table td, .w3-table th { color: #cbd5e1; font-size: 12.5px; vertical-align: middle; }
-    .w3-table th { background: #131d2e; color: #f1f5f9; }
+    .w3-table th { background: #131d2e; color: #f1f5f9; border-bottom: 2px solid #1e293b; }
+    .w3-table td { border-top: 1px solid #141e2e; }
+    .w3-hoverable tbody tr:hover,
+    .w3-hoverable tr:hover,
+    .w3-table tbody tr:hover,
+    table.w3-table tr:hover {
+      background-color: #172438 !important;
+    }
+    .w3-hoverable tbody tr:hover td,
+    .w3-hoverable tr:hover td,
+    .w3-table tbody tr:hover td,
+    table.w3-table tr:hover td {
+      color: #f1f5f9 !important;
+    }
     .info-badge { display: inline-block; padding: 5px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-right: 6px; }
     .note-box { background: #0b1320; border-left: 4px solid #10b981; padding: 14px 18px; border-radius: 0 4px 4px 0; font-size: 13px; line-height: 1.6; }
     .legend-item { display: inline-flex; align-items: center; margin-right: 18px; margin-bottom: 8px; font-size: 12px; }

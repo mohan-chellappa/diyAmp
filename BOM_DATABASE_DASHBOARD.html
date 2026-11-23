@@ -78,13 +78,20 @@
       color: #cbd5e1;
     }
     /* Soft, calm row hover (Never turns white or irritating) */
+    .w3-table tbody tr,
     .w3-hoverable tbody tr {
       transition: background-color 0.15s ease;
     }
-    .w3-hoverable tbody tr:hover {
+    .w3-hoverable tbody tr:hover,
+    .w3-hoverable tr:hover,
+    .w3-table tbody tr:hover,
+    table.w3-table tr:hover {
       background-color: #172438 !important; /* Gentle dark slate/navy, soft on the eyes */
     }
-    .w3-hoverable tbody tr:hover td {
+    .w3-hoverable tbody tr:hover td,
+    .w3-hoverable tr:hover td,
+    .w3-table tbody tr:hover td,
+    table.w3-table tr:hover td {
       color: #f1f5f9 !important;
     }
     /* Subtle zebra striping */
@@ -175,7 +182,7 @@
   </div>
 
   <!-- Scripts: xtbl.js only (Zero IndexedDB / Zero External Cloud DB) -->
-  <script src="xtbl.js"></script>
+  <script src="xtbl.js?v=2.2"></script>
   <script>
     var masterDataset = [];
     var activeFilterKey = "all";
