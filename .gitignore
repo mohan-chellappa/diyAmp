@@ -9,3 +9,7 @@ tab1_factory_autocorrect_completed.png
 toolbar_autocorrect_btn.png
 .DS_Store
 Thumbs.db
+.history/
+*.history/
+*.lck
+*.tmp
