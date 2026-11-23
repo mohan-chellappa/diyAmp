@@ -54,7 +54,7 @@ var xTbl = (function() {
       // Item Name
       var tdItem = document.createElement("td");
       tdItem.textContent = row[2];
-      tdItem.style.color = "#38bdf8";
+      tdItem.style.color = "#e2e8f0";
       tdItem.style.fontWeight = "600";
       tr.appendChild(tdItem);
 
@@ -62,45 +62,60 @@ var xTbl = (function() {
       var tdSpec = document.createElement("td");
       tdSpec.textContent = row[3];
       tdSpec.style.fontSize = "11.5px";
+      tdSpec.style.color = "#94a3b8";
       tr.appendChild(tdSpec);
 
       // Qty + Unit
       var tdQty = document.createElement("td");
       tdQty.textContent = row[4] + " " + row[5];
       tdQty.style.textAlign = "center";
+      tdQty.style.color = "#cbd5e1";
       tr.appendChild(tdQty);
 
       // Rate
       var tdRate = document.createElement("td");
       tdRate.textContent = "₹ " + Number(row[6]).toFixed(2);
+      tdRate.style.color = "#94a3b8";
       tr.appendChild(tdRate);
 
       // Total Cost
       var tdTot = document.createElement("td");
       var totVal = row[4] * row[6];
       tdTot.textContent = "₹ " + totVal.toFixed(2);
-      tdTot.style.fontWeight = "bold";
+      tdTot.style.fontWeight = "600";
+      tdTot.style.color = "#e2e8f0";
       tr.appendChild(tdTot);
 
-      // Stock Status (Interactive Dropdown / Badge)
+      // Stock Status (Calm Matte Pill Badges)
       var tdStatus = document.createElement("td");
       var statusKey = row[8];
       var badge = document.createElement("span");
-      badge.className = "w3-tag w3-round";
+      badge.style.display = "inline-block";
+      badge.style.padding = "2px 8px";
+      badge.style.borderRadius = "4px";
       badge.style.fontSize = "11px";
-      badge.style.fontWeight = "bold";
+      badge.style.fontWeight = "600";
+      badge.style.letterSpacing = "0.2px";
 
       if (statusKey === "inhand") {
-        badge.className += " w3-green";
+        badge.style.background = "rgba(34, 197, 94, 0.12)";
+        badge.style.color = "#4ade80";
+        badge.style.border = "1px solid rgba(34, 197, 94, 0.35)";
         badge.textContent = "✔ In Hand";
       } else if (statusKey === "ordered") {
-        badge.className += " w3-blue";
+        badge.style.background = "rgba(56, 189, 248, 0.12)";
+        badge.style.color = "#38bdf8";
+        badge.style.border = "1px solid rgba(56, 189, 248, 0.35)";
         badge.textContent = "✈ Ordered";
       } else if (statusKey === "missing") {
-        badge.className += " w3-red";
-        badge.textContent = "⚠ Missing";
+        badge.style.background = "rgba(239, 68, 68, 0.12)";
+        badge.style.color = "#f87171";
+        badge.style.border = "1px solid rgba(239, 68, 68, 0.35)";
+        badge.textContent = "⚠ Pending";
       } else {
-        badge.className += " w3-grey";
+        badge.style.background = "rgba(148, 163, 184, 0.1)";
+        badge.style.color = "#94a3b8";
+        badge.style.border = "1px solid rgba(148, 163, 184, 0.25)";
         badge.textContent = "Omitted";
       }
       tdStatus.appendChild(badge);
@@ -154,15 +169,24 @@ var xTbl = (function() {
       }
       tr.appendChild(tdImg);
 
-      // Doc Link
+      // Doc Link (Subtle Slate Button)
       var tdDoc = document.createElement("td");
       var docPath = row[11];
       if (docPath && docPath.length > 2) {
         var link = document.createElement("a");
         link.href = docPath;
         link.target = "_blank";
-        link.className = "w3-button w3-tiny w3-round w3-indigo";
+        link.style.display = "inline-block";
         link.style.padding = "3px 8px";
+        link.style.borderRadius = "4px";
+        link.style.fontSize = "11px";
+        link.style.fontWeight = "600";
+        link.style.textDecoration = "none";
+        link.style.background = "#1e293b";
+        link.style.color = "#94a3b8";
+        link.style.border = "1px solid #334155";
+        link.onmouseover = function() { this.style.color = "#f8fafc"; this.style.borderColor = "#64748b"; };
+        link.onmouseout = function() { this.style.color = "#94a3b8"; this.style.borderColor = "#334155"; };
         link.textContent = "Doc";
         tdDoc.appendChild(link);
       } else {

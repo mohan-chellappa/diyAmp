@@ -52,6 +52,45 @@
       margin-left: 6px;
     }
     .top-nav-btn:hover { background: #334155; color: #fff; }
+
+    /* Premium, Eye-Comfort Dark-Mode Table Styling (No Glare, No White Flash) */
+    .w3-table {
+      background: #090e17 !important;
+      border-collapse: separate !important;
+      border-spacing: 0 !important;
+    }
+    .w3-table th {
+      background: #0f172a !important;
+      color: #94a3b8 !important;
+      font-size: 11px !important;
+      font-weight: 700 !important;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      border-bottom: 2px solid #1e293b !important;
+      border-top: none !important;
+      padding: 10px 12px !important;
+    }
+    .w3-table td {
+      border-top: 1px solid #141e2e !important;
+      border-bottom: none !important;
+      font-size: 12.5px;
+      padding: 9px 12px !important;
+      color: #cbd5e1;
+    }
+    /* Soft, calm row hover (Never turns white or irritating) */
+    .w3-hoverable tbody tr {
+      transition: background-color 0.15s ease;
+    }
+    .w3-hoverable tbody tr:hover {
+      background-color: #172438 !important; /* Gentle dark slate/navy, soft on the eyes */
+    }
+    .w3-hoverable tbody tr:hover td {
+      color: #f1f5f9 !important;
+    }
+    /* Subtle zebra striping */
+    .w3-table tbody tr:nth-child(even) {
+      background-color: rgba(15, 23, 42, 0.45);
+    }
   </style>
 </head>
 <body>
