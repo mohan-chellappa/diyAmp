@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Embedded Database BOM & Asset Manager — DIY 5.1 Hybrid Amp</title>
+  <title>BOM &amp; Hardware Manager — DIY 5.1 Hybrid Amp</title>
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
   <style>
     body { background: #060a12; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; margin: 0; padding: 0; }
-    .page-wrap { max-width: 1560px; margin: 0 auto; padding: 20px 16px; }
+    .page-wrap { max-width: 1560px; margin: 0 auto; padding: 18px 16px; }
     .db-card {
       background: #0d1522;
       border: 1px solid #1e293b;
@@ -35,28 +35,44 @@
       font-weight: 600;
       cursor: pointer;
       margin-right: 6px;
+      transition: all 0.2s ease;
     }
     .filter-btn:hover { background: #334155; color: #f8fafc; }
     .filter-btn.active { background: #0284c7; color: #fff; border-color: #38bdf8; }
+    .top-nav-btn {
+      background: #1e293b;
+      color: #38bdf8;
+      border: 1px solid #334155;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-block;
+      margin-left: 6px;
+    }
+    .top-nav-btn:hover { background: #334155; color: #fff; }
   </style>
 </head>
 <body>
   <div class="page-wrap">
     
-    <!-- Header -->
+    <!-- Top Header -->
     <div class="w3-row w3-margin-bottom" style="align-items: center;">
-      <div class="w3-col l8 m12">
+      <div class="w3-col l7 m12">
         <h2 style="margin: 0; font-size: 24px; font-weight: 400; color: #38bdf8;">
-          Embedded Database BOM &amp; Tech Asset Manager
+          DIY 5.1 Amp &bull; Master BOM &amp; Asset Manager
         </h2>
         <div style="font-size: 13px; color: #94a3b8; margin-top: 4px;">
-          Backed by Browser-Embedded IndexedDB &bull; 2D Array Architecture &bull; Instant Image Lightbox &amp; Doc Links
+          Git-Native Cloud Architecture &bull; Powered Directly by <code>BOM.tsv</code> &bull; Live Image Lightbox &amp; Spec Links
         </div>
       </div>
-      <div class="w3-col l4 m12 w3-right-align" style="margin-top: 8px;">
-        <span class="w3-tag w3-teal w3-round" style="padding: 6px 12px; font-size: 12px; font-weight: bold;">
-          Single Source of Truth (SSOT)
-        </span>
+      <div class="w3-col l5 m12 w3-right-align" style="margin-top: 8px;">
+        <a href="CARRIER_MOTHERBOARD_DIAGRAM.html" class="top-nav-btn">⚡ Circuit Schematic</a>
+        <a href="PROJECT.html" class="top-nav-btn">📖 Project Spec</a>
+        <a href="https://github.com/mohan-chellappa/diyAmp" target="_blank" class="top-nav-btn" style="color: #4ade80;">
+          🐙 GitHub Repo
+        </a>
       </div>
     </div>
 
@@ -92,7 +108,7 @@
     <div class="db-card w3-margin-bottom" style="padding: 12px 16px;">
       <div style="display: flex; justify-content: space-between; font-size: 12.5px; font-weight: bold; color: #cbd5e1;">
         <span>Hardware Procurement Readiness</span>
-        <span id="readiness-label" style="color: #38bdf8;">Loading...</span>
+        <span id="readiness-label" style="color: #38bdf8;">Loading BOM.tsv...</span>
       </div>
       <div class="prog-bar-bg">
         <div id="readiness-bar" class="prog-bar-fill" style="width: 0%;"></div>
@@ -102,13 +118,13 @@
     <!-- Filter Buttons Bar -->
     <div class="w3-margin-bottom" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
       <div>
-        <button id="btn-all" class="filter-btn active" onclick="applyFilter('all')">All Components (27)</button>
-        <button id="btn-inhand" class="filter-btn" onclick="applyFilter('inhand')">✔ In Hand Only</button>
+        <button id="btn-all" class="filter-btn active" onclick="applyFilter('all')">All Items</button>
+        <button id="btn-inhand" class="filter-btn" onclick="applyFilter('inhand')">✔ In Hand</button>
         <button id="btn-ordered" class="filter-btn" onclick="applyFilter('ordered')">✈ In Transit</button>
         <button id="btn-missing" class="filter-btn" onclick="applyFilter('missing')">⚠ Pending / To Buy</button>
       </div>
       <div style="font-size: 12px; color: #94a3b8;">
-        Click any thumbnail image to zoom &bull; Click status dropdown to change &amp; auto-save to IndexedDB
+        Click any photo to zoom &bull; Click "Doc" to open spec sheets &bull; SSOT: <code>BOM.tsv</code>
       </div>
     </div>
 
@@ -119,58 +135,163 @@
 
   </div>
 
-  <!-- Scripts -->
-  <script src="db.js"></script>
+  <!-- Scripts: xtbl.js only (Zero IndexedDB / Zero External Cloud DB) -->
   <script src="xtbl.js"></script>
   <script>
-    var currentDataset = [];
+    var masterDataset = [];
     var activeFilterKey = "all";
 
     document.addEventListener("DOMContentLoaded", function() {
-      loadDatabaseData();
+      loadBomTsv();
     });
 
-    function loadDatabaseData() {
-      AppDB.getAllAs2DArray().then(function(data2D) {
-        currentDataset = data2D;
-        refreshUI();
-      }).catch(function(err) {
-        console.warn("Falling back to seed data:", err);
-        currentDataset = AppDB.getInitialSeed2D();
-        refreshUI();
-      });
+    // Fetch and Parse BOM.tsv directly with cache-busting timestamp
+    function loadBomTsv() {
+      var tsvUrl = "BOM.tsv?t=" + Date.now();
+      
+      fetch(tsvUrl)
+        .then(function(res) {
+          if (!res.ok) throw new Error("Failed to load BOM.tsv: " + res.status);
+          return res.text();
+        })
+        .then(function(tsvText) {
+          masterDataset = parseTsvTo2D(tsvText);
+          refreshUI();
+        })
+        .catch(function(err) {
+          console.error("Error loading BOM:", err);
+          document.getElementById("readiness-label").textContent = "Error loading BOM.tsv from Git repository.";
+        });
+    }
+
+    // Convert TSV text to 2D Array
+    function parseTsvTo2D(tsvText) {
+      var lines = tsvText.trim().split("\n");
+      var rows2D = [];
+
+      for (var i = 1; i < lines.length; i++) { // Skip header row
+        var line = lines[i].trim();
+        if (!line) continue;
+        var cols = line.split("\t");
+
+        // Normalize Stock Status
+        var rawStatus = (cols[9] || "").toLowerCase();
+        var statusKey = "missing";
+        if (rawStatus.indexOf("available") !== -1 || rawStatus.indexOf("in stock") !== -1 || rawStatus.indexOf("in hand") !== -1) {
+          statusKey = "inhand";
+        } else if (rawStatus.indexOf("ordered") !== -1 || rawStatus.indexOf("transit") !== -1) {
+          statusKey = "ordered";
+        } else if (rawStatus.indexOf("omitted") !== -1) {
+          statusKey = "omitted";
+        }
+
+        var qty = parseInt(cols[3], 10) || 1;
+        var rate = parseFloat(cols[5]) || 0;
+
+        // Auto-assign image and doc paths based on item name
+        var itemLower = cols[1].toLowerCase();
+        var imgPath = "";
+        var docPath = "";
+
+        if (itemLower.indexOf("mean well") !== -1) {
+          imgPath = "Meanwell LRS-350-24 SMPS.png";
+          docPath = "Meanwell LRS-350-24 SMPS Power Supply.md";
+        } else if (itemLower.indexOf("wago 221-415") !== -1) {
+          imgPath = "WAGO 221-415 5-Conductor Lever Splicing Connector.png";
+          docPath = "wago 221 specs.md";
+        } else if (itemLower.indexOf("wago 221-412") !== -1) {
+          imgPath = "image/PROJECT/wago_221_412.png";
+          docPath = "wago 221 412 2way spec.md";
+        } else if (itemLower.indexOf("bulk capacitor") !== -1) {
+          imgPath = "4700uF 50V Electrolytic Capacitor.png";
+          docPath = "4700uF capacitor Spec Sheet.md";
+        } else if (itemLower.indexOf("ams1117") !== -1) {
+          imgPath = "image/PROJECT/1791221023178.png";
+          docPath = "AMS 117 3.3 V power supply module.md";
+        } else if (itemLower.indexOf("tpa3116") !== -1 || itemLower.indexOf("xh-m562") !== -1) {
+          imgPath = "image/PROJECT/1791126129975.png";
+          docPath = "XH-M562 TPA3116D2.md";
+        } else if (itemLower.indexOf("hy510") !== -1 || itemLower.indexOf("thermal") !== -1) {
+          imgPath = "image/PROJECT/hy510_thermal_paste.jpg";
+          docPath = "arctic mx-4 4g thermal paste.md";
+        } else if (itemLower.indexOf("4.3b") !== -1) {
+          imgPath = "image/PROJECT/1791222659512.png";
+          docPath = "Waveshare ESP32-S3 with Touch spec.md";
+        } else if (itemLower.indexOf("pico") !== -1) {
+          imgPath = "image/PROJECT/waveshare_esp32_s3_pico_1552780.jpg";
+          docPath = "esp32.md";
+        } else if (itemLower.indexOf("wroom") !== -1) {
+          imgPath = "image/PROJECT/esp32_wroom32_30pin_slave.jpg";
+          docPath = "esp32.md";
+        } else if (itemLower.indexOf("pcm5102") !== -1) {
+          imgPath = "image/PROJECT/1791016549053.png";
+          docPath = "PCM5102 12S Spec.md";
+        } else if (itemLower.indexOf("pcm1808") !== -1) {
+          imgPath = "image/PROJECT/1791122464907.png";
+          docPath = "PCM1808 24bit SNR Audio Stereo ADC Single-Ended Analog-Input Decoder.md";
+        } else if (itemLower.indexOf("xl4015") !== -1) {
+          imgPath = "image/PROJECT/xl4015_buck.jpg";
+          docPath = "XL4015 Spec.md";
+        } else if (itemLower.indexOf("vhm-314") !== -1) {
+          imgPath = "image/PROJECT/vhm314_bluetooth_5_decoder.jpg";
+          docPath = "BT_RECEIVER_PCM1808.md";
+        } else if (itemLower.indexOf("b0505s") !== -1) {
+          imgPath = "image/PROJECT/b0505s.jpg";
+          docPath = "BT_RECEIVER_PCM1808.md";
+        } else if (itemLower.indexOf("jimson") !== -1) {
+          imgPath = "image/components/jimson_film_cap.jpg";
+          docPath = "PROJECT.md";
+        } else {
+          docPath = "PROJECT.md";
+        }
+
+        // Row format: [ID, Category, Item, Spec, Qty, Unit, Rate, Vendor, StockStatus, Remarks, ImagePath, DocPath]
+        rows2D.push([
+          i,
+          cols[0] || "General",
+          cols[1] || "",
+          cols[2] || "",
+          qty,
+          cols[4] || "pcs",
+          rate,
+          cols[8] || "",
+          statusKey,
+          cols[10] || "",
+          imgPath,
+          docPath
+        ]);
+      }
+
+      return rows2D;
     }
 
     function refreshUI() {
-      // 1. Calculate Stats
-      var stats = xTbl.calculateStats(currentDataset);
+      // 1. Live Stats Calculation
+      var stats = xTbl.calculateStats(masterDataset);
 
-      // Update KPI Elements
       document.getElementById("kpi-inhand").textContent = stats.inHandCount + " Items";
       document.getElementById("kpi-ordered").textContent = stats.orderedCount + " Items";
       document.getElementById("kpi-missing").textContent = stats.missingCount + " Items";
       document.getElementById("kpi-totalval").textContent = "₹ " + stats.totalValue.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-      var readyPct = Math.round(((stats.inHandCount + stats.orderedCount) / stats.totalItems) * 100);
-      document.getElementById("readiness-label").textContent = readyPct + "% Secured (" + (stats.inHandCount + stats.orderedCount) + " of " + stats.totalItems + " items)";
+      var activeItems = stats.inHandCount + stats.orderedCount;
+      var totalActive = activeItems + stats.missingCount;
+      var readyPct = Math.round((activeItems / totalActive) * 100);
+
+      document.getElementById("readiness-label").textContent = readyPct + "% Secured (" + activeItems + " of " + totalActive + " active items)";
       document.getElementById("readiness-bar").style.width = readyPct + "%";
 
       // 2. Filter dataset
-      var displayData = currentDataset;
+      var displayData = masterDataset;
       if (activeFilterKey !== "all") {
-        displayData = currentDataset.filter(function(row) {
+        displayData = masterDataset.filter(function(row) {
           return row[8] === activeFilterKey;
         });
       }
 
-      // 3. Render Table via xtbl.js
+      // 3. Render Table via xtbl.js (Clean, Pure DOM)
       xTbl.renderTable("table-mount", displayData, {
-        headers: ["Category", "Component Name", "Hardware Specification", "Qty", "Unit Rate", "Total", "Status & Edit", "Vendor", "Image", "Spec Doc"],
-        onStatusChange: function(id, newStatus) {
-          AppDB.updateComponentStatus(id, newStatus).then(function() {
-            loadDatabaseData();
-          });
-        }
+        headers: ["Category", "Component Name", "Hardware Specification", "Qty", "Unit Rate", "Total", "Status", "Vendor", "Image", "Spec Doc"]
       });
     }
 
