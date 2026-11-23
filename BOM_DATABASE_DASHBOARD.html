@@ -114,6 +114,10 @@
         </div>
       </div>
       <div class="w3-col l5 m12 w3-right-align" style="margin-top: 8px;">
+        <span id="vault-status-indicator" style="display: none; font-size: 11.5px; margin-right: 8px; vertical-align: middle;">
+          <span style="color: #4ade80;">🔒 Cloud Sync Active</span>
+          <button onclick="forgetToken()" title="Clear saved token from this device" style="background: none; border: none; color: #f87171; text-decoration: underline; cursor: pointer; font-size: 11px; padding: 0 4px;">(Forget)</button>
+        </span>
         <a href="CARRIER_MOTHERBOARD_DIAGRAM.html" class="top-nav-btn">⚡ Circuit Schematic</a>
         <a href="PROJECT.html" class="top-nav-btn">📖 Project Spec</a>
         <a href="https://github.com/mohan-chellappa/diyAmp" target="_blank" class="top-nav-btn" style="color: #4ade80;">
@@ -211,38 +215,83 @@
     <div id="gh-token-modal" class="w3-modal" style="display: none;">
       <div class="w3-modal-content w3-animate-zoom db-card" style="max-width: 520px; background: #0f172a; border: 1px solid #334155;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-          <h4 style="margin: 0; color: #38bdf8; font-size: 16px; font-weight: bold;">🐙 GitHub Direct Sync</h4>
+          <h4 style="margin: 0; color: #38bdf8; font-size: 16px; font-weight: bold;">🐙 GitHub Cloud Sync</h4>
           <span onclick="closeTokenModal()" style="cursor: pointer; color: #94a3b8; font-size: 20px;">&times;</span>
         </div>
         <p style="font-size: 12px; color: #cbd5e1; line-height: 1.5;">
-          To commit directly to <code>mohan-chellappa/diyAmp</code> from this dashboard, enter a GitHub Personal Access Token (PAT) with <code>contents: write</code> permission.
+          Enter your GitHub Personal Access Token (PAT) with <code>repo</code> or <code>contents: write</code> permission. It allows 1-click cloud sync directly from mobile or desktop.
         </p>
         <div style="margin: 12px 0;">
-          <input id="gh-pat-input" type="password" class="w3-input" placeholder="github_pat_... or ghp_..." style="background: #090e17; color: #fff; border: 1px solid #334155; border-radius: 4px; font-size: 12px; padding: 8px;">
-          <div style="font-size: 10.5px; color: #64748b; margin-top: 4px;">
-            Token is stored only in temporary browser session memory (never persisted to disk or external servers).
+          <input id="gh-pat-input" type="password" class="w3-input" placeholder="ghp_... or github_pat_..." style="background: #090e17; color: #fff; border: 1px solid #334155; border-radius: 4px; font-size: 12px; padding: 8px;">
+          
+          <div style="margin-top: 10px;">
+            <label style="font-size: 12px; color: #cbd5e1; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+              <input type="checkbox" id="remember-token-check" checked style="cursor: pointer; accent-color: #0284c7; width: 16px; height: 16px;">
+              <span><strong>Remember permanently on this device</strong> (Encrypted IndexedDB)</span>
+            </label>
+          </div>
+
+          <div style="font-size: 10.5px; color: #64748b; margin-top: 6px;">
+            🔒 Security: Token is encrypted client-side using Web Crypto (AES-GCM-256) and stored in an isolated IndexedDB vault. Never sent to any third party.
           </div>
         </div>
         <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px;">
           <button class="filter-btn" onclick="closeTokenModal()">Cancel</button>
-          <button class="filter-btn active" onclick="saveTokenAndCommit()">Commit &amp; Push</button>
+          <button class="filter-btn active" onclick="saveTokenAndCommit()">Save &amp; Commit</button>
         </div>
       </div>
     </div>
 
   </div>
 
-  <!-- Scripts: xtbl.js only (Zero IndexedDB / Zero External Cloud DB) -->
-  <script src="xtbl.js?v=2.3"></script>
+  <!-- Scripts: xtbl.js only (Zero External Cloud DB) -->
+  <script src="xtbl.js?v=2.4"></script>
   <script>
     var masterDataset = [];
     var rawHeaderLine = "";
     var activeFilterKey = "all";
     var dirtyChangesCount = 0;
+    var activeToken = null;
 
     document.addEventListener("DOMContentLoaded", function() {
       loadBomTsv();
+      initVault();
     });
+
+    // Initialize Encrypted Vault on load
+    function initVault() {
+      Vault.getPat().then(function(savedToken) {
+        if (savedToken) {
+          activeToken = savedToken;
+          updateVaultUIStatus(true);
+        } else {
+          // Fall back to session memory if present
+          var sess = sessionStorage.getItem("gh_pat");
+          if (sess) {
+            activeToken = sess;
+            updateVaultUIStatus(true);
+          }
+        }
+      }).catch(function(e) {
+        console.warn("Vault init notice:", e);
+      });
+    }
+
+    function updateVaultUIStatus(isConnected) {
+      var ind = document.getElementById("vault-status-indicator");
+      if (ind) ind.style.display = isConnected ? "inline-block" : "none";
+    }
+
+    function forgetToken() {
+      if (confirm("Disconnect and remove saved GitHub token from this device?")) {
+        Vault.clearPat().then(function() {
+          activeToken = null;
+          sessionStorage.removeItem("gh_pat");
+          updateVaultUIStatus(false);
+          alert("Token removed from this device.");
+        });
+      }
+    }
 
     // Fetch and Parse BOM.tsv directly with cache-busting timestamp
     function loadBomTsv() {
@@ -499,13 +548,148 @@
       });
     }
 
+    // =========================================================================
+    // Encrypted Device Vault (Web Crypto AES-GCM-256 + IndexedDB)
+    // Strictly No localStorage — Client-Side Hardware Encryption
+    // =========================================================================
+    var Vault = (function() {
+      var DB_NAME = "diyAmp_vault";
+      var STORE_NAME = "credentials";
+      var dbPromise = null;
+
+      function openDB() {
+        if (dbPromise) return dbPromise;
+        dbPromise = new Promise(function(resolve, reject) {
+          if (!window.indexedDB) {
+            reject(new Error("IndexedDB not supported"));
+            return;
+          }
+          var req = indexedDB.open(DB_NAME, 1);
+          req.onupgradeneeded = function(e) {
+            var db = e.target.result;
+            if (!db.objectStoreNames.contains(STORE_NAME)) {
+              db.createObjectStore(STORE_NAME);
+            }
+          };
+          req.onsuccess = function(e) { resolve(e.target.result); };
+          req.onerror = function(e) { reject(e.target.error); };
+        });
+        return dbPromise;
+      }
+
+      function getOrCreateKey(db) {
+        return new Promise(function(resolve, reject) {
+          var tx = db.transaction(STORE_NAME, "readwrite");
+          var store = tx.objectStore(STORE_NAME);
+          var req = store.get("aes_key");
+          req.onsuccess = function() {
+            if (req.result) {
+              resolve(req.result);
+            } else {
+              window.crypto.subtle.generateKey(
+                { name: "AES-GCM", length: 256 },
+                false, // Non-extractable secret key
+                ["encrypt", "decrypt"]
+              ).then(function(newKey) {
+                var putTx = db.transaction(STORE_NAME, "readwrite");
+                putTx.objectStore(STORE_NAME).put(newKey, "aes_key");
+                putTx.oncomplete = function() { resolve(newKey); };
+                putTx.onerror = function(e) { reject(e.target.error); };
+              }).catch(reject);
+            }
+          };
+          req.onerror = function(e) { reject(e.target.error); };
+        });
+      }
+
+      function savePat(patString) {
+        return openDB().then(function(db) {
+          return getOrCreateKey(db).then(function(key) {
+            var iv = window.crypto.getRandomValues(new Uint8Array(12));
+            var encoded = new TextEncoder().encode(patString);
+            return window.crypto.subtle.encrypt(
+              { name: "AES-GCM", iv: iv },
+              key,
+              encoded
+            ).then(function(ciphertext) {
+              return new Promise(function(resolve, reject) {
+                var tx = db.transaction(STORE_NAME, "readwrite");
+                var store = tx.objectStore(STORE_NAME);
+                store.put({ iv: iv, data: ciphertext }, "encrypted_pat");
+                tx.oncomplete = function() { resolve(true); };
+                tx.onerror = function(e) { reject(e.target.error); };
+              });
+            });
+          });
+        });
+      }
+
+      function getPat() {
+        return openDB().then(function(db) {
+          return new Promise(function(resolve, reject) {
+            var tx = db.transaction(STORE_NAME, "readonly");
+            var store = tx.objectStore(STORE_NAME);
+            var req = store.get("encrypted_pat");
+            req.onsuccess = function() {
+              var record = req.result;
+              if (!record) { resolve(null); return; }
+              getOrCreateKey(db).then(function(key) {
+                return window.crypto.subtle.decrypt(
+                  { name: "AES-GCM", iv: record.iv },
+                  key,
+                  record.data
+                );
+              }).then(function(decryptedBuf) {
+                var patStr = new TextDecoder().decode(decryptedBuf);
+                resolve(patStr);
+              }).catch(function(err) {
+                console.warn("Vault decryption error:", err);
+                resolve(null);
+              });
+            };
+            req.onerror = function() { resolve(null); };
+          });
+        }).catch(function() {
+          return null;
+        });
+      }
+
+      function clearPat() {
+        return openDB().then(function(db) {
+          return new Promise(function(resolve, reject) {
+            var tx = db.transaction(STORE_NAME, "readwrite");
+            var store = tx.objectStore(STORE_NAME);
+            store.delete("encrypted_pat");
+            tx.oncomplete = function() { resolve(true); };
+            tx.onerror = function(e) { reject(e.target.error); };
+          });
+        });
+      }
+
+      return {
+        savePat: savePat,
+        getPat: getPat,
+        clearPat: clearPat
+      };
+    })();
+
     function syncToGitHub() {
-      var token = sessionStorage.getItem("gh_pat");
-      if (!token) {
-        openTokenModal();
+      if (activeToken) {
+        executeGitHubCommit(activeToken);
         return;
       }
-      executeGitHubCommit(token);
+
+      Vault.getPat().then(function(savedToken) {
+        if (savedToken) {
+          activeToken = savedToken;
+          updateVaultUIStatus(true);
+          executeGitHubCommit(savedToken);
+        } else {
+          openTokenModal();
+        }
+      }).catch(function() {
+        openTokenModal();
+      });
     }
 
     function openTokenModal() {
@@ -522,7 +706,19 @@
         alert("Please enter a valid GitHub token.");
         return;
       }
-      sessionStorage.setItem("gh_pat", token);
+      activeToken = token;
+      var remember = document.getElementById("remember-token-check").checked;
+
+      if (remember) {
+        Vault.savePat(token).then(function() {
+          updateVaultUIStatus(true);
+        }).catch(function(err) {
+          console.warn("Vault persist notice:", err);
+        });
+      } else {
+        sessionStorage.setItem("gh_pat", token);
+      }
+
       closeTokenModal();
       executeGitHubCommit(token);
     }
@@ -542,7 +738,15 @@
         }
       })
       .then(function(res) {
-        if (!res.ok) throw new Error("Could not authenticate with GitHub (" + res.status + "). Check token permissions.");
+        if (!res.ok) {
+          if (res.status === 401 || res.status === 403) {
+            activeToken = null;
+            Vault.clearPat();
+            updateVaultUIStatus(false);
+            throw new Error("Token expired or unauthorized. Please re-enter your GitHub token.");
+          }
+          throw new Error("Could not access repository (" + res.status + "). Check permissions.");
+        }
         return res.json();
       })
       .then(function(fileInfo) {
@@ -571,7 +775,7 @@
       })
       .then(function(resData) {
         dirtyChangesCount = 0;
-        alert("✅ Committed and pushed directly to GitHub repository!\nCommit: " + resData.commit.sha.substring(0, 7));
+        alert("✅ Successfully committed and pushed to GitHub main branch!\nCommit: " + resData.commit.sha.substring(0, 7));
         hideSyncToolbar();
       })
       .catch(function(err) {
