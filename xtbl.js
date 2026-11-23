@@ -86,60 +86,102 @@ var xTbl = (function() {
       tdTot.style.color = "#e2e8f0";
       tr.appendChild(tdTot);
 
-      // Stock Status (Calm Matte Pill Badges)
+      // Stock Status (Interactive Matte Pill Selector)
       var tdStatus = document.createElement("td");
       var statusKey = row[8];
-      var badge = document.createElement("span");
-      badge.style.display = "inline-block";
-      badge.style.padding = "2px 8px";
-      badge.style.borderRadius = "4px";
-      badge.style.fontSize = "11px";
-      badge.style.fontWeight = "600";
-      badge.style.letterSpacing = "0.2px";
-
-      if (statusKey === "inhand") {
-        badge.style.background = "rgba(34, 197, 94, 0.12)";
-        badge.style.color = "#4ade80";
-        badge.style.border = "1px solid rgba(34, 197, 94, 0.35)";
-        badge.textContent = "✔ In Hand";
-      } else if (statusKey === "ordered") {
-        badge.style.background = "rgba(56, 189, 248, 0.12)";
-        badge.style.color = "#38bdf8";
-        badge.style.border = "1px solid rgba(56, 189, 248, 0.35)";
-        badge.textContent = "✈ Ordered";
-      } else if (statusKey === "missing") {
-        badge.style.background = "rgba(239, 68, 68, 0.12)";
-        badge.style.color = "#f87171";
-        badge.style.border = "1px solid rgba(239, 68, 68, 0.35)";
-        badge.textContent = "⚠ Pending";
-      } else {
-        badge.style.background = "rgba(148, 163, 184, 0.1)";
-        badge.style.color = "#94a3b8";
-        badge.style.border = "1px solid rgba(148, 163, 184, 0.25)";
-        badge.textContent = "Omitted";
-      }
-      tdStatus.appendChild(badge);
 
       if (onStatusChange) {
         var sel = document.createElement("select");
-        sel.className = "w3-select w3-tiny w3-dark-grey";
-        sel.style.marginLeft = "6px";
+        sel.className = "w3-select status-select-pill";
+        sel.setAttribute("aria-label", "Change status for " + row[2]);
+        sel.style.fontSize = "11.5px";
+        sel.style.fontWeight = "600";
+        sel.style.borderRadius = "4px";
+        sel.style.padding = "4px 8px";
+        sel.style.cursor = "pointer";
         sel.style.width = "auto";
+        sel.style.minWidth = "110px";
         sel.style.display = "inline-block";
-        sel.style.padding = "2px";
+        sel.style.outline = "none";
+        sel.style.transition = "all 0.2s ease";
 
-        ["inhand", "ordered", "missing"].forEach(function(optKey) {
-          var opt = document.createElement("option");
-          opt.value = optKey;
-          opt.textContent = optKey.toUpperCase();
-          if (optKey === statusKey) opt.selected = true;
-          sel.appendChild(opt);
+        function updatePillStyle(el, key) {
+          if (key === "inhand") {
+            el.style.background = "#0c2518";
+            el.style.color = "#4ade80";
+            el.style.border = "1px solid rgba(34, 197, 94, 0.45)";
+          } else if (key === "ordered") {
+            el.style.background = "#082338";
+            el.style.color = "#38bdf8";
+            el.style.border = "1px solid rgba(56, 189, 248, 0.45)";
+          } else if (key === "missing") {
+            el.style.background = "#2b0f13";
+            el.style.color = "#f87171";
+            el.style.border = "1px solid rgba(239, 68, 68, 0.45)";
+          } else {
+            el.style.background = "#172033";
+            el.style.color = "#94a3b8";
+            el.style.border = "1px solid rgba(148, 163, 184, 0.3)";
+          }
+        }
+
+        updatePillStyle(sel, statusKey);
+
+        var statusOptions = [
+          { key: "inhand", label: "✔ In Hand" },
+          { key: "ordered", label: "✈ Ordered" },
+          { key: "missing", label: "⚠ Pending" },
+          { key: "omitted", label: "— Omitted" }
+        ];
+
+        statusOptions.forEach(function(opt) {
+          var o = document.createElement("option");
+          o.value = opt.key;
+          o.textContent = opt.label;
+          o.style.background = "#0f172a";
+          o.style.color = "#e2e8f0";
+          if (opt.key === statusKey) o.selected = true;
+          sel.appendChild(o);
         });
 
         sel.onchange = function() {
-          onStatusChange(row[0], sel.value);
+          var chosen = this.value;
+          updatePillStyle(this, chosen);
+          onStatusChange(row[0], chosen);
         };
+
         tdStatus.appendChild(sel);
+      } else {
+        var badge = document.createElement("span");
+        badge.style.display = "inline-block";
+        badge.style.padding = "2px 8px";
+        badge.style.borderRadius = "4px";
+        badge.style.fontSize = "11px";
+        badge.style.fontWeight = "600";
+        badge.style.letterSpacing = "0.2px";
+
+        if (statusKey === "inhand") {
+          badge.style.background = "rgba(34, 197, 94, 0.12)";
+          badge.style.color = "#4ade80";
+          badge.style.border = "1px solid rgba(34, 197, 94, 0.35)";
+          badge.textContent = "✔ In Hand";
+        } else if (statusKey === "ordered") {
+          badge.style.background = "rgba(56, 189, 248, 0.12)";
+          badge.style.color = "#38bdf8";
+          badge.style.border = "1px solid rgba(56, 189, 248, 0.35)";
+          badge.textContent = "✈ Ordered";
+        } else if (statusKey === "missing") {
+          badge.style.background = "rgba(239, 68, 68, 0.12)";
+          badge.style.color = "#f87171";
+          badge.style.border = "1px solid rgba(239, 68, 68, 0.35)";
+          badge.textContent = "⚠ Pending";
+        } else {
+          badge.style.background = "rgba(148, 163, 184, 0.1)";
+          badge.style.color = "#94a3b8";
+          badge.style.border = "1px solid rgba(148, 163, 184, 0.25)";
+          badge.textContent = "Omitted";
+        }
+        tdStatus.appendChild(badge);
       }
       tr.appendChild(tdStatus);
 
