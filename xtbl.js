@@ -202,6 +202,12 @@ var xTbl = (function() {
         thumb.style.borderRadius = "4px";
         thumb.style.cursor = "pointer";
         thumb.style.border = "1px solid #475569";
+        thumb.onerror = function() {
+          this.style.display = "none";
+          if (this.parentNode) {
+            this.parentNode.textContent = "—";
+          }
+        };
         thumb.onclick = function() {
           openImageModal(imgPath, row[2]);
         };
