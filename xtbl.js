@@ -19,6 +19,7 @@ var xTbl = (function() {
     options = options || {};
     var headers = options.headers || ["ID", "Category", "Item", "Specification", "Qty", "Unit", "Rate (₹)", "Vendor", "Status", "Remarks", "Image", "Doc"];
     var onStatusChange = options.onStatusChange || null;
+    var onImageChange = options.onImageChange || null;
 
     var table = document.createElement("table");
     table.className = "w3-table w3-bordered w3-hoverable w3-small";
@@ -190,10 +191,17 @@ var xTbl = (function() {
       tdVendor.textContent = row[7];
       tr.appendChild(tdVendor);
 
-      // Image Thumbnail Preview
+      // Image Thumbnail Preview & Edit
       var tdImg = document.createElement("td");
+      tdImg.style.whiteSpace = "nowrap";
       var imgPath = row[10];
+
       if (imgPath && imgPath.length > 2) {
+        var thumbWrap = document.createElement("div");
+        thumbWrap.style.display = "inline-flex";
+        thumbWrap.style.alignItems = "center";
+        thumbWrap.style.gap = "5px";
+
         var thumb = document.createElement("img");
         thumb.src = imgPath;
         thumb.style.width = "32px";
@@ -202,18 +210,56 @@ var xTbl = (function() {
         thumb.style.borderRadius = "4px";
         thumb.style.cursor = "pointer";
         thumb.style.border = "1px solid #475569";
+        thumb.title = "Click to zoom";
         thumb.onerror = function() {
           this.style.display = "none";
-          if (this.parentNode) {
-            this.parentNode.textContent = "—";
-          }
         };
         thumb.onclick = function() {
           openImageModal(imgPath, row[2]);
         };
-        tdImg.appendChild(thumb);
+        thumbWrap.appendChild(thumb);
+
+        if (onImageChange) {
+          var editBtn = document.createElement("button");
+          editBtn.className = "w3-button w3-tiny";
+          editBtn.style.padding = "2px 5px";
+          editBtn.style.fontSize = "10px";
+          editBtn.style.background = "#1e293b";
+          editBtn.style.color = "#94a3b8";
+          editBtn.style.border = "1px solid #334155";
+          editBtn.style.borderRadius = "3px";
+          editBtn.style.cursor = "pointer";
+          editBtn.textContent = "✏️";
+          editBtn.title = "Change picture for " + row[2];
+          editBtn.onclick = function(e) {
+            e.stopPropagation();
+            onImageChange(row[0], row[2], imgPath);
+          };
+          thumbWrap.appendChild(editBtn);
+        }
+
+        tdImg.appendChild(thumbWrap);
       } else {
-        tdImg.textContent = "—";
+        if (onImageChange) {
+          var addBtn = document.createElement("button");
+          addBtn.className = "w3-button w3-tiny";
+          addBtn.style.padding = "3px 8px";
+          addBtn.style.fontSize = "11px";
+          addBtn.style.background = "#0f1f33";
+          addBtn.style.color = "#38bdf8";
+          addBtn.style.border = "1px dashed #0284c7";
+          addBtn.style.borderRadius = "4px";
+          addBtn.style.cursor = "pointer";
+          addBtn.textContent = "+ 📷";
+          addBtn.title = "Add picture for " + row[2];
+          addBtn.onclick = function(e) {
+            e.stopPropagation();
+            onImageChange(row[0], row[2], "");
+          };
+          tdImg.appendChild(addBtn);
+        } else {
+          tdImg.textContent = "—";
+        }
       }
       tr.appendChild(tdImg);
 

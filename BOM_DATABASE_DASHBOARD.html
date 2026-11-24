@@ -252,16 +252,60 @@
       </div>
     </div>
 
+    <!-- Component Picture Upload / Link Modal -->
+    <div id="pic-upload-modal" class="w3-modal" style="display: none; z-index: 1000;">
+      <div class="w3-modal-content w3-animate-zoom db-card" style="max-width: 520px; background: #0f172a; border: 1px solid #334155;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h4 style="margin: 0; color: #38bdf8; font-size: 16px; font-weight: bold;">📷 Component Picture</h4>
+          <span onclick="closePicModal()" style="cursor: pointer; color: #94a3b8; font-size: 20px;">&times;</span>
+        </div>
+        
+        <div id="pic-modal-comp-name" style="font-size: 13px; font-weight: 600; color: #e2e8f0; margin-bottom: 14px;"></div>
+
+        <!-- Camera / File Upload Box -->
+        <div style="margin-bottom: 14px; text-align: center; border: 2px dashed #334155; border-radius: 6px; padding: 16px; background: #090e17;">
+          <div id="pic-preview-container" style="display: none; margin-bottom: 10px;">
+            <img id="pic-modal-preview" src="" style="max-width: 140px; max-height: 140px; border-radius: 6px; border: 1px solid #475569; object-fit: contain;">
+          </div>
+          <label for="pic-file-input" class="filter-btn active" style="display: inline-block; cursor: pointer; padding: 8px 16px; font-size: 12px;">
+            📁 Choose Photo from Device / Camera
+          </label>
+          <input type="file" id="pic-file-input" accept="image/*" style="display: none;" onchange="handlePicFileSelect(event)">
+          <div style="font-size: 11px; color: #64748b; margin-top: 6px;">
+            Supports JPG, PNG, WEBP, AVIF. Mobile opens camera directly.
+          </div>
+        </div>
+
+        <!-- Path input -->
+        <div style="margin-bottom: 16px;">
+          <label style="font-size: 11px; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 4px;">
+            Repository Image Path in BOM.tsv:
+          </label>
+          <input type="text" id="pic-path-input" class="w3-input" placeholder="e.g. image/my_part.jpg or WAGO.png" style="background: #060a12; color: #fff; border: 1px solid #334155; border-radius: 4px; font-size: 12px; padding: 8px;">
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 8px;">
+          <button class="filter-btn" onclick="closePicModal()">Cancel</button>
+          <button class="filter-btn active" onclick="saveComponentPic()" style="background: #0284c7;">
+            💾 Save Picture to BOM
+          </button>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- Scripts: xtbl.js only (Zero External Cloud DB) -->
-  <script src="xtbl.js?v=2.6"></script>
+  <script src="xtbl.js?v=2.7"></script>
   <script>
     var masterDataset = [];
     var rawHeaderLine = "";
     var activeFilterKey = "all";
     var dirtyChangesCount = 0;
     var activeToken = null;
+    var activePicRowId = null;
+    var pendingUploads = {};
+    var pendingFileBase64 = null;
 
     document.addEventListener("DOMContentLoaded", function() {
       loadBomTsv();
@@ -347,59 +391,67 @@
         var qty = parseInt(cols[3], 10) || 1;
         var rate = parseFloat(cols[5]) || 0;
 
-        // Auto-assign image and doc paths based on item name
+        // Direct Image column from BOM.tsv (column index 11), or fallback rule
         var itemLower = (cols[1] || "").toLowerCase();
-        var imgPath = "";
+        var imgPath = (cols[11] || "").trim();
         var docPath = "";
 
+        if (!imgPath) {
+          if (itemLower.indexOf("mean well") !== -1) {
+            imgPath = "Meanwell LRS-350-24 SMPS.png";
+          } else if (itemLower.indexOf("wago 221-415") !== -1) {
+            imgPath = "WAGO 221-415 5-Conductor Lever Splicing Connector.png";
+          } else if (itemLower.indexOf("wago 221-412") !== -1) {
+            imgPath = "WAGO 221-412 2-Conductor Lever Splicing Connector.png";
+          } else if (itemLower.indexOf("bulk capacitor") !== -1) {
+            imgPath = "4700uF 50V Electrolytic Capacitor.png";
+          } else if (itemLower.indexOf("ams1117") !== -1) {
+            imgPath = "image/PROJECT/1791221023178.png";
+          } else if (itemLower.indexOf("tpa3116") !== -1 || itemLower.indexOf("xh-m562") !== -1) {
+            imgPath = "image/PROJECT/1791126129975.png";
+          } else if (itemLower.indexOf("4.3b") !== -1) {
+            imgPath = "image/PROJECT/1791222659512.png";
+          } else if (itemLower.indexOf("pico") !== -1) {
+            imgPath = "image/PROJECT/waveshare_esp32_s3_pico_1552780.jpg";
+          } else if (itemLower.indexOf("wroom") !== -1) {
+            imgPath = "image/PROJECT/esp32_wroom32_30pin_slave.jpg";
+          } else if (itemLower.indexOf("pcm5102") !== -1) {
+            imgPath = "image/PROJECT/1791016549053.png";
+          } else if (itemLower.indexOf("pcm1808") !== -1) {
+            imgPath = "image/PROJECT/1791122464907.png";
+          } else if (itemLower.indexOf("xl4015") !== -1) {
+            imgPath = "image/XL4015 5A DC-DC Buck Step Down Adjustable Power Supply Module.avif";
+          } else if (itemLower.indexOf("vhm-314") !== -1) {
+            imgPath = "image/PROJECT/vhm314_bluetooth_5_decoder.jpg";
+          }
+        }
+
         if (itemLower.indexOf("mean well") !== -1) {
-          imgPath = "Meanwell LRS-350-24 SMPS.png";
           docPath = "Meanwell LRS-350-24 SMPS Power Supply.md";
         } else if (itemLower.indexOf("wago 221-415") !== -1) {
-          imgPath = "WAGO 221-415 5-Conductor Lever Splicing Connector.png";
           docPath = "wago 221 specs.md";
         } else if (itemLower.indexOf("wago 221-412") !== -1) {
-          imgPath = "WAGO 221-412 2-Conductor Lever Splicing Connector.png";
           docPath = "wago 221 412 2way spec.md";
         } else if (itemLower.indexOf("bulk capacitor") !== -1) {
-          imgPath = "4700uF 50V Electrolytic Capacitor.png";
           docPath = "4700uF capacitor Spec Sheet.md";
         } else if (itemLower.indexOf("ams1117") !== -1) {
-          imgPath = "image/PROJECT/1791221023178.png";
           docPath = "AMS 117 3.3 V power supply module.md";
         } else if (itemLower.indexOf("tpa3116") !== -1 || itemLower.indexOf("xh-m562") !== -1) {
-          imgPath = "image/PROJECT/1791126129975.png";
           docPath = "XH-M562 TPA3116D2.md";
         } else if (itemLower.indexOf("hy510") !== -1 || itemLower.indexOf("thermal") !== -1) {
-          imgPath = ""; // Local photo pending
           docPath = "arctic mx-4 4g thermal paste.md";
         } else if (itemLower.indexOf("4.3b") !== -1) {
-          imgPath = "image/PROJECT/1791222659512.png";
           docPath = "Waveshare ESP32-S3 with Touch spec.md";
-        } else if (itemLower.indexOf("pico") !== -1) {
-          imgPath = "image/PROJECT/waveshare_esp32_s3_pico_1552780.jpg";
-          docPath = "esp32.md";
-        } else if (itemLower.indexOf("wroom") !== -1) {
-          imgPath = "image/PROJECT/esp32_wroom32_30pin_slave.jpg";
+        } else if (itemLower.indexOf("pico") !== -1 || itemLower.indexOf("wroom") !== -1) {
           docPath = "esp32.md";
         } else if (itemLower.indexOf("pcm5102") !== -1) {
-          imgPath = "image/PROJECT/1791016549053.png";
           docPath = "PCM5102 12S Spec.md";
         } else if (itemLower.indexOf("pcm1808") !== -1) {
-          imgPath = "image/PROJECT/1791122464907.png";
           docPath = "PCM1808 24bit SNR Audio Stereo ADC Single-Ended Analog-Input Decoder.md";
         } else if (itemLower.indexOf("xl4015") !== -1) {
-          imgPath = ""; // Local photo pending
           docPath = "XL4015 Spec.md";
-        } else if (itemLower.indexOf("vhm-314") !== -1) {
-          imgPath = "image/PROJECT/vhm314_bluetooth_5_decoder.jpg";
+        } else if (itemLower.indexOf("vhm-314") !== -1 || itemLower.indexOf("b0505s") !== -1) {
           docPath = "BT_RECEIVER_PCM1808.md";
-        } else if (itemLower.indexOf("b0505s") !== -1) {
-          imgPath = ""; // Local photo pending
-          docPath = "BT_RECEIVER_PCM1808.md";
-        } else if (itemLower.indexOf("jimson") !== -1) {
-          imgPath = ""; // Local photo pending
-          docPath = "PROJECT.md";
         } else {
           docPath = "PROJECT.md";
         }
@@ -492,11 +544,85 @@
         });
       }
 
-      // Render Table via xtbl.js with interactive status callbacks
+      // Render Table via xtbl.js with interactive status and image callbacks
       xTbl.renderTable("table-mount", displayData, {
         headers: ["Category", "Component Name", "Hardware Specification", "Qty", "Unit Rate", "Total", "Status", "Vendor", "Image", "Spec Doc"],
-        onStatusChange: handleStatusChange
+        onStatusChange: handleStatusChange,
+        onImageChange: handleImageChange
       });
+    }
+
+    // Component Picture Handlers
+    function handleImageChange(rowId, compName, currentImgPath) {
+      activePicRowId = rowId;
+      pendingFileBase64 = null;
+      document.getElementById("pic-modal-comp-name").textContent = "Item: " + compName;
+      document.getElementById("pic-path-input").value = currentImgPath || "";
+      document.getElementById("pic-file-input").value = "";
+
+      var prevWrap = document.getElementById("pic-preview-container");
+      var prevImg = document.getElementById("pic-modal-preview");
+      if (currentImgPath && currentImgPath.length > 2) {
+        prevImg.src = currentImgPath;
+        prevWrap.style.display = "block";
+      } else {
+        prevWrap.style.display = "none";
+      }
+
+      document.getElementById("pic-upload-modal").style.display = "block";
+    }
+
+    function closePicModal() {
+      document.getElementById("pic-upload-modal").style.display = "none";
+      activePicRowId = null;
+      pendingFileBase64 = null;
+    }
+
+    function handlePicFileSelect(event) {
+      var file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      var cleanName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+      var proposedPath = "image/" + cleanName;
+      document.getElementById("pic-path-input").value = proposedPath;
+
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var dataUrl = e.target.result;
+        var prevImg = document.getElementById("pic-modal-preview");
+        prevImg.src = dataUrl;
+        document.getElementById("pic-preview-container").style.display = "block";
+
+        var parts = dataUrl.split(",");
+        pendingFileBase64 = parts[1];
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function saveComponentPic() {
+      var newPath = document.getElementById("pic-path-input").value.trim();
+      if (!newPath) {
+        alert("Please choose an image file or specify an image path.");
+        return;
+      }
+
+      if (activePicRowId === null) return;
+
+      for (var i = 0; i < masterDataset.length; i++) {
+        if (masterDataset[i][0] === activePicRowId) {
+          masterDataset[i][10] = newPath;
+          break;
+        }
+      }
+
+      if (pendingFileBase64) {
+        pendingUploads[newPath] = pendingFileBase64;
+      }
+
+      dirtyChangesCount++;
+      closePicModal();
+      refreshUI();
+      showSyncToolbar();
     }
 
     function applyFilter(key) {
@@ -515,7 +641,11 @@
     // TSV Export & Direct GitHub API Sync
     // =========================================================================
     function generateTsvFromDataset() {
-      var lines = [rawHeaderLine || "Category\tItem\tSpecification\tQty\tUnit\tRate (INR)\tTotal As-Listed (INR)\tTotal Calculated (INR)\tVendor\tStock Status\tRemarks"];
+      var header = rawHeaderLine || "Category\tItem\tSpecification\tQty\tUnit\tRate (INR)\tTotal As-Listed (INR)\tTotal Calculated (INR)\tVendor\tStock Status\tRemarks\tImage";
+      if (header.indexOf("\tImage") === -1) {
+        header += "\tImage";
+      }
+      var lines = [header];
 
       masterDataset.forEach(function(row) {
         var cat = row[1];
@@ -529,8 +659,9 @@
         var vendor = row[7];
         var stockStatus = row[12];
         var remarks = row[9];
+        var imgPath = row[10] || "";
 
-        lines.push([cat, item, spec, qty, unit, rate, totalListed, totalCalc, vendor, stockStatus, remarks].join("\t"));
+        lines.push([cat, item, spec, qty, unit, rate, totalListed, totalCalc, vendor, stockStatus, remarks, imgPath].join("\t"));
       });
 
       return lines.join("\n") + "\n";
@@ -748,11 +879,49 @@
       var filePath = "BOM.tsv";
       var apiUrl = "https://api.github.com/repos/" + repo + "/contents/" + filePath;
 
-      fetch(apiUrl, {
-        headers: {
-          "Authorization": "Bearer " + token,
-          "Accept": "application/vnd.github.v3+json"
-        }
+      // Upload any newly attached component photos to GitHub first
+      var uploadKeys = Object.keys(pendingUploads);
+      var uploadChain = Promise.resolve();
+
+      uploadKeys.forEach(function(imgPath) {
+        uploadChain = uploadChain.then(function() {
+          var fileBase64 = pendingUploads[imgPath];
+          var fileApiUrl = "https://api.github.com/repos/" + repo + "/contents/" + imgPath;
+          return fetch(fileApiUrl, {
+            headers: {
+              "Authorization": "Bearer " + token,
+              "Accept": "application/vnd.github.v3+json"
+            }
+          }).then(function(res) {
+            return res.ok ? res.json() : null;
+          }).then(function(existing) {
+            var bodyObj = {
+              message: "Upload component photo: " + imgPath,
+              content: fileBase64,
+              branch: "main"
+            };
+            if (existing && existing.sha) bodyObj.sha = existing.sha;
+            return fetch(fileApiUrl, {
+              method: "PUT",
+              headers: {
+                "Authorization": "Bearer " + token,
+                "Accept": "application/vnd.github.v3+json",
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify(bodyObj)
+            });
+          });
+        });
+      });
+
+      uploadChain.then(function() {
+        pendingUploads = {};
+        return fetch(apiUrl, {
+          headers: {
+            "Authorization": "Bearer " + token,
+            "Accept": "application/vnd.github.v3+json"
+          }
+        });
       })
       .then(function(res) {
         if (!res.ok) {
@@ -779,7 +948,7 @@
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            message: "Update BOM stock status via Web Dashboard",
+            message: "Update BOM stock status & component photos via Web Dashboard",
             content: base64Content,
             sha: currentSha,
             branch: "main"
