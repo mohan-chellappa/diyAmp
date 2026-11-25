@@ -680,6 +680,37 @@
       pendingFileBase64 = null;
     }
 
+    // Helper: unwraps Next.js, Cloudinary, Imgix, or Google Image proxy wrappers to extract the raw source URL
+    function unwrapImageUrl(rawUrl) {
+      if (!rawUrl) return "";
+      try {
+        var u = new URL(rawUrl);
+        var inner = u.searchParams.get("url") || 
+                    u.searchParams.get("imgurl") || 
+                    u.searchParams.get("src") || 
+                    u.searchParams.get("image") ||
+                    u.searchParams.get("media");
+        if (inner) {
+          inner = decodeURIComponent(inner);
+          if (inner.indexOf("http://") === 0 || inner.indexOf("https://") === 0) {
+            return inner;
+          }
+          if (inner.indexOf("/") === 0) {
+            return u.origin + inner;
+          }
+        }
+      } catch (e) {
+        var m = rawUrl.match(/[?&](?:url|imgurl|src|image)=([^&]+)/i);
+        if (m && m[1]) {
+          try {
+            var dec = decodeURIComponent(m[1]);
+            if (dec.indexOf("http") === 0) return dec;
+          } catch (e2) {}
+        }
+      }
+      return rawUrl;
+    }
+
     // Helper: fetch image via CORS proxy with timeout to extract base64
     function fetchImageProxyBase64(imageUrl, onResult) {
       var proxyUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent(imageUrl);
@@ -712,92 +743,114 @@
         });
     }
 
-    // Pull from internet URL (Option 1) - Resilient to CORS & Direct CDN links
+    // Pull from internet URL (Option 1) - Resilient to CORS, Next.js wrappers & Direct CDN links
     function pullInternetImage() {
-      var url = document.getElementById("pic-url-input").value.trim();
+      var rawUrl = document.getElementById("pic-url-input").value.trim();
       var statusEl = document.getElementById("pull-status-msg");
-      if (!url) {
+      if (!rawUrl) {
         alert("Please paste an image URL first.");
         return;
       }
-      if (url.indexOf("http://") !== 0 && url.indexOf("https://") !== 0) {
+      if (rawUrl.indexOf("http://") !== 0 && rawUrl.indexOf("https://") !== 0) {
         alert("Please enter a valid URL starting with http:// or https://");
         return;
       }
 
       statusEl.style.display = "block";
       statusEl.style.color = "#38bdf8";
-      statusEl.textContent = "⏳ Testing and pulling image from web...";
+
+      // Automatically unwrap Next.js / CDN wrappers to extract the raw direct image URL
+      var cleanUrl = unwrapImageUrl(rawUrl);
+      if (cleanUrl !== rawUrl) {
+        document.getElementById("pic-url-input").value = cleanUrl;
+        statusEl.textContent = "🔍 Extracted direct raw image URL from vendor wrapper...";
+      } else {
+        statusEl.textContent = "⏳ Testing and pulling image from web...";
+      }
 
       var compName = document.getElementById("pic-modal-comp-name").textContent.replace("Item: ", "");
       var cleanSlug = compName.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
       var targetPath = "image/" + cleanSlug + ".jpg";
 
-      // By default, set the target path to the URL so user can ALWAYS save it as a live web link
-      document.getElementById("pic-path-input").value = url;
+      // By default, set the target path to cleanUrl so user can ALWAYS save it as a live web link
+      document.getElementById("pic-path-input").value = cleanUrl;
       pendingFileBase64 = null;
 
       var prevImg = document.getElementById("pic-modal-preview");
-      // CRITICAL: Do NOT set crossOrigin on the preview element, otherwise servers without CORS headers fail to load!
       prevImg.removeAttribute("crossorigin");
 
-      prevImg.onload = function() {
-        document.getElementById("pic-preview-container").style.display = "block";
-        document.getElementById("pic-preview-meta").textContent = "Resolution: " + (prevImg.naturalWidth || "Web") + " × " + (prevImg.naturalHeight || "Image") + " px";
+      var attempt = 1; // 1 = direct, 2 = CDN mirror
 
-        statusEl.style.color = "#38bdf8";
-        statusEl.textContent = "⏳ Image loaded! Checking if repository file export is allowed...";
+      function tryLoad(srcToLoad) {
+        prevImg.onload = function() {
+          document.getElementById("pic-preview-container").style.display = "block";
+          document.getElementById("pic-preview-meta").textContent = "Resolution: " + (prevImg.naturalWidth || "Web") + " × " + (prevImg.naturalHeight || "Image") + " px";
 
-        // Step 1: Attempt direct off-screen canvas with crossOrigin
-        var corsImg = new Image();
-        corsImg.crossOrigin = "anonymous";
-        corsImg.onload = function() {
-          try {
-            var canvas = document.createElement("canvas");
-            canvas.width = corsImg.naturalWidth;
-            canvas.height = corsImg.naturalHeight;
-            var ctx = canvas.getContext("2d");
-            ctx.drawImage(corsImg, 0, 0);
+          statusEl.style.color = "#38bdf8";
+          statusEl.textContent = "⏳ Image loaded! Checking if repository file export is allowed...";
 
-            var dataUrl = canvas.toDataURL("image/jpeg", 0.9);
-            pendingFileBase64 = dataUrl.split(",")[1];
-            document.getElementById("pic-path-input").value = targetPath;
-            statusEl.style.color = "#4ade80";
-            statusEl.textContent = "✔ Direct pull successful! Ready to save into repository as '" + targetPath + "'.";
-          } catch (e) {
-            handleProxyFallback();
-          }
-        };
-        corsImg.onerror = function() {
-          handleProxyFallback();
-        };
+          // Attempt canvas conversion
+          var corsImg = new Image();
+          corsImg.crossOrigin = "anonymous";
+          corsImg.onload = function() {
+            try {
+              var canvas = document.createElement("canvas");
+              canvas.width = corsImg.naturalWidth;
+              canvas.height = corsImg.naturalHeight;
+              var ctx = canvas.getContext("2d");
+              ctx.drawImage(corsImg, 0, 0);
 
-        function handleProxyFallback() {
-          statusEl.textContent = "⏳ Trying CORS proxy to download repository copy...";
-          fetchImageProxyBase64(url, function(success, b64) {
-            if (success && b64) {
-              pendingFileBase64 = b64;
+              var dataUrl = canvas.toDataURL("image/jpeg", 0.9);
+              pendingFileBase64 = dataUrl.split(",")[1];
               document.getElementById("pic-path-input").value = targetPath;
               statusEl.style.color = "#4ade80";
-              statusEl.textContent = "✔ Pulled via proxy! Prepped to save into repository as '" + targetPath + "'.";
-            } else {
-              pendingFileBase64 = null;
-              document.getElementById("pic-path-input").value = url;
-              statusEl.style.color = "#38bdf8";
-              statusEl.textContent = "✔ Live web image verified! (Linked directly via URL in BOM.tsv)";
+              statusEl.textContent = "✔ Direct pull successful! Ready to save into repository as '" + targetPath + "'.";
+            } catch (e) {
+              handleFallback();
             }
-          });
-        }
+          };
+          corsImg.onerror = function() {
+            handleFallback();
+          };
 
-        corsImg.src = url;
-      };
+          function handleFallback() {
+            statusEl.textContent = "⏳ Downloading image bytes into repository via proxy...";
+            fetchImageProxyBase64(cleanUrl, function(success, b64) {
+              if (success && b64) {
+                pendingFileBase64 = b64;
+                document.getElementById("pic-path-input").value = targetPath;
+                statusEl.style.color = "#4ade80";
+                statusEl.textContent = "✔ Pulled via proxy! Prepped to save into repository as '" + targetPath + "'.";
+              } else {
+                pendingFileBase64 = null;
+                document.getElementById("pic-path-input").value = cleanUrl;
+                statusEl.style.color = "#38bdf8";
+                statusEl.textContent = "✔ Live web image verified! (Linked directly via URL in BOM.tsv)";
+              }
+            });
+          }
 
-      prevImg.onerror = function() {
-        statusEl.style.color = "#f87171";
-        statusEl.textContent = "❌ Could not load image from this URL. Verify it points directly to an image (.jpg, .png, etc.).";
-      };
+          // If attempt 2 (mirror), corsImg loads from mirror directly with CORS headers
+          corsImg.src = (attempt === 2) ? srcToLoad : cleanUrl;
+        };
 
-      prevImg.src = url;
+        prevImg.onerror = function() {
+          if (attempt === 1) {
+            // Attempt 2: Try CORS-friendly image mirror
+            attempt = 2;
+            statusEl.textContent = "⏳ Direct URL blocked by host; trying image CDN mirror...";
+            var mirrorUrl = "https://images.weserv.nl/?url=" + encodeURIComponent(cleanUrl);
+            tryLoad(mirrorUrl);
+          } else {
+            statusEl.style.color = "#f87171";
+            statusEl.textContent = "❌ Could not load image from this URL. Verify it points directly to an image (.jpg, .png, etc.).";
+          }
+        };
+
+        prevImg.src = srcToLoad;
+      }
+
+      tryLoad(cleanUrl);
     }
 
     // Choose file from device / camera (Option 2)
