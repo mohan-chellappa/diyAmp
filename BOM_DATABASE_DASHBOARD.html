@@ -177,6 +177,10 @@
         <button id="btn-ordered" class="filter-btn" onclick="applyFilter('ordered')">✈ In Transit</button>
         <button id="btn-missing" class="filter-btn" onclick="applyFilter('missing')">⚠ Pending / To Buy</button>
 
+        <button class="filter-btn active" onclick="openAddComponentModal()" style="background: #10b981; border-color: #059669; font-weight: 600;">
+          ➕ Add Component
+        </button>
+
         <span id="active-cat-badge" style="display: none; align-items: center; gap: 6px; background: #0369a1; color: #fff; border-radius: 4px; padding: 4px 8px; font-size: 11.5px; font-weight: 600;">
           <span id="active-cat-text">Category</span>
           <span onclick="resetCategoryFilter()" title="Clear category filter" style="cursor: pointer; margin-left: 4px; font-weight: bold;">&times;</span>
@@ -389,6 +393,102 @@
             💾 Apply &amp; Save to BOM
           </button>
         </div>
+      </div>
+    </div>
+
+    <!-- Add New Component Modal -->
+    <div id="add-comp-modal" class="w3-modal" style="display: none; z-index: 1000;">
+      <div class="w3-modal-content w3-animate-zoom db-card" style="max-width: 580px; background: #0f172a; border: 1px solid #334155;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+          <h4 style="margin: 0; color: #4ade80; font-size: 16px; font-weight: bold;">➕ Add New Component to BOM</h4>
+          <span onclick="closeAddComponentModal()" style="cursor: pointer; color: #94a3b8; font-size: 20px;">&times;</span>
+        </div>
+
+        <form id="add-comp-form" onsubmit="handleAddComponentSubmit(event)">
+          <div class="w3-row-padding" style="margin-left: -6px; margin-right: -6px; margin-bottom: 10px;">
+            <div class="w3-col m6 s12" style="margin-bottom: 8px;">
+              <label style="font-size: 11.5px; color: #94a3b8; display: block; margin-bottom: 4px;">Category *</label>
+              <select id="new-comp-category" class="w3-select" required style="background: #060a12; color: #fff; border: 1px solid #334155; border-radius: 4px; font-size: 12px; padding: 7px;">
+                <option value="Power">Power</option>
+                <option value="Amplifiers">Amplifiers</option>
+                <option value="DAC + Brain">DAC + Brain</option>
+                <option value="Wiring / Protection">Wiring / Protection</option>
+                <option value="Mechanical & Hardware">Mechanical & Hardware</option>
+                <option value="Passive Crossover">Passive Crossover</option>
+                <option value="Optional / Audio Control">Optional / Audio Control</option>
+              </select>
+            </div>
+            <div class="w3-col m6 s12" style="margin-bottom: 8px;">
+              <label style="font-size: 11.5px; color: #94a3b8; display: block; margin-bottom: 4px;">Component Name *</label>
+              <input type="text" id="new-comp-name" class="w3-input" required placeholder="e.g. 10k Resistor (10-Pack)" style="background: #060a12; color: #fff; border: 1px solid #334155; border-radius: 4px; font-size: 12px; padding: 7px;">
+            </div>
+          </div>
+
+          <div style="margin-bottom: 10px;">
+            <label style="font-size: 11.5px; color: #94a3b8; display: block; margin-bottom: 4px;">Hardware Specification</label>
+            <input type="text" id="new-comp-spec" class="w3-input" placeholder="e.g. 1/4W Metal Film 1% tolerance" style="background: #060a12; color: #fff; border: 1px solid #334155; border-radius: 4px; font-size: 12px; padding: 7px;">
+          </div>
+
+          <div class="w3-row-padding" style="margin-left: -6px; margin-right: -6px; margin-bottom: 10px;">
+            <div class="w3-col m4 s6" style="margin-bottom: 8px;">
+              <label style="font-size: 11.5px; color: #94a3b8; display: block; margin-bottom: 4px;">Quantity *</label>
+              <input type="number" id="new-comp-qty" class="w3-input" required min="1" value="1" style="background: #060a12; color: #fff; border: 1px solid #334155; border-radius: 4px; font-size: 12px; padding: 7px;">
+            </div>
+            <div class="w3-col m4 s6" style="margin-bottom: 8px;">
+              <label style="font-size: 11.5px; color: #94a3b8; display: block; margin-bottom: 4px;">Unit</label>
+              <select id="new-comp-unit" class="w3-select" style="background: #060a12; color: #fff; border: 1px solid #334155; border-radius: 4px; font-size: 12px; padding: 7px;">
+                <option value="pcs">pcs</option>
+                <option value="set">set</option>
+                <option value="pack">pack</option>
+                <option value="m">m</option>
+                <option value="pairs">pairs</option>
+              </select>
+            </div>
+            <div class="w3-col m4 s12" style="margin-bottom: 8px;">
+              <label style="font-size: 11.5px; color: #94a3b8; display: block; margin-bottom: 4px;">Unit Rate (₹) *</label>
+              <input type="number" step="0.01" min="0" id="new-comp-rate" class="w3-input" required value="0.00" style="background: #060a12; color: #fff; border: 1px solid #334155; border-radius: 4px; font-size: 12px; padding: 7px;">
+            </div>
+          </div>
+
+          <div class="w3-row-padding" style="margin-left: -6px; margin-right: -6px; margin-bottom: 10px;">
+            <div class="w3-col m6 s12" style="margin-bottom: 8px;">
+              <label style="font-size: 11.5px; color: #94a3b8; display: block; margin-bottom: 4px;">Vendor / Source</label>
+              <input type="text" id="new-comp-vendor" class="w3-input" placeholder="e.g. robu.in, hubtronics.in, In Lab" style="background: #060a12; color: #fff; border: 1px solid #334155; border-radius: 4px; font-size: 12px; padding: 7px;">
+            </div>
+            <div class="w3-col m6 s12" style="margin-bottom: 8px;">
+              <label style="font-size: 11.5px; color: #94a3b8; display: block; margin-bottom: 4px;">Initial Status</label>
+              <select id="new-comp-status" class="w3-select" style="background: #060a12; color: #fff; border: 1px solid #334155; border-radius: 4px; font-size: 12px; padding: 7px;">
+                <option value="inhand">✔ In Hand (Available)</option>
+                <option value="ordered">✈ In Transit (Ordered)</option>
+                <option value="missing" selected>⚠ Pending (To Buy)</option>
+                <option value="omitted">⊘ Omitted / Not Needed</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 10px;">
+            <label style="font-size: 11.5px; color: #94a3b8; display: block; margin-bottom: 4px;">Remarks / Circuit Role</label>
+            <input type="text" id="new-comp-remarks" class="w3-input" placeholder="e.g. Used for ADC input attenuation" style="background: #060a12; color: #fff; border: 1px solid #334155; border-radius: 4px; font-size: 12px; padding: 7px;">
+          </div>
+
+          <div class="w3-row-padding" style="margin-left: -6px; margin-right: -6px; margin-bottom: 16px;">
+            <div class="w3-col m6 s12" style="margin-bottom: 8px;">
+              <label style="font-size: 11.5px; color: #94a3b8; display: block; margin-bottom: 4px;">Image Path / Web URL (Optional)</label>
+              <input type="text" id="new-comp-image" class="w3-input" placeholder="image/item.jpg or https://..." style="background: #060a12; color: #fff; border: 1px solid #334155; border-radius: 4px; font-size: 12px; padding: 7px;">
+            </div>
+            <div class="w3-col m6 s12" style="margin-bottom: 8px;">
+              <label style="font-size: 11.5px; color: #94a3b8; display: block; margin-bottom: 4px;">Spec Sheet / Doc (Optional)</label>
+              <input type="text" id="new-comp-doc" class="w3-input" placeholder="e.g. PROJECT.md or https://..." style="background: #060a12; color: #fff; border: 1px solid #334155; border-radius: 4px; font-size: 12px; padding: 7px;">
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 8px;">
+            <button type="button" class="filter-btn" onclick="closeAddComponentModal()">Cancel</button>
+            <button type="submit" class="filter-btn active" style="background: #10b981; border-color: #059669;">
+              ➕ Insert Component to BOM
+            </button>
+          </div>
+        </form>
       </div>
     </div>
 
@@ -1093,6 +1193,65 @@
 
       dirtyChangesCount++;
       closeDocModal();
+      refreshUI();
+      showSyncToolbar();
+    }
+
+    // =========================================================================
+    // Add New Component Handlers
+    // =========================================================================
+    function openAddComponentModal() {
+      var form = document.getElementById("add-comp-form");
+      if (form) form.reset();
+      document.getElementById("add-comp-modal").style.display = "block";
+    }
+
+    function closeAddComponentModal() {
+      document.getElementById("add-comp-modal").style.display = "none";
+    }
+
+    function handleAddComponentSubmit(e) {
+      e.preventDefault();
+      var cat = document.getElementById("new-comp-category").value;
+      var name = document.getElementById("new-comp-name").value.trim();
+      var spec = document.getElementById("new-comp-spec").value.trim();
+      var qty = parseInt(document.getElementById("new-comp-qty").value, 10) || 1;
+      var unit = document.getElementById("new-comp-unit").value;
+      var rate = parseFloat(document.getElementById("new-comp-rate").value) || 0;
+      var vendor = document.getElementById("new-comp-vendor").value.trim() || "Local Electronics";
+      var statusKey = document.getElementById("new-comp-status").value;
+      var remarks = document.getElementById("new-comp-remarks").value.trim();
+      var img = document.getElementById("new-comp-image").value.trim();
+      var doc = document.getElementById("new-comp-doc").value.trim() || "PROJECT.md";
+
+      var total = (qty * rate).toFixed(2);
+      var rawStatus = "Pending (" + qty + ")";
+      if (statusKey === "inhand") rawStatus = "Available (" + qty + ")";
+      else if (statusKey === "ordered") rawStatus = "Ordered (" + qty + ")";
+      else if (statusKey === "omitted") rawStatus = "Omitted";
+
+      var newRowId = masterDataset.length + 1;
+      // Row format: [ID, Category, Item, Spec, Qty, Unit, Rate, Vendor, StockStatusKey, Remarks, ImagePath, DocPath, RawStatus, TotalAsListed, TotalCalc]
+      masterDataset.push([
+        newRowId,
+        cat,
+        name,
+        spec,
+        qty,
+        unit,
+        rate,
+        vendor,
+        statusKey,
+        remarks,
+        img,
+        doc,
+        rawStatus,
+        total,
+        total
+      ]);
+
+      dirtyChangesCount++;
+      closeAddComponentModal();
       refreshUI();
       showSyncToolbar();
     }
