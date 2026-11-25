@@ -166,13 +166,21 @@
       </div>
     </div>
 
+    <!-- Category-Wise Interactive Chart Mount -->
+    <div id="category-chart-mount" class="db-card w3-margin-bottom" style="padding: 16px;"></div>
+
     <!-- Filter Buttons Bar -->
     <div class="w3-margin-bottom" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
-      <div>
+      <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
         <button id="btn-all" class="filter-btn active" onclick="applyFilter('all')">All Items</button>
         <button id="btn-inhand" class="filter-btn" onclick="applyFilter('inhand')">✔ In Hand</button>
         <button id="btn-ordered" class="filter-btn" onclick="applyFilter('ordered')">✈ In Transit</button>
         <button id="btn-missing" class="filter-btn" onclick="applyFilter('missing')">⚠ Pending / To Buy</button>
+
+        <span id="active-cat-badge" style="display: none; align-items: center; gap: 6px; background: #0369a1; color: #fff; border-radius: 4px; padding: 4px 8px; font-size: 11.5px; font-weight: 600;">
+          <span id="active-cat-text">Category</span>
+          <span onclick="resetCategoryFilter()" title="Clear category filter" style="cursor: pointer; margin-left: 4px; font-weight: bold;">&times;</span>
+        </span>
       </div>
       <div style="font-size: 12px; color: #94a3b8;">
         Click any photo to zoom &bull; Click "Doc" to open spec sheets &bull; SSOT: <code>BOM.tsv</code>
@@ -387,11 +395,13 @@
   </div>
 
   <!-- Scripts: xtbl.js only (Zero External Cloud DB) -->
-  <script src="xtbl.js?v=2.8"></script>
+  <script src="xtbl.js?v=2.9"></script>
   <script>
     var masterDataset = [];
     var rawHeaderLine = "";
     var activeFilterKey = "all";
+    var activeCategoryFilter = "all";
+    var currentChartMode = "cost"; // "cost" or "count"
     var dirtyChangesCount = 0;
     var activeToken = null;
     var activePicRowId = null;
@@ -626,15 +636,55 @@
       if (banner) banner.style.display = "none";
     }
 
+    function resetCategoryFilter() {
+      activeCategoryFilter = "all";
+      refreshUI();
+    }
+
     function refreshUI() {
       updateKPIs();
 
-      // Filter dataset
+      // Render Category-Wise Distribution Chart via xtbl.js
+      xTbl.renderCategoryChart("category-chart-mount", masterDataset, {
+        activeCategory: activeCategoryFilter,
+        chartMode: currentChartMode,
+        onCategoryClick: function(catName) {
+          if (activeCategoryFilter === catName) {
+            activeCategoryFilter = "all";
+          } else {
+            activeCategoryFilter = catName;
+          }
+          refreshUI();
+        },
+        onModeChange: function(newMode) {
+          currentChartMode = newMode;
+          refreshUI();
+        }
+      });
+
+      // Filter dataset by status and category
       var displayData = masterDataset;
       if (activeFilterKey !== "all") {
-        displayData = masterDataset.filter(function(row) {
+        displayData = displayData.filter(function(row) {
           return row[8] === activeFilterKey;
         });
+      }
+      if (activeCategoryFilter !== "all") {
+        displayData = displayData.filter(function(row) {
+          return row[1] === activeCategoryFilter;
+        });
+      }
+
+      // Update active category badge in filter bar
+      var catBadge = document.getElementById("active-cat-badge");
+      var catText = document.getElementById("active-cat-text");
+      if (catBadge && catText) {
+        if (activeCategoryFilter !== "all") {
+          catBadge.style.display = "inline-flex";
+          catText.textContent = "Category: " + activeCategoryFilter;
+        } else {
+          catBadge.style.display = "none";
+        }
       }
 
       // Render Table via xtbl.js with interactive status, image and doc callbacks

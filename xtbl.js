@@ -418,9 +418,456 @@ var xTbl = (function() {
     return stats;
   }
 
+  // Category color mapping
+  var CATEGORY_COLORS = {
+    "DAC + Brain": "#38bdf8",
+    "Mechanical & Hardware": "#f59e0b",
+    "Power": "#10b981",
+    "Amplifiers": "#c084fc",
+    "Wiring / Protection": "#fb923c",
+    "Passive Crossover": "#818cf8",
+    "Optional / Audio Control": "#64748b"
+  };
+
+  var FALLBACK_COLORS = ["#38bdf8", "#f59e0b", "#10b981", "#c084fc", "#fb923c", "#818cf8", "#ec4899", "#14b8a6"];
+
+  function getCategoryColor(name, index) {
+    if (CATEGORY_COLORS[name]) return CATEGORY_COLORS[name];
+    return FALLBACK_COLORS[index % FALLBACK_COLORS.length];
+  }
+
+  // Calculates Category-Wise Statistics from 2D Array
+  function calculateCategoryStats(data2D) {
+    var catMap = {};
+    var catOrder = [];
+    var totalCostAll = 0;
+    var totalCountAll = 0;
+
+    data2D.forEach(function(row) {
+      var cat = row[1] || "Uncategorized";
+      var qty = Number(row[4]) || 1;
+      var rate = Number(row[6]) || 0;
+      var val = qty * rate;
+      var status = row[8]; // "inhand", "ordered", "missing", "omitted"
+
+      if (!catMap[cat]) {
+        catMap[cat] = {
+          name: cat,
+          totalCost: 0,
+          itemCount: 0,
+          inHandCount: 0,
+          orderedCount: 0,
+          missingCount: 0,
+          omittedCount: 0,
+          inHandCost: 0,
+          orderedCost: 0,
+          missingCost: 0
+        };
+        catOrder.push(cat);
+      }
+
+      var c = catMap[cat];
+      c.itemCount++;
+      c.totalCost += val;
+      totalCostAll += val;
+      totalCountAll++;
+
+      if (status === "inhand") {
+        c.inHandCount++;
+        c.inHandCost += val;
+      } else if (status === "ordered") {
+        c.orderedCount++;
+        c.orderedCost += val;
+      } else if (status === "missing") {
+        c.missingCount++;
+        c.missingCost += val;
+      } else {
+        c.omittedCount++;
+      }
+    });
+
+    var list = catOrder.map(function(k) { return catMap[k]; });
+    list.sort(function(a, b) { return b.totalCost - a.totalCost; });
+
+    return {
+      categories: list,
+      totalCost: totalCostAll,
+      totalCount: totalCountAll
+    };
+  }
+
+  // Renders Pure DOM & SVG Category Breakdown Chart Widget
+  function renderCategoryChart(containerId, data2D, options) {
+    var mount = document.getElementById(containerId);
+    if (!mount) return;
+    while (mount.firstChild) mount.removeChild(mount.firstChild);
+
+    options = options || {};
+    var activeCategory = options.activeCategory || "all";
+    var chartMode = options.chartMode || "cost"; // "cost" or "count"
+    var onCategoryClick = options.onCategoryClick || null;
+    var onModeChange = options.onModeChange || null;
+
+    var stats = calculateCategoryStats(data2D);
+    var categories = stats.categories;
+    var totalCost = stats.totalCost;
+    var totalCount = stats.totalCount;
+
+    // Outer Card Header with Title and Mode Switcher
+    var headerRow = document.createElement("div");
+    headerRow.style.display = "flex";
+    headerRow.style.justifyContent = "space-between";
+    headerRow.style.alignItems = "center";
+    headerRow.style.flexWrap = "wrap";
+    headerRow.style.gap = "10px";
+    headerRow.style.marginBottom = "14px";
+    headerRow.style.borderBottom = "1px solid #1e293b";
+    headerRow.style.paddingBottom = "10px";
+
+    var titleBox = document.createElement("div");
+    var titleH = document.createElement("h3");
+    titleH.style.margin = "0";
+    titleH.style.fontSize = "15px";
+    titleH.style.fontWeight = "700";
+    titleH.style.color = "#38bdf8";
+    titleH.textContent = "📊 Category-Wise Investment & Readiness";
+    var titleSub = document.createElement("div");
+    titleSub.style.fontSize = "11.5px";
+    titleSub.style.color = "#94a3b8";
+    titleSub.textContent = "Interactive overview — click any category to filter table below";
+    titleBox.appendChild(titleH);
+    titleBox.appendChild(titleSub);
+    headerRow.appendChild(titleBox);
+
+    // Switcher buttons (Cost vs Count)
+    var btnGroup = document.createElement("div");
+    btnGroup.style.display = "flex";
+    btnGroup.style.alignItems = "center";
+    btnGroup.style.gap = "6px";
+
+    var btnCost = document.createElement("button");
+    btnCost.className = "filter-btn" + (chartMode === "cost" ? " active" : "");
+    btnCost.textContent = "💰 Valuation (₹)";
+    btnCost.style.padding = "4px 10px";
+    btnCost.style.fontSize = "11px";
+    btnCost.onclick = function() {
+      if (onModeChange) onModeChange("cost");
+    };
+
+    var btnCount = document.createElement("button");
+    btnCount.className = "filter-btn" + (chartMode === "count" ? " active" : "");
+    btnCount.textContent = "📦 Item Count";
+    btnCount.style.padding = "4px 10px";
+    btnCount.style.fontSize = "11px";
+    btnCount.onclick = function() {
+      if (onModeChange) onModeChange("count");
+    };
+
+    btnGroup.appendChild(btnCost);
+    btnGroup.appendChild(btnCount);
+
+    if (activeCategory !== "all") {
+      var btnReset = document.createElement("button");
+      btnReset.className = "filter-btn";
+      btnReset.style.padding = "4px 10px";
+      btnReset.style.fontSize = "11px";
+      btnReset.style.background = "#0369a1";
+      btnReset.style.color = "#f8fafc";
+      btnReset.textContent = "Filter: " + activeCategory + " ✕";
+      btnReset.title = "Click to show all categories";
+      btnReset.onclick = function() {
+        if (onCategoryClick) onCategoryClick("all");
+      };
+      btnGroup.appendChild(btnReset);
+    }
+
+    headerRow.appendChild(btnGroup);
+    mount.appendChild(headerRow);
+
+    // Main Chart Layout: 2-Column Responsive Layout
+    var chartLayout = document.createElement("div");
+    chartLayout.className = "w3-row-padding";
+    chartLayout.style.marginLeft = "-8px";
+    chartLayout.style.marginRight = "-8px";
+
+    // Column 1: SVG Donut Chart
+    var colLeft = document.createElement("div");
+    colLeft.className = "w3-col l4 m5 s12";
+    colLeft.style.textAlign = "center";
+    colLeft.style.marginBottom = "14px";
+
+    var svgNS = "http://www.w3.org/2000/svg";
+    var svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("viewBox", "0 0 240 240");
+    svg.style.width = "100%";
+    svg.style.maxWidth = "220px";
+    svg.style.height = "auto";
+    svg.style.display = "inline-block";
+    svg.style.filter = "drop-shadow(0 4px 12px rgba(0,0,0,0.5))";
+
+    var radius = 78;
+    var cx = 120;
+    var cy = 120;
+    var circ = 2 * Math.PI * radius; // ~490.09
+    var currentOffset = 0;
+
+    // Background track circle
+    var bgCircle = document.createElementNS(svgNS, "circle");
+    bgCircle.setAttribute("cx", cx);
+    bgCircle.setAttribute("cy", cy);
+    bgCircle.setAttribute("r", radius);
+    bgCircle.setAttribute("fill", "none");
+    bgCircle.setAttribute("stroke", "#0f172a");
+    bgCircle.setAttribute("stroke-width", "32");
+    svg.appendChild(bgCircle);
+
+    // Build slices
+    categories.forEach(function(cat, idx) {
+      var color = getCategoryColor(cat.name, idx);
+      var sliceVal = (chartMode === "cost") ? cat.totalCost : cat.itemCount;
+      var totalVal = (chartMode === "cost") ? totalCost : totalCount;
+      var ratio = totalVal > 0 ? (sliceVal / totalVal) : 0;
+      var strokeLen = ratio * circ;
+      var strokeGap = circ - strokeLen;
+
+      if (strokeLen > 0.5) {
+        var circle = document.createElementNS(svgNS, "circle");
+        circle.setAttribute("cx", cx);
+        circle.setAttribute("cy", cy);
+        circle.setAttribute("r", radius);
+        circle.setAttribute("fill", "none");
+        circle.setAttribute("stroke", color);
+        circle.setAttribute("stroke-width", activeCategory === cat.name ? "38" : "30");
+        circle.setAttribute("stroke-dasharray", strokeLen + " " + strokeGap);
+        circle.setAttribute("stroke-dashoffset", -currentOffset);
+        circle.setAttribute("transform", "rotate(-90 " + cx + " " + cy + ")");
+        circle.style.cursor = "pointer";
+        circle.style.transition = "stroke-width 0.2s, opacity 0.2s";
+        circle.style.opacity = (activeCategory === "all" || activeCategory === cat.name) ? "1" : "0.35";
+
+        var titleEl = document.createElementNS(svgNS, "title");
+        titleEl.textContent = cat.name + ": " + (chartMode === "cost" ? "₹ " + cat.totalCost.toFixed(2) : cat.itemCount + " items") + " (" + (ratio * 100).toFixed(1) + "%)";
+        circle.appendChild(titleEl);
+
+        circle.onclick = function() {
+          if (onCategoryClick) onCategoryClick(cat.name);
+        };
+
+        svg.appendChild(circle);
+        currentOffset += strokeLen;
+      }
+    });
+
+    // Donut Center Text
+    var textGroup = document.createElementNS(svgNS, "g");
+    textGroup.setAttribute("text-anchor", "middle");
+
+    var valText = document.createElementNS(svgNS, "text");
+    valText.setAttribute("x", cx);
+    valText.setAttribute("y", cy - 4);
+    valText.setAttribute("fill", "#38bdf8");
+    valText.setAttribute("font-size", chartMode === "cost" ? "17" : "24");
+    valText.setAttribute("font-weight", "bold");
+    valText.textContent = chartMode === "cost" ? ("₹ " + Math.round(totalCost).toLocaleString("en-IN")) : (totalCount + " Items");
+
+    var lblText = document.createElementNS(svgNS, "text");
+    lblText.setAttribute("x", cx);
+    lblText.setAttribute("y", cy + 16);
+    lblText.setAttribute("fill", "#94a3b8");
+    lblText.setAttribute("font-size", "10.5");
+    lblText.setAttribute("font-weight", "600");
+    lblText.textContent = chartMode === "cost" ? "Total Valuation" : "Active BOM";
+
+    textGroup.appendChild(valText);
+    textGroup.appendChild(lblText);
+    svg.appendChild(textGroup);
+
+    colLeft.appendChild(svg);
+    chartLayout.appendChild(colLeft);
+
+    // Column 2: Detailed Category Rows with Stacked Readiness Bars
+    var colRight = document.createElement("div");
+    colRight.className = "w3-col l8 m7 s12";
+
+    var listWrap = document.createElement("div");
+    listWrap.style.display = "flex";
+    listWrap.style.flexDirection = "column";
+    listWrap.style.gap = "8px";
+
+    categories.forEach(function(cat, idx) {
+      var color = getCategoryColor(cat.name, idx);
+      var isSelected = activeCategory === cat.name;
+      var sliceVal = (chartMode === "cost") ? cat.totalCost : cat.itemCount;
+      var totalVal = (chartMode === "cost") ? totalCost : totalCount;
+      var ratio = totalVal > 0 ? (sliceVal / totalVal) : 0;
+      var pct = (ratio * 100).toFixed(1);
+
+      var rowBox = document.createElement("div");
+      rowBox.style.background = isSelected ? "#0c1a2e" : "#090e17";
+      rowBox.style.border = isSelected ? "1.5px solid #38bdf8" : "1px solid #1e293b";
+      rowBox.style.borderRadius = "6px";
+      rowBox.style.padding = "8px 12px";
+      rowBox.style.cursor = "pointer";
+      rowBox.style.transition = "all 0.15s ease-in-out";
+      rowBox.onmouseover = function() {
+        if (!isSelected) this.style.borderColor = "#334155";
+      };
+      rowBox.onmouseout = function() {
+        if (!isSelected) this.style.borderColor = "#1e293b";
+      };
+      rowBox.onclick = function() {
+        if (onCategoryClick) onCategoryClick(cat.name);
+      };
+
+      // Header of row: Name + Cost / Count
+      var rHead = document.createElement("div");
+      rHead.style.display = "flex";
+      rHead.style.justifyContent = "space-between";
+      rHead.style.alignItems = "center";
+      rHead.style.marginBottom = "4px";
+
+      var rNameBox = document.createElement("div");
+      rNameBox.style.display = "flex";
+      rNameBox.style.alignItems = "center";
+      rNameBox.style.gap = "8px";
+
+      var dot = document.createElement("span");
+      dot.style.display = "inline-block";
+      dot.style.width = "10px";
+      dot.style.height = "10px";
+      dot.style.borderRadius = "50%";
+      dot.style.backgroundColor = color;
+      rNameBox.appendChild(dot);
+
+      var nameText = document.createElement("span");
+      nameText.style.fontWeight = "600";
+      nameText.style.fontSize = "12.5px";
+      nameText.style.color = isSelected ? "#38bdf8" : "#f1f5f9";
+      nameText.textContent = cat.name;
+      rNameBox.appendChild(nameText);
+
+      var rValBox = document.createElement("div");
+      rValBox.style.fontSize = "12px";
+      rValBox.style.fontWeight = "bold";
+      rValBox.style.color = "#cbd5e1";
+
+      var costSpan = document.createElement("span");
+      costSpan.style.color = "#f8fafc";
+      costSpan.textContent = "₹ " + cat.totalCost.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+      var pctSpan = document.createElement("span");
+      pctSpan.style.fontSize = "11px";
+      pctSpan.style.color = "#94a3b8";
+      pctSpan.style.marginLeft = "8px";
+      pctSpan.textContent = "(" + pct + "%)";
+
+      rValBox.appendChild(costSpan);
+      rValBox.appendChild(pctSpan);
+
+      rHead.appendChild(rNameBox);
+      rHead.appendChild(rValBox);
+      rowBox.appendChild(rHead);
+
+      // Stacked Mini Bar for Category Readiness (In Hand / Ordered / Missing)
+      var barWrap = document.createElement("div");
+      barWrap.style.height = "6px";
+      barWrap.style.background = "#1e293b";
+      barWrap.style.borderRadius = "3px";
+      barWrap.style.overflow = "hidden";
+      barWrap.style.display = "flex";
+      barWrap.style.margin = "4px 0";
+
+      var activeCatItems = cat.inHandCount + cat.orderedCount + cat.missingCount;
+      if (activeCatItems > 0) {
+        var pInHand = (cat.inHandCount / activeCatItems) * 100;
+        var pOrdered = (cat.orderedCount / activeCatItems) * 100;
+        var pMissing = (cat.missingCount / activeCatItems) * 100;
+
+        if (pInHand > 0) {
+          var segInHand = document.createElement("div");
+          segInHand.style.width = pInHand + "%";
+          segInHand.style.background = "#10b981";
+          segInHand.title = cat.inHandCount + " In Hand";
+          barWrap.appendChild(segInHand);
+        }
+        if (pOrdered > 0) {
+          var segOrdered = document.createElement("div");
+          segOrdered.style.width = pOrdered + "%";
+          segOrdered.style.background = "#0284c7";
+          segOrdered.title = cat.orderedCount + " In Transit";
+          barWrap.appendChild(segOrdered);
+        }
+        if (pMissing > 0) {
+          var segMissing = document.createElement("div");
+          segMissing.style.width = pMissing + "%";
+          segMissing.style.background = "#ef4444";
+          segMissing.title = cat.missingCount + " Pending Procurement";
+          barWrap.appendChild(segMissing);
+        }
+      } else {
+        var segOmitted = document.createElement("div");
+        segOmitted.style.width = "100%";
+        segOmitted.style.background = "#475569";
+        barWrap.appendChild(segOmitted);
+      }
+      rowBox.appendChild(barWrap);
+
+      // Sub-footer pill tags: In-Hand, In-Transit, Pending counts
+      var pillRow = document.createElement("div");
+      pillRow.style.display = "flex";
+      pillRow.style.justifyContent = "space-between";
+      pillRow.style.fontSize = "10.5px";
+      pillRow.style.color = "#64748b";
+
+      var countLbl = document.createElement("span");
+      countLbl.textContent = cat.itemCount + (cat.itemCount === 1 ? " item" : " items");
+
+      var badgesBox = document.createElement("div");
+      badgesBox.style.display = "flex";
+      badgesBox.style.gap = "6px";
+
+      if (cat.inHandCount > 0) {
+        var bInHand = document.createElement("span");
+        bInHand.style.color = "#4ade80";
+        bInHand.textContent = "✔ " + cat.inHandCount + " in hand";
+        badgesBox.appendChild(bInHand);
+      }
+      if (cat.orderedCount > 0) {
+        var bOrdered = document.createElement("span");
+        bOrdered.style.color = "#38bdf8";
+        bOrdered.textContent = "✈ " + cat.orderedCount + " transit";
+        badgesBox.appendChild(bOrdered);
+      }
+      if (cat.missingCount > 0) {
+        var bMissing = document.createElement("span");
+        bMissing.style.color = "#f87171";
+        bMissing.textContent = "⚠ " + cat.missingCount + " to buy";
+        badgesBox.appendChild(bMissing);
+      }
+      if (cat.omittedCount > 0) {
+        var bOmitted = document.createElement("span");
+        bOmitted.style.color = "#94a3b8";
+        bOmitted.textContent = "⊘ " + cat.omittedCount + " omitted";
+        badgesBox.appendChild(bOmitted);
+      }
+
+      pillRow.appendChild(countLbl);
+      pillRow.appendChild(badgesBox);
+      rowBox.appendChild(pillRow);
+
+      listWrap.appendChild(rowBox);
+    });
+
+    colRight.appendChild(listWrap);
+    chartLayout.appendChild(colRight);
+    mount.appendChild(chartLayout);
+  }
+
   return {
     renderTable: renderTable,
     calculateStats: calculateStats,
+    calculateCategoryStats: calculateCategoryStats,
+    renderCategoryChart: renderCategoryChart,
     openImageModal: openImageModal
   };
 })();
