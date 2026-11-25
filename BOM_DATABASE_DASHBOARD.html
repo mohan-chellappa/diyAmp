@@ -313,10 +313,81 @@
       </div>
     </div>
 
+    <!-- Component Document / Spec Sheet Modal -->
+    <div id="doc-upload-modal" class="w3-modal" style="display: none; z-index: 1000;">
+      <div class="w3-modal-content w3-animate-zoom db-card" style="max-width: 550px; background: #0f172a; border: 1px solid #334155;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h4 style="margin: 0; color: #38bdf8; font-size: 16px; font-weight: bold;">📄 Component Document Manager</h4>
+          <span onclick="closeDocModal()" style="cursor: pointer; color: #94a3b8; font-size: 20px;">&times;</span>
+        </div>
+        
+        <div id="doc-modal-comp-name" style="font-size: 13.5px; font-weight: 600; color: #e2e8f0; margin-bottom: 14px;"></div>
+
+        <!-- Current Document Status / Link Preview -->
+        <div id="doc-preview-container" style="display: none; margin-bottom: 14px; background: #090e17; padding: 12px; border-radius: 6px; border: 1px solid #1e293b;">
+          <div style="font-size: 11px; color: #38bdf8; font-weight: 600; margin-bottom: 4px;">Current Attached Document:</div>
+          <div id="doc-preview-meta" style="font-size: 12px; color: #f8fafc; word-break: break-all;"></div>
+          <a id="doc-preview-link" href="#" target="_blank" class="w3-button w3-tiny" style="margin-top: 8px; background: #1e293b; color: #38bdf8; border: 1px solid #0284c7; border-radius: 4px; display: inline-block; padding: 4px 10px; text-decoration: none;">
+            🔗 Open Document in New Tab
+          </a>
+        </div>
+
+        <!-- Option 1: Internet Document / Datasheet URL -->
+        <div style="margin-bottom: 14px; background: #090e17; padding: 12px; border-radius: 6px; border: 1px solid #1e293b;">
+          <label style="font-size: 11.5px; color: #38bdf8; font-weight: 600; display: block; margin-bottom: 6px;">
+            🌐 Option 1: Link Internet Datasheet / Spec Sheet URL (PDF, Web, Vendor):
+          </label>
+          <div style="display: flex; gap: 6px;">
+            <input type="text" id="doc-url-input" class="w3-input" placeholder="https://example.com/datasheet.pdf or spec page" style="background: #060a12; color: #fff; border: 1px solid #334155; border-radius: 4px; font-size: 12px; padding: 8px;">
+            <button class="filter-btn active" type="button" onclick="linkInternetDoc()" style="white-space: nowrap; background: #0284c7; padding: 6px 12px;">
+              🔗 Link URL
+            </button>
+          </div>
+          <div id="doc-pull-status-msg" style="font-size: 11px; margin-top: 6px; display: none;"></div>
+        </div>
+
+        <!-- Option 2: Select Existing Repository Spec or Upload from Device -->
+        <div style="margin-bottom: 14px; background: #090e17; padding: 12px; border-radius: 6px; border: 1px solid #1e293b;">
+          <label style="font-size: 11.5px; color: #38bdf8; font-weight: 600; display: block; margin-bottom: 6px;">
+            📂 Option 2: Choose from Project Specs or Upload File:
+          </label>
+          
+          <div style="margin-bottom: 8px;">
+            <select id="doc-repo-select" onchange="handleRepoDocSelect(this.value)" class="w3-select" style="background: #060a12; color: #fff; border: 1px solid #334155; border-radius: 4px; font-size: 12px; padding: 6px;">
+              <option value="">-- Select from Project Repository Docs (.md / .pdf) --</option>
+            </select>
+          </div>
+
+          <div style="text-align: center; border: 1px dashed #334155; border-radius: 6px; padding: 10px; background: #060a12;">
+            <label for="doc-file-input" class="filter-btn" style="display: inline-block; cursor: pointer; padding: 6px 14px; font-size: 11.5px; background: #1e293b; color: #cbd5e1; border: 1px solid #334155;">
+              📁 Upload New Doc / PDF from Device
+            </label>
+            <input type="file" id="doc-file-input" accept=".md,.txt,.pdf,.html,.doc,.docx" onchange="handleDocFileSelect(event)" style="display: none;">
+            <div id="doc-file-selected-name" style="font-size: 11px; color: #4ade80; margin-top: 5px; display: none;"></div>
+          </div>
+        </div>
+
+        <!-- Target Document Path in BOM.tsv -->
+        <div style="margin-bottom: 16px;">
+          <label style="font-size: 11px; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 4px;">
+            Assigned Document Path / URL in BOM.tsv:
+          </label>
+          <input type="text" id="doc-path-input" class="w3-input" placeholder="e.g. XL4015 Spec.md or https://..." style="background: #060a12; color: #cbd5e1; border: 1px solid #334155; border-radius: 4px; font-size: 12px; padding: 8px;">
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 8px;">
+          <button class="filter-btn" onclick="closeDocModal()">Cancel</button>
+          <button class="filter-btn active" onclick="saveComponentDoc()" style="background: #0284c7;">
+            💾 Apply &amp; Save to BOM
+          </button>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- Scripts: xtbl.js only (Zero External Cloud DB) -->
-  <script src="xtbl.js?v=2.7"></script>
+  <script src="xtbl.js?v=2.8"></script>
   <script>
     var masterDataset = [];
     var rawHeaderLine = "";
@@ -411,10 +482,10 @@
         var qty = parseInt(cols[3], 10) || 1;
         var rate = parseFloat(cols[5]) || 0;
 
-        // Direct Image column from BOM.tsv (column index 11), or fallback rule
+        // Direct Image and Doc columns from BOM.tsv (col 11 and col 12), with smart fallbacks
         var itemLower = (cols[1] || "").toLowerCase();
         var imgPath = (cols[11] || "").trim();
-        var docPath = "";
+        var docPath = (cols[12] || "").trim();
 
         if (!imgPath) {
           if (itemLower.indexOf("mean well") !== -1) {
@@ -446,34 +517,36 @@
           }
         }
 
-        if (itemLower.indexOf("mean well") !== -1) {
-          docPath = "Meanwell LRS-350-24 SMPS Power Supply.md";
-        } else if (itemLower.indexOf("wago 221-415") !== -1) {
-          docPath = "wago 221 specs.md";
-        } else if (itemLower.indexOf("wago 221-412") !== -1) {
-          docPath = "wago 221 412 2way spec.md";
-        } else if (itemLower.indexOf("bulk capacitor") !== -1) {
-          docPath = "4700uF capacitor Spec Sheet.md";
-        } else if (itemLower.indexOf("ams1117") !== -1) {
-          docPath = "AMS 117 3.3 V power supply module.md";
-        } else if (itemLower.indexOf("tpa3116") !== -1 || itemLower.indexOf("xh-m562") !== -1) {
-          docPath = "XH-M562 TPA3116D2.md";
-        } else if (itemLower.indexOf("hy510") !== -1 || itemLower.indexOf("thermal") !== -1) {
-          docPath = "arctic mx-4 4g thermal paste.md";
-        } else if (itemLower.indexOf("4.3b") !== -1) {
-          docPath = "Waveshare ESP32-S3 with Touch spec.md";
-        } else if (itemLower.indexOf("pico") !== -1 || itemLower.indexOf("wroom") !== -1) {
-          docPath = "esp32.md";
-        } else if (itemLower.indexOf("pcm5102") !== -1) {
-          docPath = "PCM5102 12S Spec.md";
-        } else if (itemLower.indexOf("pcm1808") !== -1) {
-          docPath = "PCM1808 24bit SNR Audio Stereo ADC Single-Ended Analog-Input Decoder.md";
-        } else if (itemLower.indexOf("xl4015") !== -1) {
-          docPath = "XL4015 Spec.md";
-        } else if (itemLower.indexOf("vhm-314") !== -1 || itemLower.indexOf("b0505s") !== -1) {
-          docPath = "BT_RECEIVER_PCM1808.md";
-        } else {
-          docPath = "PROJECT.md";
+        if (!docPath) {
+          if (itemLower.indexOf("mean well") !== -1) {
+            docPath = "Meanwell LRS-350-24 SMPS Power Supply.md";
+          } else if (itemLower.indexOf("wago 221-415") !== -1) {
+            docPath = "wago 221 specs.md";
+          } else if (itemLower.indexOf("wago 221-412") !== -1) {
+            docPath = "wago 221 412 2way spec.md";
+          } else if (itemLower.indexOf("bulk capacitor") !== -1) {
+            docPath = "4700uF capacitor Spec Sheet.md";
+          } else if (itemLower.indexOf("ams1117") !== -1) {
+            docPath = "AMS 117 3.3 V power supply module.md";
+          } else if (itemLower.indexOf("tpa3116") !== -1 || itemLower.indexOf("xh-m562") !== -1) {
+            docPath = "XH-M562 TPA3116D2.md";
+          } else if (itemLower.indexOf("hy510") !== -1 || itemLower.indexOf("thermal") !== -1) {
+            docPath = "arctic mx-4 4g thermal paste.md";
+          } else if (itemLower.indexOf("4.3b") !== -1) {
+            docPath = "Waveshare ESP32-S3 with Touch spec.md";
+          } else if (itemLower.indexOf("pico") !== -1 || itemLower.indexOf("wroom") !== -1) {
+            docPath = "esp32.md";
+          } else if (itemLower.indexOf("pcm5102") !== -1) {
+            docPath = "PCM5102 12S Spec.md";
+          } else if (itemLower.indexOf("pcm1808") !== -1) {
+            docPath = "PCM1808 24bit SNR Audio Stereo ADC Single-Ended Analog-Input Decoder.md";
+          } else if (itemLower.indexOf("xl4015") !== -1) {
+            docPath = "XL4015 Spec.md";
+          } else if (itemLower.indexOf("vhm-314") !== -1 || itemLower.indexOf("b0505s") !== -1) {
+            docPath = "BT_RECEIVER_PCM1808.md";
+          } else {
+            docPath = "PROJECT.md";
+          }
         }
 
         // Row format: [ID, Category, Item, Spec, Qty, Unit, Rate, Vendor, StockStatusKey, Remarks, ImagePath, DocPath, RawStatus, TotalAsListed, TotalCalc]
@@ -564,11 +637,12 @@
         });
       }
 
-      // Render Table via xtbl.js with interactive status and image callbacks
+      // Render Table via xtbl.js with interactive status, image and doc callbacks
       xTbl.renderTable("table-mount", displayData, {
         headers: ["Category", "Component Name", "Hardware Specification", "Qty", "Unit Rate", "Total", "Status", "Vendor", "Image", "Spec Doc"],
         onStatusChange: handleStatusChange,
-        onImageChange: handleImageChange
+        onImageChange: handleImageChange,
+        onDocChange: handleDocChange
       });
     }
 
@@ -606,7 +680,39 @@
       pendingFileBase64 = null;
     }
 
-    // Pull from internet URL (Option 1)
+    // Helper: fetch image via CORS proxy with timeout to extract base64
+    function fetchImageProxyBase64(imageUrl, onResult) {
+      var proxyUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent(imageUrl);
+      var abortCtrl = window.AbortController ? new AbortController() : null;
+      var timer = setTimeout(function() {
+        if (abortCtrl) abortCtrl.abort();
+      }, 3500);
+
+      fetch(proxyUrl, { signal: abortCtrl ? abortCtrl.signal : undefined })
+        .then(function(res) {
+          clearTimeout(timer);
+          if (!res.ok) throw new Error("Proxy error");
+          return res.blob();
+        })
+        .then(function(blob) {
+          var reader = new FileReader();
+          reader.onloadend = function() {
+            var dataUrl = reader.result;
+            if (dataUrl && dataUrl.indexOf(",") !== -1) {
+              onResult(true, dataUrl.split(",")[1]);
+            } else {
+              onResult(false, null);
+            }
+          };
+          reader.readAsDataURL(blob);
+        })
+        .catch(function(err) {
+          clearTimeout(timer);
+          onResult(false, null);
+        });
+    }
+
+    // Pull from internet URL (Option 1) - Resilient to CORS & Direct CDN links
     function pullInternetImage() {
       var url = document.getElementById("pic-url-input").value.trim();
       var statusEl = document.getElementById("pull-status-msg");
@@ -627,43 +733,71 @@
       var cleanSlug = compName.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
       var targetPath = "image/" + cleanSlug + ".jpg";
 
-      var testImg = new Image();
-      testImg.crossOrigin = "anonymous";
+      // By default, set the target path to the URL so user can ALWAYS save it as a live web link
+      document.getElementById("pic-path-input").value = url;
+      pendingFileBase64 = null;
 
-      testImg.onload = function() {
-        var prevImg = document.getElementById("pic-modal-preview");
-        prevImg.src = url;
+      var prevImg = document.getElementById("pic-modal-preview");
+      // CRITICAL: Do NOT set crossOrigin on the preview element, otherwise servers without CORS headers fail to load!
+      prevImg.removeAttribute("crossorigin");
+
+      prevImg.onload = function() {
         document.getElementById("pic-preview-container").style.display = "block";
-        document.getElementById("pic-preview-meta").textContent = "Resolution: " + testImg.naturalWidth + " × " + testImg.naturalHeight + " px";
+        document.getElementById("pic-preview-meta").textContent = "Resolution: " + (prevImg.naturalWidth || "Web") + " × " + (prevImg.naturalHeight || "Image") + " px";
 
-        try {
-          var canvas = document.createElement("canvas");
-          canvas.width = testImg.naturalWidth;
-          canvas.height = testImg.naturalHeight;
-          var ctx = canvas.getContext("2d");
-          ctx.drawImage(testImg, 0, 0);
+        statusEl.style.color = "#38bdf8";
+        statusEl.textContent = "⏳ Image loaded! Checking if repository file export is allowed...";
 
-          var dataUrl = canvas.toDataURL("image/jpeg", 0.9);
-          var parts = dataUrl.split(",");
-          pendingFileBase64 = parts[1];
-          document.getElementById("pic-path-input").value = targetPath;
-          statusEl.style.color = "#4ade80";
-          statusEl.textContent = "✔ Pulled! Ready to save into repository as '" + targetPath + "'.";
-        } catch (corsErr) {
-          // If remote server restricts canvas export via CORS, use direct URL
-          pendingFileBase64 = null;
-          document.getElementById("pic-path-input").value = url;
-          statusEl.style.color = "#38bdf8";
-          statusEl.textContent = "✔ Preview verified! (CORS protected by host — saved as live internet link in BOM.tsv)";
+        // Step 1: Attempt direct off-screen canvas with crossOrigin
+        var corsImg = new Image();
+        corsImg.crossOrigin = "anonymous";
+        corsImg.onload = function() {
+          try {
+            var canvas = document.createElement("canvas");
+            canvas.width = corsImg.naturalWidth;
+            canvas.height = corsImg.naturalHeight;
+            var ctx = canvas.getContext("2d");
+            ctx.drawImage(corsImg, 0, 0);
+
+            var dataUrl = canvas.toDataURL("image/jpeg", 0.9);
+            pendingFileBase64 = dataUrl.split(",")[1];
+            document.getElementById("pic-path-input").value = targetPath;
+            statusEl.style.color = "#4ade80";
+            statusEl.textContent = "✔ Direct pull successful! Ready to save into repository as '" + targetPath + "'.";
+          } catch (e) {
+            handleProxyFallback();
+          }
+        };
+        corsImg.onerror = function() {
+          handleProxyFallback();
+        };
+
+        function handleProxyFallback() {
+          statusEl.textContent = "⏳ Trying CORS proxy to download repository copy...";
+          fetchImageProxyBase64(url, function(success, b64) {
+            if (success && b64) {
+              pendingFileBase64 = b64;
+              document.getElementById("pic-path-input").value = targetPath;
+              statusEl.style.color = "#4ade80";
+              statusEl.textContent = "✔ Pulled via proxy! Prepped to save into repository as '" + targetPath + "'.";
+            } else {
+              pendingFileBase64 = null;
+              document.getElementById("pic-path-input").value = url;
+              statusEl.style.color = "#38bdf8";
+              statusEl.textContent = "✔ Live web image verified! (Linked directly via URL in BOM.tsv)";
+            }
+          });
         }
+
+        corsImg.src = url;
       };
 
-      testImg.onerror = function() {
+      prevImg.onerror = function() {
         statusEl.style.color = "#f87171";
         statusEl.textContent = "❌ Could not load image from this URL. Verify it points directly to an image (.jpg, .png, etc.).";
       };
 
-      testImg.src = url;
+      prevImg.src = url;
     }
 
     // Choose file from device / camera (Option 2)
@@ -679,6 +813,7 @@
       reader.onload = function(e) {
         var dataUrl = e.target.result;
         var prevImg = document.getElementById("pic-modal-preview");
+        prevImg.removeAttribute("crossorigin");
         prevImg.src = dataUrl;
         document.getElementById("pic-preview-container").style.display = "block";
         document.getElementById("pic-preview-meta").textContent = "File: " + file.name + " (" + Math.round(file.size / 1024) + " KB)";
@@ -715,6 +850,150 @@
       showSyncToolbar();
     }
 
+    // =========================================================================
+    // Component Document Handlers
+    // =========================================================================
+    var activeDocRowId = null;
+    var pendingDocBase64 = null;
+
+    var REPO_DOCS = [
+      "Meanwell LRS-350-24 SMPS Power Supply.md",
+      "wago 221 specs.md",
+      "wago 221 412 2way spec.md",
+      "4700uF capacitor Spec Sheet.md",
+      "AMS 117 3.3 V power supply module.md",
+      "XH-M562 TPA3116D2.md",
+      "TPA3116D2 Stere Board spec sheet.md",
+      "arctic mx-4 4g thermal paste.md",
+      "Waveshare ESP32-S3 with Touch spec.md",
+      "esp32.md",
+      "PCM5102 12S Spec.md",
+      "PCM1808 24bit SNR Audio Stereo ADC Single-Ended Analog-Input Decoder.md",
+      "XL4015 Spec.md",
+      "BT_RECEIVER_PCM1808.md",
+      "PROJECT.md",
+      "AMP_DESIGN_DRAWING.md",
+      "WIRING_DIAGRAM.md",
+      "ASSEMBLY_GUIDE.md"
+    ];
+
+    function handleDocChange(rowId, compName, currentDocPath) {
+      activeDocRowId = rowId;
+      pendingDocBase64 = null;
+
+      document.getElementById("doc-modal-comp-name").textContent = "Item: " + compName;
+      document.getElementById("doc-path-input").value = currentDocPath || "";
+      document.getElementById("doc-file-input").value = "";
+      document.getElementById("doc-file-selected-name").style.display = "none";
+
+      var isWebUrl = currentDocPath && (currentDocPath.indexOf("http://") === 0 || currentDocPath.indexOf("https://") === 0);
+      document.getElementById("doc-url-input").value = isWebUrl ? currentDocPath : "";
+
+      var pullStatus = document.getElementById("doc-pull-status-msg");
+      if (pullStatus) pullStatus.style.display = "none";
+
+      var prevContainer = document.getElementById("doc-preview-container");
+      var prevMeta = document.getElementById("doc-preview-meta");
+      var prevLink = document.getElementById("doc-preview-link");
+
+      if (currentDocPath && currentDocPath.length > 1) {
+        prevContainer.style.display = "block";
+        prevMeta.textContent = currentDocPath;
+        prevLink.href = currentDocPath;
+      } else {
+        prevContainer.style.display = "none";
+      }
+
+      // Populate repo docs dropdown
+      var selectEl = document.getElementById("doc-repo-select");
+      while (selectEl.options.length > 1) selectEl.remove(1);
+      REPO_DOCS.forEach(function(docName) {
+        var opt = document.createElement("option");
+        opt.value = docName;
+        opt.textContent = docName;
+        if (docName === currentDocPath) opt.selected = true;
+        selectEl.appendChild(opt);
+      });
+
+      document.getElementById("doc-upload-modal").style.display = "block";
+    }
+
+    function closeDocModal() {
+      document.getElementById("doc-upload-modal").style.display = "none";
+      activeDocRowId = null;
+      pendingDocBase64 = null;
+    }
+
+    function linkInternetDoc() {
+      var url = document.getElementById("doc-url-input").value.trim();
+      var statusEl = document.getElementById("doc-pull-status-msg");
+      if (!url) {
+        alert("Please paste a document or datasheet URL first.");
+        return;
+      }
+      if (url.indexOf("http://") !== 0 && url.indexOf("https://") !== 0) {
+        alert("Please enter a valid URL starting with http:// or https://");
+        return;
+      }
+      document.getElementById("doc-path-input").value = url;
+      statusEl.style.display = "block";
+      statusEl.style.color = "#4ade80";
+      statusEl.textContent = "✔ Web document URL linked! Click 'Apply & Save to BOM' to commit.";
+    }
+
+    function handleRepoDocSelect(val) {
+      if (val) {
+        document.getElementById("doc-path-input").value = val;
+      }
+    }
+
+    function handleDocFileSelect(event) {
+      var file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      var cleanName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+      var proposedPath = "docs/" + cleanName;
+      document.getElementById("doc-path-input").value = proposedPath;
+
+      var nameEl = document.getElementById("doc-file-selected-name");
+      nameEl.style.display = "block";
+      nameEl.textContent = "✔ File selected: " + file.name + " (" + Math.round(file.size / 1024) + " KB)";
+
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var dataUrl = e.target.result;
+        var parts = dataUrl.split(",");
+        pendingDocBase64 = parts[1];
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function saveComponentDoc() {
+      var newPath = document.getElementById("doc-path-input").value.trim();
+      if (!newPath) {
+        alert("Please specify a document path, select a repo document, or enter a URL.");
+        return;
+      }
+
+      if (activeDocRowId === null) return;
+
+      for (var i = 0; i < masterDataset.length; i++) {
+        if (masterDataset[i][0] === activeDocRowId) {
+          masterDataset[i][11] = newPath;
+          break;
+        }
+      }
+
+      if (pendingDocBase64) {
+        pendingUploads[newPath] = pendingDocBase64;
+      }
+
+      dirtyChangesCount++;
+      closeDocModal();
+      refreshUI();
+      showSyncToolbar();
+    }
+
     function applyFilter(key) {
       activeFilterKey = key;
       document.querySelectorAll(".filter-btn").forEach(function(b) {
@@ -731,9 +1010,13 @@
     // TSV Export & Direct GitHub API Sync
     // =========================================================================
     function generateTsvFromDataset() {
-      var header = rawHeaderLine || "Category\tItem\tSpecification\tQty\tUnit\tRate (INR)\tTotal As-Listed (INR)\tTotal Calculated (INR)\tVendor\tStock Status\tRemarks\tImage";
-      if (header.indexOf("\tImage") === -1) {
-        header += "\tImage";
+      var header = rawHeaderLine || "Category\tItem\tSpecification\tQty\tUnit\tRate (INR)\tTotal As-Listed (INR)\tTotal Calculated (INR)\tVendor\tStock Status\tRemarks\tImage\tDoc";
+      if (header.indexOf("\tDoc") === -1) {
+        if (header.indexOf("\tImage") === -1) {
+          header += "\tImage\tDoc";
+        } else {
+          header += "\tDoc";
+        }
       }
       var lines = [header];
 
@@ -750,8 +1033,9 @@
         var stockStatus = row[12];
         var remarks = row[9];
         var imgPath = row[10] || "";
+        var docPath = row[11] || "";
 
-        lines.push([cat, item, spec, qty, unit, rate, totalListed, totalCalc, vendor, stockStatus, remarks, imgPath].join("\t"));
+        lines.push([cat, item, spec, qty, unit, rate, totalListed, totalCalc, vendor, stockStatus, remarks, imgPath, docPath].join("\t"));
       });
 
       return lines.join("\n") + "\n";

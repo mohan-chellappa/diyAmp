@@ -20,6 +20,7 @@ var xTbl = (function() {
     var headers = options.headers || ["ID", "Category", "Item", "Specification", "Qty", "Unit", "Rate (₹)", "Vendor", "Status", "Remarks", "Image", "Doc"];
     var onStatusChange = options.onStatusChange || null;
     var onImageChange = options.onImageChange || null;
+    var onDocChange = options.onDocChange || null;
 
     var table = document.createElement("table");
     table.className = "w3-table w3-bordered w3-hoverable w3-small";
@@ -263,10 +264,16 @@ var xTbl = (function() {
       }
       tr.appendChild(tdImg);
 
-      // Doc Link (Subtle Slate Button)
+      // Doc Link & Edit (Subtle Slate Button + Edit/Add)
       var tdDoc = document.createElement("td");
+      tdDoc.style.whiteSpace = "nowrap";
       var docPath = row[11];
       if (docPath && docPath.length > 2) {
+        var docWrap = document.createElement("div");
+        docWrap.style.display = "inline-flex";
+        docWrap.style.alignItems = "center";
+        docWrap.style.gap = "5px";
+
         var link = document.createElement("a");
         link.href = docPath;
         link.target = "_blank";
@@ -281,10 +288,50 @@ var xTbl = (function() {
         link.style.border = "1px solid #334155";
         link.onmouseover = function() { this.style.color = "#f8fafc"; this.style.borderColor = "#64748b"; };
         link.onmouseout = function() { this.style.color = "#94a3b8"; this.style.borderColor = "#334155"; };
-        link.textContent = "Doc";
-        tdDoc.appendChild(link);
+        link.textContent = "📄 Doc";
+        docWrap.appendChild(link);
+
+        if (onDocChange) {
+          var editDocBtn = document.createElement("button");
+          editDocBtn.className = "w3-button w3-tiny";
+          editDocBtn.style.padding = "2px 5px";
+          editDocBtn.style.fontSize = "10px";
+          editDocBtn.style.background = "#1e293b";
+          editDocBtn.style.color = "#94a3b8";
+          editDocBtn.style.border = "1px solid #334155";
+          editDocBtn.style.borderRadius = "3px";
+          editDocBtn.style.cursor = "pointer";
+          editDocBtn.textContent = "✏️";
+          editDocBtn.title = "Change spec doc for " + row[2];
+          editDocBtn.onclick = function(e) {
+            e.stopPropagation();
+            onDocChange(row[0], row[2], docPath);
+          };
+          docWrap.appendChild(editDocBtn);
+        }
+
+        tdDoc.appendChild(docWrap);
       } else {
-        tdDoc.textContent = "—";
+        if (onDocChange) {
+          var addDocBtn = document.createElement("button");
+          addDocBtn.className = "w3-button w3-tiny";
+          addDocBtn.style.padding = "3px 8px";
+          addDocBtn.style.fontSize = "11px";
+          addDocBtn.style.background = "#0f1f33";
+          addDocBtn.style.color = "#38bdf8";
+          addDocBtn.style.border = "1px dashed #0284c7";
+          addDocBtn.style.borderRadius = "4px";
+          addDocBtn.style.cursor = "pointer";
+          addDocBtn.textContent = "+ 📄";
+          addDocBtn.title = "Add spec doc / datasheet for " + row[2];
+          addDocBtn.onclick = function(e) {
+            e.stopPropagation();
+            onDocChange(row[0], row[2], "");
+          };
+          tdDoc.appendChild(addDocBtn);
+        } else {
+          tdDoc.textContent = "—";
+        }
       }
       tr.appendChild(tdDoc);
 
