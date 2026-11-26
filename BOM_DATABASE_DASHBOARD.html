@@ -492,10 +492,113 @@
       </div>
     </div>
 
+    <!-- Edit Existing Component Modal -->
+    <div id="edit-comp-modal" class="w3-modal" style="display: none; z-index: 1000;">
+      <div class="w3-modal-content w3-animate-zoom db-card" style="max-width: 580px; background: #0f172a; border: 1px solid #334155;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+          <h4 style="margin: 0; color: #38bdf8; font-size: 16px; font-weight: bold;">✏️ Edit Component Details</h4>
+          <span onclick="closeEditComponentModal()" style="cursor: pointer; color: #94a3b8; font-size: 20px;">&times;</span>
+        </div>
+
+        <form id="edit-comp-form" onsubmit="handleEditComponentSubmit(event)">
+          <input type="hidden" id="edit-comp-id">
+
+          <div class="w3-row-padding" style="margin-left: -6px; margin-right: -6px; margin-bottom: 10px;">
+            <div class="w3-col m6 s12" style="margin-bottom: 8px;">
+              <label style="font-size: 11.5px; color: #94a3b8; display: block; margin-bottom: 4px;">Category *</label>
+              <select id="edit-comp-category" class="w3-select" required style="background: #060a12; color: #fff; border: 1px solid #334155; border-radius: 4px; font-size: 12px; padding: 7px;">
+                <option value="Power">Power</option>
+                <option value="Amplifiers">Amplifiers</option>
+                <option value="DAC + Brain">DAC + Brain</option>
+                <option value="Wiring / Protection">Wiring / Protection</option>
+                <option value="Mechanical & Hardware">Mechanical & Hardware</option>
+                <option value="Passive Crossover">Passive Crossover</option>
+                <option value="Optional / Audio Control">Optional / Audio Control</option>
+              </select>
+            </div>
+            <div class="w3-col m6 s12" style="margin-bottom: 8px;">
+              <label style="font-size: 11.5px; color: #94a3b8; display: block; margin-bottom: 4px;">Component Name *</label>
+              <input type="text" id="edit-comp-name" class="w3-input" required style="background: #060a12; color: #fff; border: 1px solid #334155; border-radius: 4px; font-size: 12px; padding: 7px;">
+            </div>
+          </div>
+
+          <div style="margin-bottom: 10px;">
+            <label style="font-size: 11.5px; color: #94a3b8; display: block; margin-bottom: 4px;">Hardware Specification</label>
+            <input type="text" id="edit-comp-spec" class="w3-input" style="background: #060a12; color: #fff; border: 1px solid #334155; border-radius: 4px; font-size: 12px; padding: 7px;">
+          </div>
+
+          <div class="w3-row-padding" style="margin-left: -6px; margin-right: -6px; margin-bottom: 10px;">
+            <div class="w3-col m4 s6" style="margin-bottom: 8px;">
+              <label style="font-size: 11.5px; color: #94a3b8; display: block; margin-bottom: 4px;">Quantity *</label>
+              <input type="number" id="edit-comp-qty" class="w3-input" required min="1" style="background: #060a12; color: #fff; border: 1px solid #334155; border-radius: 4px; font-size: 12px; padding: 7px;">
+            </div>
+            <div class="w3-col m4 s6" style="margin-bottom: 8px;">
+              <label style="font-size: 11.5px; color: #94a3b8; display: block; margin-bottom: 4px;">Unit</label>
+              <select id="edit-comp-unit" class="w3-select" style="background: #060a12; color: #fff; border: 1px solid #334155; border-radius: 4px; font-size: 12px; padding: 7px;">
+                <option value="pcs">pcs</option>
+                <option value="set">set</option>
+                <option value="pack">pack</option>
+                <option value="m">m</option>
+                <option value="pairs">pairs</option>
+              </select>
+            </div>
+            <div class="w3-col m4 s12" style="margin-bottom: 8px;">
+              <label style="font-size: 11.5px; color: #94a3b8; display: block; margin-bottom: 4px;">Unit Rate (₹) *</label>
+              <input type="number" step="0.01" min="0" id="edit-comp-rate" class="w3-input" required style="background: #060a12; color: #fff; border: 1px solid #334155; border-radius: 4px; font-size: 12px; padding: 7px;">
+            </div>
+          </div>
+
+          <div class="w3-row-padding" style="margin-left: -6px; margin-right: -6px; margin-bottom: 10px;">
+            <div class="w3-col m6 s12" style="margin-bottom: 8px;">
+              <label style="font-size: 11.5px; color: #94a3b8; display: block; margin-bottom: 4px;">Vendor / Source</label>
+              <input type="text" id="edit-comp-vendor" class="w3-input" style="background: #060a12; color: #fff; border: 1px solid #334155; border-radius: 4px; font-size: 12px; padding: 7px;">
+            </div>
+            <div class="w3-col m6 s12" style="margin-bottom: 8px;">
+              <label style="font-size: 11.5px; color: #94a3b8; display: block; margin-bottom: 4px;">Stock Status</label>
+              <select id="edit-comp-status" class="w3-select" style="background: #060a12; color: #fff; border: 1px solid #334155; border-radius: 4px; font-size: 12px; padding: 7px;">
+                <option value="inhand">✔ In Hand (Available)</option>
+                <option value="ordered">✈ In Transit (Ordered)</option>
+                <option value="missing">⚠ Pending (To Buy)</option>
+                <option value="omitted">⊘ Omitted / Not Needed</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 10px;">
+            <label style="font-size: 11.5px; color: #94a3b8; display: block; margin-bottom: 4px;">Remarks / Circuit Role</label>
+            <input type="text" id="edit-comp-remarks" class="w3-input" style="background: #060a12; color: #fff; border: 1px solid #334155; border-radius: 4px; font-size: 12px; padding: 7px;">
+          </div>
+
+          <div class="w3-row-padding" style="margin-left: -6px; margin-right: -6px; margin-bottom: 16px;">
+            <div class="w3-col m6 s12" style="margin-bottom: 8px;">
+              <label style="font-size: 11.5px; color: #94a3b8; display: block; margin-bottom: 4px;">Image Path / Web URL</label>
+              <input type="text" id="edit-comp-image" class="w3-input" style="background: #060a12; color: #fff; border: 1px solid #334155; border-radius: 4px; font-size: 12px; padding: 7px;">
+            </div>
+            <div class="w3-col m6 s12" style="margin-bottom: 8px;">
+              <label style="font-size: 11.5px; color: #94a3b8; display: block; margin-bottom: 4px;">Spec Sheet / Doc Path</label>
+              <input type="text" id="edit-comp-doc" class="w3-input" style="background: #060a12; color: #fff; border: 1px solid #334155; border-radius: 4px; font-size: 12px; padding: 7px;">
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <button type="button" class="filter-btn" onclick="handleDeleteComponent()" style="background: #7f1d1d; border-color: #991b1b; color: #fca5a5;">
+              🗑 Remove from BOM
+            </button>
+            <div style="display: flex; gap: 8px;">
+              <button type="button" class="filter-btn" onclick="closeEditComponentModal()">Cancel</button>
+              <button type="submit" class="filter-btn active" style="background: #0284c7;">
+                💾 Save Changes
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
   </div>
 
   <!-- Scripts: xtbl.js only (Zero External Cloud DB) -->
-  <script src="xtbl.js?v=2.9"></script>
+  <script src="xtbl.js?v=3.0"></script>
   <script>
     var masterDataset = [];
     var rawHeaderLine = "";
@@ -787,12 +890,13 @@
         }
       }
 
-      // Render Table via xtbl.js with interactive status, image and doc callbacks
+      // Render Table via xtbl.js with interactive status, image, doc and edit callbacks
       xTbl.renderTable("table-mount", displayData, {
-        headers: ["Category", "Component Name", "Hardware Specification", "Qty", "Unit Rate", "Total", "Status", "Vendor", "Image", "Spec Doc"],
+        headers: ["Category", "Component Name", "Hardware Specification", "Qty", "Unit Rate", "Total", "Status", "Vendor", "Image", "Spec Doc", "Action"],
         onStatusChange: handleStatusChange,
         onImageChange: handleImageChange,
-        onDocChange: handleDocChange
+        onDocChange: handleDocChange,
+        onEditRow: handleOpenEditModal
       });
     }
 
@@ -1252,6 +1356,97 @@
 
       dirtyChangesCount++;
       closeAddComponentModal();
+      refreshUI();
+      showSyncToolbar();
+    }
+
+    // =========================================================================
+    // Edit Existing Component Handlers
+    // =========================================================================
+    function handleOpenEditModal(row) {
+      document.getElementById("edit-comp-id").value = row[0];
+      document.getElementById("edit-comp-category").value = row[1];
+      document.getElementById("edit-comp-name").value = row[2];
+      document.getElementById("edit-comp-spec").value = row[3];
+      document.getElementById("edit-comp-qty").value = row[4];
+      document.getElementById("edit-comp-unit").value = row[5];
+      document.getElementById("edit-comp-rate").value = Number(row[6]).toFixed(2);
+      document.getElementById("edit-comp-vendor").value = row[7];
+      document.getElementById("edit-comp-status").value = row[8];
+      document.getElementById("edit-comp-remarks").value = row[9];
+      document.getElementById("edit-comp-image").value = row[10] || "";
+      document.getElementById("edit-comp-doc").value = row[11] || "";
+
+      document.getElementById("edit-comp-modal").style.display = "block";
+    }
+
+    function closeEditComponentModal() {
+      document.getElementById("edit-comp-modal").style.display = "none";
+    }
+
+    function handleEditComponentSubmit(e) {
+      e.preventDefault();
+      var id = parseInt(document.getElementById("edit-comp-id").value, 10);
+      var cat = document.getElementById("edit-comp-category").value;
+      var name = document.getElementById("edit-comp-name").value.trim();
+      var spec = document.getElementById("edit-comp-spec").value.trim();
+      var qty = parseInt(document.getElementById("edit-comp-qty").value, 10) || 1;
+      var unit = document.getElementById("edit-comp-unit").value;
+      var rate = parseFloat(document.getElementById("edit-comp-rate").value) || 0;
+      var vendor = document.getElementById("edit-comp-vendor").value.trim();
+      var statusKey = document.getElementById("edit-comp-status").value;
+      var remarks = document.getElementById("edit-comp-remarks").value.trim();
+      var img = document.getElementById("edit-comp-image").value.trim();
+      var doc = document.getElementById("edit-comp-doc").value.trim() || "PROJECT.md";
+
+      var total = (qty * rate).toFixed(2);
+      var rawStatus = "Pending (" + qty + ")";
+      if (statusKey === "inhand") rawStatus = "Available (" + qty + ")";
+      else if (statusKey === "ordered") rawStatus = "Ordered (" + qty + ")";
+      else if (statusKey === "omitted") rawStatus = "Omitted";
+
+      for (var i = 0; i < masterDataset.length; i++) {
+        if (masterDataset[i][0] === id) {
+          masterDataset[i][1] = cat;
+          masterDataset[i][2] = name;
+          masterDataset[i][3] = spec;
+          masterDataset[i][4] = qty;
+          masterDataset[i][5] = unit;
+          masterDataset[i][6] = rate;
+          masterDataset[i][7] = vendor;
+          masterDataset[i][8] = statusKey;
+          masterDataset[i][9] = remarks;
+          masterDataset[i][10] = img;
+          masterDataset[i][11] = doc;
+          masterDataset[i][12] = rawStatus;
+          masterDataset[i][13] = total;
+          masterDataset[i][14] = total;
+          break;
+        }
+      }
+
+      dirtyChangesCount++;
+      closeEditComponentModal();
+      refreshUI();
+      showSyncToolbar();
+    }
+
+    function handleDeleteComponent() {
+      var id = parseInt(document.getElementById("edit-comp-id").value, 10);
+      var name = document.getElementById("edit-comp-name").value;
+      if (!confirm("Are you sure you want to permanently delete '" + name + "' from the BOM?")) {
+        return;
+      }
+
+      for (var i = 0; i < masterDataset.length; i++) {
+        if (masterDataset[i][0] === id) {
+          masterDataset.splice(i, 1);
+          break;
+        }
+      }
+
+      dirtyChangesCount++;
+      closeEditComponentModal();
       refreshUI();
       showSyncToolbar();
     }

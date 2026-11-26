@@ -21,6 +21,7 @@ var xTbl = (function() {
     var onStatusChange = options.onStatusChange || null;
     var onImageChange = options.onImageChange || null;
     var onDocChange = options.onDocChange || null;
+    var onEditRow = options.onEditRow || null;
 
     var table = document.createElement("table");
     table.className = "w3-table w3-bordered w3-hoverable w3-small";
@@ -334,6 +335,28 @@ var xTbl = (function() {
         }
       }
       tr.appendChild(tdDoc);
+
+      if (onEditRow) {
+        var tdAct = document.createElement("td");
+        tdAct.style.whiteSpace = "nowrap";
+        var editRowBtn = document.createElement("button");
+        editRowBtn.className = "w3-button w3-tiny";
+        editRowBtn.style.padding = "3px 8px";
+        editRowBtn.style.fontSize = "11px";
+        editRowBtn.style.background = "#1e293b";
+        editRowBtn.style.color = "#38bdf8";
+        editRowBtn.style.border = "1px solid #334155";
+        editRowBtn.style.borderRadius = "4px";
+        editRowBtn.style.cursor = "pointer";
+        editRowBtn.textContent = "✏️ Edit";
+        editRowBtn.title = "Edit row data for " + row[2];
+        editRowBtn.onclick = function(e) {
+          e.stopPropagation();
+          onEditRow(row);
+        };
+        tdAct.appendChild(editRowBtn);
+        tr.appendChild(tdAct);
+      }
 
       tbody.appendChild(tr);
     });
